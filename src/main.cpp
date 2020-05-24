@@ -12,6 +12,9 @@
 #include "island.h"
 #include "boat.h"
 #include "keyboard.h"
+#include "opengl.h"
+#include "3d_wave.h"
+#include "mouse.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,30 +22,19 @@
 #include <list>
 #include <string>
 
-#if _WIN32
-#   include <Windows.h>
-#endif
-#if __APPLE__
-#   include <OpenGL/gl.h>
-#   include <OpenGL/glu.h>
-#   include <GLUT/glut.h>
-#else
-#   include <GL/gl.h>
-#   include <GL/glu.h>
-#   include <GL/glut.h>
-#endif
-
 const int milli = 1000;
 const float windowSize = 1;
 
 // Game objects
-Wave* wave = new Wave(windowSize, 64, 0.25, 2 * M_PI, 0, 0);
+Wave3D* wave = new Wave3D(windowSize, 30, 0.25, 2 * M_PI, 0, 0);
 vec2f boat1location = { -0.5, 0 };
 Boat* boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = { 0.5, 0 };
 Boat* boat2 = new Boat(boat2location, 0, 135, 1);
 Island* island = new Island();
 Keyboard* keyboard = new Keyboard();
+
+Mouse* mouse = new Mouse();
 
 typedef struct
 {
@@ -82,6 +74,9 @@ float degToRad(float deg);
 float gradToRad(float grad);
 float calcGrad(float x1, float y1, float x2, float y2);
 
+void mouseMotion(int x, int y);
+void mouseFunction(int button, int state, int x, int y);
+
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
@@ -98,6 +93,8 @@ int main(int argc, char** argv)
     glutIdleFunc(update);
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
+	glutMotionFunc(mouseMotion);
+	glutMouseFunc(mouseFunction);
 
     glutMainLoop();
 }
@@ -142,8 +139,41 @@ void display()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glColor3f(0.8f, 0.8f, 0.8f);
+	// FPS Counter
+	displayFPS();
+
+	if (global.wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	drawAxis(windowSize);
+
+	glRotatef(mouse->cameraRotationX, 0, 1.0, 0);
+	glRotatef(mouse->cameraRotationY, 1.0, 0, 0);
+
+	float scale = mouse->zoomValue;
+	glScalef(scale, scale, scale);
+
+	// Draw Wave
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	GLfloat light_ambient[] = { 1.0, 0.0, 0.0, 1.0 };
+	GLfloat light_diffuse[] = { 1.0, 0.0, 0.0, 1.0 };
+	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat high_shininess[] = { 100.0 };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+	wave->draw();
+	drawAxis(windowSize);
+
     // Draw Axis
-    drawAxis(windowSize);
+    /*drawAxis(windowSize);
 
     // Start Wireframe
     if (global.wireframe)
@@ -191,8 +221,7 @@ void display()
     // drawCircle(boat1->getCannonLocation(), 0.01);
     // drawCircle(boat2->getCannonLocation(), 0.01);
 
-    // Draw Wave
-    wave->draw();
+	// Draw wave
 
     //Draw Health Bars
     island->drawHealth();
@@ -230,10 +259,7 @@ void display()
         for (int i = 0; i < len; i++)
             glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
         glPopMatrix();
-    }
-
-    // FPS Counter
-    displayFPS();
+    }*/
 
     glPopMatrix();
 
@@ -308,6 +334,72 @@ void update()
     }
 
     glutPostRedisplay();
+}
+
+void mouseMotion(int x, int y)
+{
+	if (mouse->moveCamera)
+	{
+		if (x < mouse->lastMouse1X)
+		{
+			mouse->cameraRotationX++;
+		}
+		else if (x > mouse->lastMouse1X)
+		{
+			mouse->cameraRotationX--;
+		}
+		if (y < mouse->lastMouse1Y)
+		{
+			mouse->cameraRotationY++;
+		}
+		else if (y > mouse->lastMouse1Y)
+		{
+			mouse->cameraRotationY--;
+		}
+		mouse->lastMouse1X = x;
+		mouse->lastMouse1Y = y;
+	}
+	else if (mouse->zoom)
+	{
+		if (y < mouse->lastMouse2Y)
+		{
+			mouse->zoomValue += 0.01;
+		}
+		else if (y > mouse->lastMouse2Y)
+		{
+			if (mouse->zoomValue - 0.01 > 0.01)
+				mouse->zoomValue -= 0.01;
+		}
+		mouse->lastMouse2Y = y;
+	}
+}
+
+void mouseFunction(int button, int state, int x, int y)
+{
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		mouse->moveCamera = true;
+		mouse->mouse1XDown = x + mouse->mouse1XUp;
+		mouse->mouse1YDown = y + mouse->mouse1YUp;
+		// std::cout << x << " : " << y << std::endl;
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+	{
+		mouse->moveCamera = false;
+		mouse->mouse1XUp = mouse->cameraRotationX;
+		mouse->mouse1YUp = mouse->cameraRotationY;
+		// std::cout << x << " : " << y << std::endl;
+	}
+	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		mouse->zoom = true;
+		mouse->mouse2YDown = y;
+	}
+	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP)
+	{
+		mouse->zoom = false;
+		mouse->mouse2YUp = y;
+	}
 }
 
 void keyDown(unsigned char key, int x, int y)
@@ -617,6 +709,7 @@ void drawAxis(float length)
     glVertex3f(0, 0, 0);
     glVertex3f(0, 0, length);
     glEnd();
+	glColor3f(1, 1, 1);
 }
 
 void drawCircle(vec2f location, float r)
