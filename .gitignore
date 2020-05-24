@@ -1,0 +1,18 @@
+# Build results
+vs/[Dd]ebug/
+vs/[Dd]ebugPublic/
+vs/[Rr]elease/
+vs/[Rr]eleases/
+vs/x64/
+vs/x86/
+vs/[Ww][Ii][Nn]32/
+vs/[Aa][Rr][Mm]/
+vs/[Aa][Rr][Mm]64/
+vs/bld/
+vs/[Bb]in/
+vs/[Oo]bj/
+vs/[Ll]og/
+vs/[Ll]ogs/
+
+# Visual Studio 2015/2017 cache/options directory
+vs/.vs/
