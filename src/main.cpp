@@ -14,6 +14,7 @@
 #include "keyboard.h"
 #include "opengl.h"
 #include "3d_wave.h"
+#include "3d_island.h"
 #include "mouse.h"
 #include "seafloor.h"
 
@@ -27,16 +28,17 @@ const int milli = 1000;
 const float windowSize = 1;
 
 // Game objects
-Wave3D* wave = new Wave3D(windowSize, 30, 0.15, 4 * M_PI, 0, 0);
-vec2f boat1location = { -0.5, 0 };
-Boat* boat1 = new Boat(boat1location, 0, 45, 0);
-vec2f boat2location = { 0.5, 0 };
-Boat* boat2 = new Boat(boat2location, 0, 135, 1);
-Island* island = new Island();
-Keyboard* keyboard = new Keyboard();
-Seafloor* seafloor; // We cannot load the texutre in here, initalise it during init func
+Wave3D *wave = new Wave3D(windowSize, 64, 0.10, 6 * M_PI, 0, -0.5);
+vec2f boat1location = {-0.5, 0};
+Boat *boat1 = new Boat(boat1location, 0, 45, 0);
+vec2f boat2location = {0.5, 0};
+Boat *boat2 = new Boat(boat2location, 0, 135, 1);
+Island *island = new Island();
+Island3D *island3D = new Island3D();
+Keyboard *keyboard = new Keyboard();
+Seafloor *seafloor; // We cannot load the texutre in here, initalise it during init func
 
-Mouse* mouse = new Mouse();
+Mouse *mouse = new Mouse();
 
 typedef struct
 {
@@ -52,7 +54,7 @@ typedef struct
     float keyPressTime;
 } global_t;
 
-global_t global = { 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, -1 };
+global_t global = {600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, -1};
 
 // Application Functions
 void myinit();
@@ -79,7 +81,7 @@ float calcGrad(float x1, float y1, float x2, float y2);
 void mouseMotion(int x, int y);
 void mouseFunction(int button, int state, int x, int y);
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -95,8 +97,8 @@ int main(int argc, char** argv)
     glutIdleFunc(update);
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
-	glutMotionFunc(mouseMotion);
-	glutMouseFunc(mouseFunction);
+    glutMotionFunc(mouseMotion);
+    glutMouseFunc(mouseFunction);
 
     glutMainLoop();
 }
@@ -110,7 +112,7 @@ void myinit()
     //glShadeModel(GL_FLAT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
-	seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
+    seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
 
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
@@ -143,51 +145,52 @@ void display()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glColor3f(0.8f, 0.8f, 0.8f);
-	// FPS Counter
-	glLoadIdentity();
-	displayFPS();
-	glLoadIdentity();
+    glColor3f(0.8f, 0.8f, 0.8f);
+    // FPS Counter
+    glLoadIdentity();
+    displayFPS();
+    glLoadIdentity();
 
-	if (global.wireframe)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	else
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (global.wireframe)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	drawAxis(windowSize);
+    glRotatef(mouse->cameraRotationX, 0, 1.0, 0);
+    glRotatef(mouse->cameraRotationY, 1.0, 0, 0);
 
-	glRotatef(mouse->cameraRotationX, 0, 1.0, 0);
-	glRotatef(mouse->cameraRotationY, 1.0, 0, 0);
-
-	float scale = mouse->zoomValue;
-	glScalef(scale, scale, scale);
-
-	glPushMatrix();
-	// Draw seafloor
-	seafloor->draw();
-	glPopMatrix();
-
-	glPushMatrix();
-
-	// Draw Wave
-	wave->drawTom();
-	drawAxis(windowSize);
-
-	glPopMatrix();
-    // Draw Axis
-    /*drawAxis(windowSize);
+    float scale = mouse->zoomValue;
+    glScalef(scale, scale, scale);
 
     // Start Wireframe
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    // Draw Axis
+    drawAxis(windowSize);
+
+    // Draw seafloor
+    glPushMatrix();
+    seafloor->draw();
+    glPopMatrix();
+
+    // Draw Wave
+    glPushMatrix();
+    wave->draw();
+    glPopMatrix();
+
+    // Draw 3D Island
+    glPushMatrix();
+    island3D->draw();
+    glPopMatrix();
+
     // Draw Island
-    island->draw();
+    // island->draw();
 
     // Draw Boat 1
     glPushMatrix();
-    boat1->setLocation({ boat1->getLocation().x,
-                        wave->getYfromX(boat1->getLocation().x) });
+    boat1->setLocation({boat1->getLocation().x,
+                        wave->getYfromX(boat1->getLocation().x)});
     boat1->setBoatDeg(wave->getGrad(boat1->getLocation().x));
     boat1->setScale(0.1);
     boat1->draw();
@@ -203,8 +206,8 @@ void display()
 
     // Draw Boat 2
     glPushMatrix();
-    boat2->setLocation({ boat2->getLocation().x,
-                        wave->getYfromX(boat2->getLocation().x) });
+    boat2->setLocation({boat2->getLocation().x,
+                        wave->getYfromX(boat2->getLocation().x)});
     boat2->setBoatDeg(wave->getGrad(boat2->getLocation().x));
     boat2->setScale(0.1);
     boat2->draw();
@@ -223,7 +226,7 @@ void display()
     // drawCircle(boat1->getCannonLocation(), 0.01);
     // drawCircle(boat2->getCannonLocation(), 0.01);
 
-	// Draw wave
+    // Draw wave
 
     //Draw Health Bars
     island->drawHealth();
@@ -231,7 +234,7 @@ void display()
     boat2->drawHealth();
 
     // Draw Projectiles
-    if (island->getProjectileExists())
+    /*if (island->getProjectileExists())
         island->drawProjectile(wave);
     if (boat1->getProjectileExists())
         boat1->drawProjectile(wave);
@@ -297,9 +300,9 @@ void update()
     // Keypresses
     if (global.keyPressTime + 20 < glutGet(GLUT_ELAPSED_TIME))
     {
-        std::list<unsigned char>* pressed = keyboard->getPressed();
+        std::list<unsigned char> *pressed = keyboard->getPressed();
         for (std::list<unsigned char>::iterator i = pressed->begin();
-            i != pressed->end(); ++i)
+             i != pressed->end(); ++i)
         {
             keyPress(*i);
         }
@@ -311,16 +314,16 @@ void update()
     updateProjectiles(dt);
 
     // Boat 1 Defences
-    std::list<Defence*>* defences1 = boat1->getDefences();
-    for (std::list<Defence*>::iterator d = defences1->begin();
-        d != defences1->end(); ++d)
+    std::list<Defence *> *defences1 = boat1->getDefences();
+    for (std::list<Defence *>::iterator d = defences1->begin();
+         d != defences1->end(); ++d)
     {
         (*d)->increaseRadius();
     }
     // Boat 2 Defences
-    std::list<Defence*>* defences2 = boat2->getDefences();
-    for (std::list<Defence*>::iterator d = defences2->begin();
-        d != defences2->end(); ++d)
+    std::list<Defence *> *defences2 = boat2->getDefences();
+    for (std::list<Defence *>::iterator d = defences2->begin();
+         d != defences2->end(); ++d)
     {
         (*d)->increaseRadius();
     }
@@ -340,68 +343,68 @@ void update()
 
 void mouseMotion(int x, int y)
 {
-	if (mouse->moveCamera)
-	{
-		if (x < mouse->lastMouse1X)
-		{
-			mouse->cameraRotationX++;
-		}
-		else if (x > mouse->lastMouse1X)
-		{
-			mouse->cameraRotationX--;
-		}
-		if (y < mouse->lastMouse1Y)
-		{
-			mouse->cameraRotationY++;
-		}
-		else if (y > mouse->lastMouse1Y)
-		{
-			mouse->cameraRotationY--;
-		}
-		mouse->lastMouse1X = x;
-		mouse->lastMouse1Y = y;
-	}
-	else if (mouse->zoom)
-	{
-		if (y < mouse->lastMouse2Y)
-		{
-			mouse->zoomValue += 0.01;
-		}
-		else if (y > mouse->lastMouse2Y)
-		{
-			if (mouse->zoomValue - 0.01 > 0.01)
-				mouse->zoomValue -= 0.01;
-		}
-		mouse->lastMouse2Y = y;
-	}
+    if (mouse->moveCamera)
+    {
+        if (x < mouse->lastMouse1X)
+        {
+            mouse->cameraRotationX++;
+        }
+        else if (x > mouse->lastMouse1X)
+        {
+            mouse->cameraRotationX--;
+        }
+        if (y < mouse->lastMouse1Y)
+        {
+            mouse->cameraRotationY++;
+        }
+        else if (y > mouse->lastMouse1Y)
+        {
+            mouse->cameraRotationY--;
+        }
+        mouse->lastMouse1X = x;
+        mouse->lastMouse1Y = y;
+    }
+    else if (mouse->zoom)
+    {
+        if (y < mouse->lastMouse2Y)
+        {
+            mouse->zoomValue += 0.01;
+        }
+        else if (y > mouse->lastMouse2Y)
+        {
+            if (mouse->zoomValue - 0.01 > 0.01)
+                mouse->zoomValue -= 0.01;
+        }
+        mouse->lastMouse2Y = y;
+    }
 }
 
 void mouseFunction(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-	{
-		mouse->moveCamera = true;
-		mouse->mouse1XDown = x + mouse->mouse1XUp;
-		mouse->mouse1YDown = y + mouse->mouse1YUp;
-		// std::cout << x << " : " << y << std::endl;
-	}
-	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
-	{
-		mouse->moveCamera = false;
-		mouse->mouse1XUp = mouse->cameraRotationX;
-		mouse->mouse1YUp = mouse->cameraRotationY;
-		// std::cout << x << " : " << y << std::endl;
-	}
-	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
-	{
-		mouse->zoom = true;
-		mouse->mouse2YDown = y;
-	}
-	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP)
-	{
-		mouse->zoom = false;
-		mouse->mouse2YUp = y;
-	}
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        mouse->moveCamera = true;
+        mouse->mouse1XDown = x + mouse->mouse1XUp;
+        mouse->mouse1YDown = y + mouse->mouse1YUp;
+        // std::cout << x << " : " << y << std::endl;
+    }
+    else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+    {
+        mouse->moveCamera = false;
+        mouse->mouse1XUp = mouse->cameraRotationX;
+        mouse->mouse1YUp = mouse->cameraRotationY;
+        // std::cout << x << " : " << y << std::endl;
+    }
+    else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+    {
+        mouse->zoom = true;
+        mouse->mouse2YDown = y;
+    }
+    else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP)
+    {
+        mouse->zoom = false;
+        mouse->mouse2YUp = y;
+    }
 }
 
 void keyDown(unsigned char key, int x, int y)
@@ -502,7 +505,7 @@ void keyPress(unsigned char key)
 
 void displayFPS()
 {
-    colour col = { 1.0, 1.0, 1.0, 1.0 };
+    colour col = {1.0, 1.0, 1.0, 1.0};
 
     // Display FPS Counter
     glPushMatrix();
@@ -549,26 +552,26 @@ void updateProjectiles(float dt)
     boat2->updateProjectile(dt);
 
     // Lambda function for collision detection
-    auto projectileCollision = [&](std::list<Projectile*>* projectiles) {
+    auto projectileCollision = [&](std::list<Projectile *> *projectiles) {
         bool collision = false;
 
-        for (std::list<Projectile*>::iterator p = projectiles->begin();
-            p != projectiles->end(); ++p)
+        for (std::list<Projectile *>::iterator p = projectiles->begin();
+             p != projectiles->end(); ++p)
         {
             vec2f location = (*p)->getLocation();
 
             // Boat 1 Defences
-            std::list<Defence*>* defences1 = boat1->getDefences();
-            for (std::list<Defence*>::iterator d = defences1->begin();
-                d != defences1->end(); ++d)
+            std::list<Defence *> *defences1 = boat1->getDefences();
+            for (std::list<Defence *>::iterator d = defences1->begin();
+                 d != defences1->end(); ++d)
             {
                 if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
                     collision = true;
             }
             // Boat 2 Defences
-            std::list<Defence*>* defences2 = boat2->getDefences();
-            for (std::list<Defence*>::iterator d = defences2->begin();
-                d != defences2->end(); ++d)
+            std::list<Defence *> *defences2 = boat2->getDefences();
+            for (std::list<Defence *>::iterator d = defences2->begin();
+                 d != defences2->end(); ++d)
             {
                 if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
                     collision = true;
@@ -607,7 +610,7 @@ void updateProjectiles(float dt)
                 {
                     // Boat 2 Collision
                     if ((*p)->getCollision(boat2->getScale(),
-                        boat2->getLocation()))
+                                           boat2->getLocation()))
                     {
                         collision = true;
                         if (boat2->damage())
@@ -618,7 +621,7 @@ void updateProjectiles(float dt)
                 {
                     // Boat 1 Collision
                     if ((*p)->getCollision(boat1->getScale(),
-                        boat1->getLocation()))
+                                           boat1->getLocation()))
                     {
                         collision = true;
                         if (boat1->damage())
@@ -659,11 +662,11 @@ void updateDefences(float dt)
     boat2->updateDefence(dt);
 
     // Lambda function for collision detection
-    auto defenceCollision = [&](std::list<Defence*>* defences) {
+    auto defenceCollision = [&](std::list<Defence *> *defences) {
         bool collision = false;
 
-        for (std::list<Defence*>::iterator d = defences->begin();
-            d != defences->end(); ++d)
+        for (std::list<Defence *>::iterator d = defences->begin();
+             d != defences->end(); ++d)
         {
             vec2f location = (*d)->getLocation();
             // Wave Collision
@@ -711,7 +714,7 @@ void drawAxis(float length)
     glVertex3f(0, 0, 0);
     glVertex3f(0, 0, length);
     glEnd();
-	glColor3f(1, 1, 1);
+    glColor3f(1, 1, 1);
 }
 
 void drawCircle(vec2f location, float r)

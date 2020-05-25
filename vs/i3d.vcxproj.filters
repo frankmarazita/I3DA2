@@ -42,6 +42,9 @@
     <ClCompile Include="..\src\texture.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\3d_island.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\boat.h">
@@ -98,5 +101,13 @@
     <ClInclude Include="..\src\stb_image.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\3d_island.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\src\sand.jpg">
+      <Filter>src</Filter>
+    </Image>
   </ItemGroup>
 </Project>
