@@ -30,6 +30,18 @@
     <ClCompile Include="..\src\wave.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\3d_wave.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\mouse.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\seafloor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texture.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\boat.h">
@@ -63,6 +75,27 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\wave.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\opengl.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3d_wave.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\mouse.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\seafloor.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Header.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texture.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\stb_image.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
