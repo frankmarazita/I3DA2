@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\3d_island.cpp" />
     <ClCompile Include="..\src\3d_wave.cpp" />
     <ClCompile Include="..\src\boat.cpp" />
     <ClCompile Include="..\src\defence.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="..\src\wave.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\3d_island.h" />
     <ClInclude Include="..\src\3d_wave.h" />
     <ClInclude Include="..\src\boat.h" />
     <ClInclude Include="..\src\colour.h" />
@@ -186,6 +188,9 @@
     <ClInclude Include="..\src\vec2fPolar.h" />
     <ClInclude Include="..\src\vec3f.h" />
     <ClInclude Include="..\src\wave.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\src\sand.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
