@@ -163,6 +163,8 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\mouse.cpp" />
     <ClCompile Include="..\src\projectile.cpp" />
+    <ClCompile Include="..\src\seafloor.cpp" />
+    <ClCompile Include="..\src\texture.cpp" />
     <ClCompile Include="..\src\wave.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,11 +173,15 @@
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\defence.h" />
     <ClInclude Include="..\src\functions.h" />
+    <ClInclude Include="..\src\Header.h" />
     <ClInclude Include="..\src\island.h" />
     <ClInclude Include="..\src\keyboard.h" />
     <ClInclude Include="..\src\mouse.h" />
     <ClInclude Include="..\src\opengl.h" />
     <ClInclude Include="..\src\projectile.h" />
+    <ClInclude Include="..\src\seafloor.h" />
+    <ClInclude Include="..\src\stb_image.h" />
+    <ClInclude Include="..\src\texture.h" />
     <ClInclude Include="..\src\vec2f.h" />
     <ClInclude Include="..\src\vec2fPolar.h" />
     <ClInclude Include="..\src\vec3f.h" />
