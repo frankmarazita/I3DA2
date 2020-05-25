@@ -15,6 +15,7 @@
 #include "opengl.h"
 #include "3d_wave.h"
 #include "mouse.h"
+#include "seafloor.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,13 +27,14 @@ const int milli = 1000;
 const float windowSize = 1;
 
 // Game objects
-Wave3D* wave = new Wave3D(windowSize, 30, 0.25, 2 * M_PI, 0, 0);
+Wave3D* wave = new Wave3D(windowSize, 30, 0.15, 4 * M_PI, 0, 0);
 vec2f boat1location = { -0.5, 0 };
 Boat* boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = { 0.5, 0 };
 Boat* boat2 = new Boat(boat2location, 0, 135, 1);
 Island* island = new Island();
 Keyboard* keyboard = new Keyboard();
+Seafloor* seafloor; // We cannot load the texutre in here, initalise it during init func
 
 Mouse* mouse = new Mouse();
 
@@ -105,8 +107,10 @@ void myinit()
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glShadeModel(GL_FLAT);
+    //glShadeModel(GL_FLAT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
+
+	seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
 
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
@@ -141,7 +145,9 @@ void display()
 
 	glColor3f(0.8f, 0.8f, 0.8f);
 	// FPS Counter
+	glLoadIdentity();
 	displayFPS();
+	glLoadIdentity();
 
 	if (global.wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -156,22 +162,18 @@ void display()
 	float scale = mouse->zoomValue;
 	glScalef(scale, scale, scale);
 
+	glPushMatrix();
+	// Draw seafloor
+	seafloor->draw();
+	glPopMatrix();
+
+	glPushMatrix();
+
 	// Draw Wave
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	GLfloat light_ambient[] = { 1.0, 0.0, 0.0, 1.0 };
-	GLfloat light_diffuse[] = { 1.0, 0.0, 0.0, 1.0 };
-	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
-	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat high_shininess[] = { 100.0 };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-	wave->draw();
+	wave->drawTom();
 	drawAxis(windowSize);
 
+	glPopMatrix();
     // Draw Axis
     /*drawAxis(windowSize);
 

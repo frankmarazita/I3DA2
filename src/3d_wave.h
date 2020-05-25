@@ -18,6 +18,8 @@ public:
 	Wave3D(float windowSize, float numSegments, float a, float b, float c, float d);
 
 	void draw();
+	void drawTom();
+	void drawTom2();
 
 	void moveWave(float amount);
 	void calcVerticies();
@@ -35,8 +37,11 @@ public:
 	void drawVector(vec3f point, float m, float s, bool normalize);
 
 private:
+	void setLighting();
+	void disableLighting();
 	float windowSize;
 	int numSegments;
+	float getGradientForSine(float x);
 	float segmentSize;
 
 	float a;
