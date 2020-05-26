@@ -21,6 +21,7 @@ public:
 
 private:
     Texture *texture;
+	GLUquadric* qobj;
 };
 
 #endif // THREE_D_ISLAND_H

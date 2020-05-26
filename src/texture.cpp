@@ -25,6 +25,8 @@ Texture::Texture(const char* filename)
 void Texture::enable()
 {
 	glEnable(GL_TEXTURE_2D);
+	//glEnable(GL_TEXTURE_GEN_S);
+	//glEnable(GL_TEXTURE_GEN_T);
 	glBindTexture(GL_TEXTURE_2D, this->texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

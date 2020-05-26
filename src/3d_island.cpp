@@ -15,6 +15,11 @@ void Island3D::draw()
     glTranslatef(0, -1, 0);
     glRotatef(-90, 1.0, 0, 0);
     GLUquadric *qobj = gluNewQuadric();
+	/*
+	gluQuadricDrawStyle(this->qobj, GLU_FILL);
+	gluQuadricTexture(this->qobj, GL_TRUE);
+	gluQuadricNormals(this->qobj, GLU_SMOOTH);
+	*/
     gluCylinder(qobj, 0.5, 0.25, 0.5, 40, 40);
     glPopMatrix();
     glPushMatrix();

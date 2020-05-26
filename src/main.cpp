@@ -32,7 +32,7 @@ const int milli = 1000;
 const float windowSize = 1;
 
 // Game objects
-Wave3D *wave = new Wave3D(windowSize, 64, 0.10, 6 * M_PI, 0, -0.5);
+Wave3D *wave = new Wave3D(windowSize, 64, 0.10, 6 * M_PI, 0.25 * M_PI, 0, -0.5);
 vec2f boat1location = {-0.5, 0};
 Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
@@ -97,6 +97,8 @@ int main(int argc, char **argv)
     glutCreateWindow("Island Defence");
 
     myinit();
+
+	//glEnable(GL_DEPTH_TEST);
 
     glutReshapeFunc(myReshape);
     glutDisplayFunc(display);
@@ -210,7 +212,7 @@ void display()
 
     // Draw Wave
     glPushMatrix();
-    wave->draw();
+    wave->drawAdvanced();
     glPopMatrix();
 
     // Draw 3D Island

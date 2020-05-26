@@ -15,16 +15,19 @@
 class Wave3D
 {
 public:
-	Wave3D(float windowSize, float numSegments, float a, float b, float c, float d);
+	Wave3D(float windowSize, float numSegments, float a, float b, float k, float c, float d);
 
 	void draw();
 	void drawTom();
 	void drawTom2();
+	void drawAdvanced();
 
 	void moveWave(float amount);
 	void calcVerticies();
 
 	float getYfromX(float x);
+	float getYfromXZ(float x, float z);
+	float getGradientForAdvancedSine(float x, float z);
 	float getGrad(float x);
 	bool getAnimate();
 	int getNumSegments();
@@ -48,6 +51,7 @@ private:
 	float b;
 	float c;
 	float d;
+	float k;
 
 	bool normal = false;
 	bool tangent = false;
