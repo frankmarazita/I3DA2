@@ -1,6 +1,6 @@
 #include "3d_wave.h"
 
-Wave3D::Wave3D(float windowSize, float numSegments, float a, float b, float c, float d)
+Wave3D::Wave3D(float windowSize, float numSegments, float a, float b, float k, float c, float d)
 {
 	this->windowSize = windowSize;
 	this->numSegments = numSegments;
@@ -10,8 +10,149 @@ Wave3D::Wave3D(float windowSize, float numSegments, float a, float b, float c, f
 	this->b = b;
 	this->c = c;
 	this->d = d;
+	this->k = k;
 
 	calcVerticies();
+}
+
+float Wave3D::getYfromXZ(float x, float z)
+{
+	float k = 2 * M_PI;
+	//A * sin(kx * x + kz * z + w * t)
+	// old: return a * sin(b * x + c) + d;
+	
+	//y = A * sin(k * x + w * t)
+
+	//return a * sin(b * x + b * z + c);
+
+	//float one = 0.10 * sinf(5 * M_PI * x + 0.25 * M_PI * c);
+	//float two = 0.10 * sinf(5 * M_PI * z + 0.25 * M_PI * c);
+
+	float one = a * sinf(b * x + k * c);
+	float two = a * sinf(b * z + k * c);
+	
+	return one + two + d;
+
+	//return 0.25 * sinf(k * x * x + k * z * z + c);
+}
+
+float Wave3D::getGradientForAdvancedSine(float x, float z)
+{
+	//float one = a * sinf(b * x + k * c);
+	//float two = a * sinf(b * z + k * c);
+
+	float one = a * b * cosf(b * x + k * c);
+	float two = a * b * cosf(b * z + k * c);
+
+	return one + two;
+}
+
+void Wave3D::drawAdvanced()
+{
+	//y = A * sin(kx * x + kz * z + w * t)
+
+	float x = -1.0;
+	float z = 1.0;
+
+	float dist = 2 * z / numSegments;
+	this->setLighting();
+	glColor4f(col.r, col.g, col.b, col.a);
+	//glColor3f(col.r, col.g, col.b);
+	glBegin(GL_TRIANGLE_STRIP);
+
+	auto getXYZ = [&](int i, int j) {
+		float px = x + j * dist;
+		float pz = z - i * dist;
+		float y = getYfromXZ(px, pz);
+
+		vec3f vec = { px, y, pz };
+		return vec;
+	};
+
+	auto drawVerticies = [&](int i, int j) {
+		vec3f vec = getXYZ(i, j);
+
+		float px = vec.x;
+		float y = vec.y;
+		float pz = vec.z;
+
+		glNormal3f(px, y, pz);
+		glVertex3f(px, y, pz);
+
+		pz = z - i * dist - dist;
+		y = getYfromXZ(px, pz);
+
+		glNormal3f(px, y, pz);
+		glVertex3f(px, y, pz);
+	};
+
+	auto drawVectorsAndOrNormals = [&](int i, int j) {
+		vec3f vec = getXYZ(i, j);
+
+		float px = vec.x;
+		float y = vec.y;
+		float pz = vec.z;
+
+		float m;
+		glColor3f(1.0, 1.0, 0.0);
+		if (normal)
+		{
+			m = getGradientForAdvancedSine(px, pz);
+			drawVector({ px, y, pz }, m, 0.1, true);
+			m = getGradientForAdvancedSine(px, pz);
+			drawVector({ px, y, pz }, m, 0.1, true);
+		}
+		if (tangent)
+		{
+			m = getGradientForAdvancedSine(px, pz);
+			drawVector({ px, y, pz }, m, 0.1, false);
+			m = getGradientForAdvancedSine(px, pz);
+			drawVector({ px, y, pz }, m, 0.1, false);
+		}
+	};
+
+
+	for (int i = 0; i < numSegments; i++)
+	{
+		if (i % 2 == 0)
+		{
+			for (int j = 0; j <= numSegments; j++)
+			{
+				drawVerticies(i, j);
+			}
+		}
+		else
+		{
+			for (int j = numSegments; j >= 0; j--)
+			{
+				drawVerticies(i, j);
+			}
+		}
+	}
+	glEnd();
+
+	this->disableLighting();
+
+	if (tangent || normal)
+	{
+		for (int i = 0; i < numSegments; i++)
+		{
+			if (i % 2 == 0)
+			{
+				for (int j = 0; j <= numSegments; j++)
+				{
+					drawVectorsAndOrNormals(i, j);
+				}
+			}
+			else
+			{
+				for (int j = numSegments; j >= 0; j--)
+				{
+					drawVectorsAndOrNormals(i, j);
+				}
+			}
+		}
+	}
 }
 
 void Wave3D::draw()
@@ -30,10 +171,11 @@ void Wave3D::draw()
 			for (int j = 0; j <= numSegments; j++)
 			{
 				float px = x + j * dist;
-				glNormal3f(px, getYfromX(px), z - i * dist);
-				glVertex3f(px, getYfromX(px), z - i * dist);
-				glNormal3f(px, getYfromX(px), z - i * dist - dist);
-				glVertex3f(px, getYfromX(px), z - i * dist - dist);
+				float y = getYfromX(px);
+				glNormal3f(px, y, z - i * dist);
+				glVertex3f(px, y, z - i * dist);
+				glNormal3f(px, y, z - i * dist - dist);
+				glVertex3f(px, y, z - i * dist - dist);
 			}
 		}
 		else
@@ -41,16 +183,64 @@ void Wave3D::draw()
 			for (int j = numSegments; j >= 0; j--)
 			{
 				float px = x + j * dist;
-				glNormal3f(px, getYfromX(px), z - i * dist);
-				glVertex3f(px, getYfromX(px), z - i * dist);
-				glNormal3f(px, getYfromX(px), z - i * dist - dist);
-				glVertex3f(px, getYfromX(px), z - i * dist - dist);
+				float y = getYfromX(px);
+				glNormal3f(px, y, z - i * dist);
+				glVertex3f(px, y, z - i * dist);
+				glNormal3f(px, y, z - i * dist - dist);
+				glVertex3f(px, y, z - i * dist - dist);
 			}
 		}
 	}
 	glEnd();
 
 	this->disableLighting();
+
+	for (int i = 0; i < numSegments; i++)
+	{
+		if (i % 2 == 0)
+		{
+			for (int j = 0; j <= numSegments; j++)
+			{
+				float px = x + j * dist;
+				float y = getYfromX(px);
+
+				float m = getGradientForSine(px);
+				glColor3f(1.0, 1.0, 0.0);
+				if (normal)
+				{
+					drawVector({ px, y, z - i * dist }, m, 0.1, true);
+					drawVector({ px, y, z - i * dist - dist }, m, 0.1, true);
+				}
+				if (tangent)
+				{
+					drawVector({ px, y, z - i * dist }, m, 0.1, false);
+					drawVector({ px, y, z - i * dist - dist }, m, 0.1, false);
+				}
+			}
+		}
+		else
+		{
+			for (int j = numSegments; j >= 0; j--)
+			{
+				float px = x + j * dist;
+				float y = getYfromX(px);
+
+				float m = getGradientForSine(px);
+				glColor3f(1.0, 1.0, 0.0);
+				if (normal)
+				{
+					drawVector({ px, y, z - i * dist }, m, 0.1, true);
+					drawVector({ px, y, z - i * dist - dist }, m, 0.1, true);
+				}
+				if (tangent)
+				{
+					drawVector({ px, y, z - i * dist }, m, 0.1, false);
+					drawVector({ px, y, z - i * dist - dist }, m, 0.1, false);
+				}
+			}
+		}
+	}
+
 }
 
 void Wave3D::setLighting()
@@ -72,6 +262,7 @@ void Wave3D::setLighting()
 
 void Wave3D::disableLighting()
 {
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 }

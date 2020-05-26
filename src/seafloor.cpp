@@ -3,7 +3,7 @@
 Seafloor::Seafloor(float windowSize) // Make it use windowSize instead of -1.0 to 1.0..?
 {
 	this->windowSize = windowSize;
-	this->texture = new Texture("../src/wood.jpg");
+	this->texture = new Texture("../src/sand.jpg");
 }
 
 void Seafloor::draw()
