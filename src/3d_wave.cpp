@@ -20,7 +20,7 @@ float Wave3D::getYfromXZ(float x, float z)
 	float k = 2 * M_PI;
 	//A * sin(kx * x + kz * z + w * t)
 	// old: return a * sin(b * x + c) + d;
-	
+
 	//y = A * sin(k * x + w * t)
 
 	//return a * sin(b * x + b * z + c);
@@ -30,7 +30,7 @@ float Wave3D::getYfromXZ(float x, float z)
 
 	float one = a * sinf(b * x + k * c);
 	float two = a * sinf(b * z + k * c);
-	
+
 	return one + two + d;
 
 	//return 0.25 * sinf(k * x * x + k * z * z + c);
@@ -65,7 +65,7 @@ void Wave3D::drawAdvanced()
 		float pz = z - i * dist;
 		float y = getYfromXZ(px, pz);
 
-		vec3f vec = { px, y, pz };
+		vec3f vec = {px, y, pz};
 		return vec;
 	};
 
@@ -98,19 +98,18 @@ void Wave3D::drawAdvanced()
 		if (normal)
 		{
 			m = getGradientForAdvancedSine(px, pz);
-			drawVector({ px, y, pz }, m, 0.1, true);
+			drawVector({px, y, pz}, m, 0.1, true);
 			m = getGradientForAdvancedSine(px, pz);
-			drawVector({ px, y, pz }, m, 0.1, true);
+			drawVector({px, y, pz}, m, 0.1, true);
 		}
 		if (tangent)
 		{
 			m = getGradientForAdvancedSine(px, pz);
-			drawVector({ px, y, pz }, m, 0.1, false);
+			drawVector({px, y, pz}, m, 0.1, false);
 			m = getGradientForAdvancedSine(px, pz);
-			drawVector({ px, y, pz }, m, 0.1, false);
+			drawVector({px, y, pz}, m, 0.1, false);
 		}
 	};
-
 
 	for (int i = 0; i < numSegments; i++)
 	{
@@ -208,13 +207,13 @@ void Wave3D::draw()
 				glColor3f(1.0, 1.0, 0.0);
 				if (normal)
 				{
-					drawVector({ px, y, z - i * dist }, m, 0.1, true);
-					drawVector({ px, y, z - i * dist - dist }, m, 0.1, true);
+					drawVector({px, y, z - i * dist}, m, 0.1, true);
+					drawVector({px, y, z - i * dist - dist}, m, 0.1, true);
 				}
 				if (tangent)
 				{
-					drawVector({ px, y, z - i * dist }, m, 0.1, false);
-					drawVector({ px, y, z - i * dist - dist }, m, 0.1, false);
+					drawVector({px, y, z - i * dist}, m, 0.1, false);
+					drawVector({px, y, z - i * dist - dist}, m, 0.1, false);
 				}
 			}
 		}
@@ -229,18 +228,17 @@ void Wave3D::draw()
 				glColor3f(1.0, 1.0, 0.0);
 				if (normal)
 				{
-					drawVector({ px, y, z - i * dist }, m, 0.1, true);
-					drawVector({ px, y, z - i * dist - dist }, m, 0.1, true);
+					drawVector({px, y, z - i * dist}, m, 0.1, true);
+					drawVector({px, y, z - i * dist - dist}, m, 0.1, true);
 				}
 				if (tangent)
 				{
-					drawVector({ px, y, z - i * dist }, m, 0.1, false);
-					drawVector({ px, y, z - i * dist - dist }, m, 0.1, false);
+					drawVector({px, y, z - i * dist}, m, 0.1, false);
+					drawVector({px, y, z - i * dist - dist}, m, 0.1, false);
 				}
 			}
 		}
 	}
-
 }
 
 void Wave3D::setLighting()
