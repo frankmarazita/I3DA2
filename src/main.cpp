@@ -4,19 +4,23 @@
 #define M_PI 3.141592653589793238463
 #endif
 
+#include "opengl.h"
+
 #include "vec2f.h"
 #include "vec2fPolar.h"
 #include "vec3f.h"
 #include "colour.h"
+
 #include "wave.h"
 #include "island.h"
 #include "boat.h"
-#include "keyboard.h"
-#include "opengl.h"
 #include "3d_wave.h"
 #include "3d_island.h"
-#include "mouse.h"
+#include "3d_boat.h"
 #include "seafloor.h"
+#include "random.h"
+#include "keyboard.h"
+#include "mouse.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,10 +39,12 @@ vec2f boat2location = {0.5, 0};
 Boat *boat2 = new Boat(boat2location, 0, 135, 1);
 Island *island = new Island();
 Island3D *island3D = new Island3D();
-Keyboard *keyboard = new Keyboard();
 Seafloor *seafloor; // We cannot load the texutre in here, initalise it during init func
-
+Random *random = new Random();
+Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
+
+std::list<Boat3D *> boats;
 
 typedef struct
 {
@@ -114,6 +120,34 @@ void myinit()
 
     seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
 
+    for (int i = 0; i < 50; i++)
+    {
+        float location = (float)random->getRandom(-1000, 1000) / 1000;
+        int side = random->getRandom(1, 4);
+
+        vec3f boat3DLocation = {0, 0, 0};
+
+        switch (side)
+        {
+        case 1:
+            boat3DLocation = {location, 0, 1};
+            break;
+        case 2:
+            boat3DLocation = {1, 0, location};
+            break;
+        case 3:
+            boat3DLocation = {location, 0, -1};
+            break;
+        case 4:
+            boat3DLocation = {-1, 0, location};
+            break;
+        }
+
+        Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 45);
+
+        boats.push_back(boat3D);
+    }
+
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
 }
@@ -186,6 +220,13 @@ void display()
 
     // Draw Island
     // island->draw();
+
+    // Draw AI Boats
+    for (std::list<Boat3D *>::iterator boat = boats.begin();
+         boat != boats.end(); ++boat)
+    {
+        (*boat)->draw();
+    }
 
     // Draw Boat 1
     glPushMatrix();
