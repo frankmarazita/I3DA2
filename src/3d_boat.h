@@ -22,10 +22,21 @@ public:
 
     void draw();
 
+    vec3f getLocation();
+    void setLocation(vec3f location);
+    void setBoatRotation(float boatRotation);
+    void updateBoatRotation();
+    void setBoatDeg(float boatDeg);
+
 private:
     vec3f location;
     float boatDeg;
+    float boatRotation;
     vec2fPolar projectilePolar = {0.5, 90};
+
+    float scale = 1;
+    int health = 1;
+    bool projectileExists = false;
 
     colour col = {1, 0, 0, 1};
 };

@@ -58,10 +58,9 @@ private:
 	bool animate = true;
 	bool wireframe = false;
 
-	colour col = { 0.2, 0.5, 1.0, 0.75 };
+	colour col = {0.2, 0.5, 1.0, 0.75};
 
-	std::list<vec2f>
-		verticies;
+	std::list<vec2f> verticies;
 };
 
-#endif // WAVE_H
+#endif // THREE_D_WAVE_H
