@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\3d_boat.cpp" />
     <ClCompile Include="..\src\3d_island.cpp" />
     <ClCompile Include="..\src\3d_wave.cpp" />
     <ClCompile Include="..\src\boat.cpp" />
@@ -164,23 +165,25 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\mouse.cpp" />
     <ClCompile Include="..\src\projectile.cpp" />
+    <ClCompile Include="..\src\random.cpp" />
     <ClCompile Include="..\src\seafloor.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
     <ClCompile Include="..\src\wave.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\3d_boat.h" />
     <ClInclude Include="..\src\3d_island.h" />
     <ClInclude Include="..\src\3d_wave.h" />
     <ClInclude Include="..\src\boat.h" />
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\defence.h" />
     <ClInclude Include="..\src\functions.h" />
-    <ClInclude Include="..\src\Header.h" />
     <ClInclude Include="..\src\island.h" />
     <ClInclude Include="..\src\keyboard.h" />
     <ClInclude Include="..\src\mouse.h" />
     <ClInclude Include="..\src\opengl.h" />
     <ClInclude Include="..\src\projectile.h" />
+    <ClInclude Include="..\src\random.h" />
     <ClInclude Include="..\src\seafloor.h" />
     <ClInclude Include="..\src\stb_image.h" />
     <ClInclude Include="..\src\texture.h" />

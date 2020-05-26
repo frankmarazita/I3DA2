@@ -45,6 +45,12 @@
     <ClCompile Include="..\src\3d_island.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\random.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\3d_boat.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\boat.h">
@@ -92,9 +98,6 @@
     <ClInclude Include="..\src\seafloor.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Header.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\texture.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -102,6 +105,12 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\3d_island.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\random.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3d_boat.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
