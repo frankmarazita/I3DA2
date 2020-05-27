@@ -262,7 +262,7 @@ void Wave3D::disableLighting()
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	glDisable(GL_LIGHT0);
 }
 
 float Wave3D::getGradientForSine(float x)

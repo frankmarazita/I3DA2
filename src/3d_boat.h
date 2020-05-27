@@ -18,7 +18,7 @@
 class Boat3D
 {
 public:
-    Boat3D(vec3f location, float boatDeg, float cannonDeg);
+    Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg);
 
     void draw();
 
@@ -34,7 +34,7 @@ private:
     float boatRotation;
     vec2fPolar projectilePolar = {0.5, 90};
 
-    float scale = 1;
+    float scale = 0.1;
     int health = 1;
     bool projectileExists = false;
 

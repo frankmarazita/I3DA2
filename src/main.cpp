@@ -59,9 +59,10 @@ typedef struct
     bool wireframe;
     float keyPressTime;
     float updateBoatTime;
+    float boatCreationTime;
 } global_t;
 
-global_t global = {600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, -1, -1};
+global_t global = {600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, -1, -1, -1};
 
 // Application Functions
 void myinit();
@@ -122,40 +123,6 @@ void myinit()
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
     seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
-
-    for (int i = 0; i < 100; i++)
-    {
-        float location = (float)random->getRandom(-1000, 1000) / 1000;
-        int side = random->getRandom(1, 4);
-
-        vec3f boat3DLocation = {0, 0, 0};
-
-        switch (side)
-        {
-        case 1:
-            boat3DLocation.x = location;
-            boat3DLocation.z = 1;
-            break;
-        case 2:
-            boat3DLocation.x = 1;
-            boat3DLocation.z = location;
-            break;
-        case 3:
-            boat3DLocation.x = location;
-            boat3DLocation.z = -1;
-            break;
-        case 4:
-            boat3DLocation.x = -1;
-            boat3DLocation.z = location;
-            break;
-        }
-
-        boat3DLocation.y = wave->getYfromXZ(boat3DLocation.x, boat3DLocation.z);
-
-        Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 45);
-
-        boats.push_back(boat3D);
-    }
 
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
@@ -357,6 +324,43 @@ void update()
         global.keyPressTime = glutGet(GLUT_ELAPSED_TIME);
     }
 
+    // Create Boat AI
+    if (global.boatCreationTime + 3000 < glutGet(GLUT_ELAPSED_TIME))
+    {
+        float location = (float)random->getRandom(-1000, 1000) / 1000;
+        int side = random->getRandom(1, 4);
+
+        vec3f boat3DLocation = {0, 0, 0};
+
+        switch (side)
+        {
+        case 1:
+            boat3DLocation.x = location;
+            boat3DLocation.z = 1;
+            break;
+        case 2:
+            boat3DLocation.x = 1;
+            boat3DLocation.z = location;
+            break;
+        case 3:
+            boat3DLocation.x = location;
+            boat3DLocation.z = -1;
+            break;
+        case 4:
+            boat3DLocation.x = -1;
+            boat3DLocation.z = location;
+            break;
+        }
+
+        boat3DLocation.y = wave->getYfromXZ(boat3DLocation.x, boat3DLocation.z);
+
+        Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45);
+
+        boats.push_back(boat3D);
+
+        global.boatCreationTime = glutGet(GLUT_ELAPSED_TIME);
+    }
+
     // Update AI Boats
     if (global.updateBoatTime + 20 < glutGet(GLUT_ELAPSED_TIME))
     {
@@ -386,12 +390,25 @@ void update()
             // Update location
             (*boat)->setLocation(location);
             // Update rotation
-            (*boat)->setBoatRotation(deg);
+            (*boat)->updateBoatRotation();
             // Update pitch
             // TODO gradientFromAdvacnedSine is not returning correct value
             float pitch = radToDeg(gradToRad(wave->getGradientForAdvancedSine(location.z, location.x)));
-            (*boat)->setBoatDeg(pitch);
+            // (*boat)->setBoatDeg(pitch);
         }
+
+        for (std::list<Boat3D *>::iterator boat = boats.begin();
+             boat != boats.end(); ++boat)
+        {
+            bool collision = island3D->collision((*boat)->getLocation());
+            if (collision)
+            {
+                boats.erase(boat);
+                break;
+                std::cout << "Colides" << std::endl;
+            }
+        }
+
         global.updateBoatTime = glutGet(GLUT_ELAPSED_TIME);
     }
 
