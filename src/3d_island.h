@@ -19,9 +19,13 @@ public:
     Island3D();
     void draw();
 
+    bool collision(vec3f location);
+
 private:
     Texture *texture;
-	GLUquadric* qobj;
+    GLUquadric *qobj;
+
+    float radius = 0.25;
 };
 
 #endif // THREE_D_ISLAND_H

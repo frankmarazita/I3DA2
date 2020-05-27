@@ -35,3 +35,10 @@ vec2fPolar cartesianToPolar(vec2f cart)
     polar.angle = radToDeg(gradToRad(cart.y / cart.x));
     return polar;
 }
+
+float calcVectorDistance(vec3f v1, vec3f v2)
+{
+    vec3f vec = {-v1.x + v2.x, -v1.y + v2.y, -v1.z + v2.z};
+    float distance = sqrt(pow(vec.x, 2) + pow(vec.y, 2) + pow(vec.z, 2));
+    return distance;
+}

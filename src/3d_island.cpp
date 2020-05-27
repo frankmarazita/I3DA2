@@ -20,13 +20,21 @@ void Island3D::draw()
 	gluQuadricTexture(this->qobj, GL_TRUE);
 	gluQuadricNormals(this->qobj, GLU_SMOOTH);
 	*/
-    gluCylinder(qobj, 0.25, 0.25, 0.5, 40, 40);
+    gluCylinder(qobj, radius, radius, 0.5, 40, 40);
     glPopMatrix();
     glPushMatrix();
     glTranslatef(0, -0.5, 0);
     glRotatef(-90, 1.0, 0, 0);
-    glutSolidSphere(0.25, 40, 40);
+    glutSolidSphere(radius, 40, 40);
     glPopMatrix();
 
     texture->disable();
+}
+
+bool Island3D::collision(vec3f location)
+{
+    float dist = calcVectorDistance(location, {0, -0.5, 0});
+    if (dist <= radius)
+        return true;
+    return false;
 }
