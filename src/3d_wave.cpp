@@ -17,7 +17,6 @@ Wave3D::Wave3D(float windowSize, float numSegments, float a, float b, float k, f
 
 float Wave3D::getYfromXZ(float x, float z)
 {
-	float k = 2 * M_PI;
 	//A * sin(kx * x + kz * z + w * t)
 	// old: return a * sin(b * x + c) + d;
 
@@ -38,6 +37,7 @@ float Wave3D::getYfromXZ(float x, float z)
 
 float Wave3D::getGradientForAdvancedSine(float x, float z)
 {
+
 	//float one = a * sinf(b * x + k * c);
 	//float two = a * sinf(b * z + k * c);
 
@@ -45,6 +45,18 @@ float Wave3D::getGradientForAdvancedSine(float x, float z)
 	float two = a * b * cosf(b * z + k * c);
 
 	return one + two;
+}
+
+vec3f Wave3D::getGradientForAdvancedTest(float x, float z)
+{
+
+	//float one = a * sinf(b * x + k * c);
+	//float two = a * sinf(b * z + k * c);
+	vec3f t;
+	t.x = a * b * cosf(b * x + k * c);
+	t.z = a * b * cosf(b * z + k * c);
+
+	return t;
 }
 
 void Wave3D::drawAdvanced()

@@ -32,6 +32,8 @@ public:
 	bool getAnimate();
 	int getNumSegments();
 
+	vec3f getGradientForAdvancedTest(float x, float z);
+
 	void toggleNormal();
 	void toggleTangent();
 	void toggleAnimation();
