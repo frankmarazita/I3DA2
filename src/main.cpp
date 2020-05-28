@@ -32,7 +32,7 @@ const int milli = 1000;
 const float windowSize = 1;
 
 // Game objects
-Wave3D *wave = new Wave3D(windowSize, 64, 0.07, 6 * M_PI, 0.25 * M_PI, 0, -0.5);
+Wave3D *wave = new Wave3D(windowSize, 64, 0.07, 6 * M_PI, 2 * M_PI, 0, -0.5);
 vec2f boat1location = {-0.5, 0};
 Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
@@ -390,11 +390,12 @@ void update()
             // Update location
             (*boat)->setLocation(location);
             // Update rotation
-            (*boat)->updateBoatRotation();
+            //(*boat)->updateBoatRotation();
             // Update pitch
             // TODO gradientFromAdvacnedSine is not returning correct value
-            float pitch = radToDeg(gradToRad(wave->getGradientForAdvancedSine(location.z, location.x)));
-            // (*boat)->setBoatDeg(pitch);
+			vec3f pitchsomething = wave->getGradientForAdvancedTest(location.z, location.x);
+            float pitch = radToDeg(gradToRad(pitchsomething.x));
+            (*boat)->setBoatDeg(pitch);
         }
 
         for (std::list<Boat3D *>::iterator boat = boats.begin();

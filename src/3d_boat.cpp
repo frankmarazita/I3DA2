@@ -16,8 +16,8 @@ void Boat3D::draw()
 
     glTranslatef(this->location.x, this->location.y, this->location.z);
     glScalef(scale, scale, scale);
+	glRotatef(boatRotation, 0, 1, 0);
     glRotatef(boatDeg, 0, 0, 1);
-    glRotatef(boatRotation, 0, 1, 0);
 
     // Draw Hull
     glBegin(GL_QUADS);
