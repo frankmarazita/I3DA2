@@ -32,14 +32,14 @@ const int milli = 1000;
 const float windowSize = 1;
 
 // Game objects
-Wave3D *wave = new Wave3D(windowSize, 64, 0.07, 6 * M_PI, 0.25 * M_PI, 0, -0.5);
+Wave3D *wave = new Wave3D(windowSize, 64, 0.07, 9, 0.25 * M_PI, 0, -0.5);
 vec2f boat1location = {-0.5, 0};
 Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
 Boat *boat2 = new Boat(boat2location, 0, 135, 1);
 Island *island = new Island();
 Island3D *island3D = new Island3D();
-Seafloor *seafloor; // We cannot load the texutre in here, initalise it during init func
+Seafloor *seafloor; // We cannot load the texture in here, initalise it during init func
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
@@ -126,6 +126,8 @@ void myinit()
 
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
+
+    // std::cout << radToDeg(gradToRad(calcVectorGrad({-1, 1, -1}, {0, 0, 0}))) << std::endl;
 }
 
 void myReshape(int w, int h)
@@ -387,14 +389,18 @@ void update()
             location.z += zChange;
 
             location.y = wave->getYfromXZ(location.x, location.z);
-            // Update location
+
+            (*boat)->setPrevLocation();
             (*boat)->setLocation(location);
-            // Update rotation
             (*boat)->updateBoatRotation();
-            // Update pitch
-            // TODO gradientFromAdvacnedSine is not returning correct value
-            float pitch = radToDeg(gradToRad(wave->getGradientForAdvancedSine(location.z, location.x)));
-            // (*boat)->setBoatDeg(pitch);
+
+            vec3f prevLocation = (*boat)->getPrevLocation();
+            prevLocation.y = wave->getYfromXZ(prevLocation.x, prevLocation.z);
+            grad = calcVectorGrad(prevLocation, location);
+            // std::cout << gradToDeg(1) << std::endl;
+            (*boat)->setBoatDeg(gradToDeg(grad));
+
+            // (*boat)->calcBoatDegFromPrev();
         }
 
         for (std::list<Boat3D *>::iterator boat = boats.begin();

@@ -14,9 +14,11 @@
 float radToDeg(float rad);
 float degToRad(float deg);
 float gradToRad(float grad);
+float gradToDeg(float grad);
 float calcGrad(float x1, float y1, float x2, float y2);
 vec2f polarToCartesian(vec2fPolar polar);
 vec2fPolar cartesianToPolar(vec2f cart);
 float calcVectorDistance(vec3f v1, vec3f v2);
+float calcVectorGrad(vec3f v1, vec3f v2);
 
 #endif // FUNCTIONS_H
