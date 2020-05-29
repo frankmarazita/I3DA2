@@ -9,6 +9,11 @@ void Keyboard::keyDown(unsigned char key)
     pressed.push_back(key);
 }
 
+void Keyboard::keyDownSpecial(int key)
+{
+    pressedSpecial.push_back(key);
+}
+
 void Keyboard::keyUp(unsigned char key)
 {
     // When a key is released, remove from list
@@ -21,7 +26,24 @@ void Keyboard::keyUp(unsigned char key)
         }
 }
 
+void Keyboard::keyUpSpecial(int key)
+{
+    // When a key is released, remove from list
+    for (std::list<int>::iterator i = pressedSpecial.begin();
+        i != pressedSpecial.end(); ++i)
+        if (*i == key)
+        {
+            pressedSpecial.erase(i);
+            break;
+        }
+}
+
 std::list<unsigned char> *Keyboard::getPressed()
 {
     return &pressed;
+}
+
+std::list<int>* Keyboard::getPressedSpecial()
+{
+    return &pressedSpecial;
 }
