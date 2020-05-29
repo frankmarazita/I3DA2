@@ -92,6 +92,9 @@ float calcGrad(float x1, float y1, float x2, float y2);
 
 void mouseMotion(int x, int y);
 void mouseFunction(int button, int state, int x, int y);
+void keyPressSpecial(int key);
+void keyUpSpecial(int key, int x, int y);
+void keyDownSpecial(int key, int x, int y);
 
 int main(int argc, char **argv)
 {
@@ -111,6 +114,8 @@ int main(int argc, char **argv)
     glutIdleFunc(update);
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
+    glutSpecialFunc(keyDownSpecial);
+    glutSpecialUpFunc(keyUpSpecial);
     glutMotionFunc(mouseMotion);
     glutMouseFunc(mouseFunction);
 
@@ -347,10 +352,20 @@ void update()
     if (global.keyPressTime + 20 < glutGet(GLUT_ELAPSED_TIME))
     {
         std::list<unsigned char> *pressed = keyboard->getPressed();
+
         for (std::list<unsigned char>::iterator i = pressed->begin();
              i != pressed->end(); ++i)
         {
             keyPress(*i);
+        }
+
+        // Loop through the special list
+        std::list<int> *pressedSpecial = keyboard->getPressedSpecial();
+
+        for (std::list<int>::iterator i = pressedSpecial->begin();
+             i != pressedSpecial->end(); ++i)
+        {
+            keyPressSpecial(*i);
         }
         global.keyPressTime = glutGet(GLUT_ELAPSED_TIME);
     }
@@ -573,9 +588,47 @@ void keyDown(unsigned char key, int x, int y)
     }
 }
 
+void keyDownSpecial(int key, int x, int y)
+{
+    // Keyboard single presses, else require holding
+    switch (key)
+    {
+    default:
+        keyboard->keyDownSpecial(key);
+        break;
+    }
+}
+
 void keyUp(unsigned char key, int x, int y)
 {
     keyboard->keyUp(key);
+}
+
+void keyUpSpecial(int key, int x, int y)
+{
+    keyboard->keyUpSpecial(key);
+}
+
+void keyPressSpecial(int key)
+{
+    // Keypress functionality for simultaneous holding
+    if (global.runnning)
+    {
+        switch (key)
+        {
+        case GLUT_KEY_LEFT:
+            island3D->cannonRotation -= CANNON_ROTATION_SPEED;
+            break;
+        case GLUT_KEY_RIGHT:
+            island3D->cannonRotation += CANNON_ROTATION_SPEED;
+            break;
+        }
+        /*default:
+            keyboard->keyDownSpecial(key);
+            break;
+        }*/
+        glutPostRedisplay();
+    }
 }
 
 void keyPress(unsigned char key)
@@ -594,11 +647,11 @@ void keyPress(unsigned char key)
         case 32: // Island Cannon Fire
             island->shoot();
             break;
-        case 'a': // Boat Left Move Left
-            boat1->moveLeft(0.01);
+        case 'a': // Cannon Tilt Down
+            island3D->tiltCannonDown();
             break;
-        case 'd': // Boat Left Move Right
-            boat1->moveRight(0.01);
+        case 'd': // Cannon Tilt Up
+            island3D->tiltCannonUp();
             break;
         case 'w': // Boat Left Cannon left
             boat1->cannonLeft(5);
