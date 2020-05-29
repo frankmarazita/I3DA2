@@ -28,6 +28,11 @@ void Island3D::draw()
     glutSolidSphere(radius, 40, 40);
     glPopMatrix();
 
+	// Cannon
+	glPushMatrix();
+
+	glPopMatrix();
+
     texture->disable();
 }
 

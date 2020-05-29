@@ -17,7 +17,6 @@ Wave3D::Wave3D(float windowSize, float numSegments, float a, float b, float k, f
 
 float Wave3D::getYfromXZ(float x, float z)
 {
-	float k = 2 * M_PI;
 	//A * sin(kx * x + kz * z + w * t)
 	// old: return a * sin(b * x + c) + d;
 
@@ -38,6 +37,7 @@ float Wave3D::getYfromXZ(float x, float z)
 
 float Wave3D::getGradientForAdvancedSine(float x, float z)
 {
+
 	//float one = a * sinf(b * x + k * c);
 	//float two = a * sinf(b * z + k * c);
 
@@ -45,6 +45,18 @@ float Wave3D::getGradientForAdvancedSine(float x, float z)
 	float two = a * b * cosf(b * z + k * c);
 
 	return a * b * cos(c * k + b + x);
+}
+
+vec3f Wave3D::getGradientForAdvancedTest(float x, float z)
+{
+
+	//float one = a * sinf(b * x + k * c);
+	//float two = a * sinf(b * z + k * c);
+	vec3f t;
+	t.x = a * b * cosf(b * x + k * c);
+	t.z = a * b * cosf(b * z + k * c);
+
+	return t;
 }
 
 void Wave3D::drawAdvanced()
@@ -244,16 +256,16 @@ void Wave3D::draw()
 void Wave3D::setLighting()
 {
 	glBlendFunc(GL_ONE, GL_ONE); // Enables Transparency
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+
+	glEnable(GL_LIGHT1);
 	GLfloat light_ambient[] = {0.2, 0.5, 1.0, 0.75};
 	GLfloat light_diffuse[] = {0.2, 0.5, 1.0, 0.75};
 	GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
 	GLfloat mat_specular[] = {0.2, 0.5, 1.0, 0};
 	GLfloat high_shininess[] = {100.0};
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position);
 	// glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
 	// glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
 }
@@ -261,8 +273,8 @@ void Wave3D::setLighting()
 void Wave3D::disableLighting()
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
+	//glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT1);
 }
 
 float Wave3D::getGradientForSine(float x)

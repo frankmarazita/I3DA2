@@ -51,6 +51,9 @@
     <ClCompile Include="..\src\3d_boat.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\cylinder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\boat.h">
@@ -111,6 +114,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\3d_boat.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cylinder.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
