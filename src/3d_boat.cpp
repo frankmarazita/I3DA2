@@ -16,7 +16,7 @@ void Boat3D::draw()
 
     glTranslatef(this->location.x, this->location.y, this->location.z);
     glScalef(scale, scale, scale);
-	glRotatef(boatRotation, 0, 1, 0);
+    glRotatef(boatRotation, 0, 1, 0);
     glRotatef(boatDeg, 0, 0, 1);
 
     // Draw Hull
@@ -122,9 +122,19 @@ vec3f Boat3D::getLocation()
     return this->location;
 }
 
+vec3f Boat3D::getPrevLocation()
+{
+    return this->prevLocation;
+}
+
 void Boat3D::setLocation(vec3f location)
 {
     this->location = location;
+}
+
+void Boat3D::setPrevLocation()
+{
+    this->prevLocation = this->location;
 }
 
 void Boat3D::setBoatRotation(float boatRotation)
@@ -150,4 +160,10 @@ void Boat3D::updateBoatRotation()
 void Boat3D::setBoatDeg(float boatDeg)
 {
     this->boatDeg = boatDeg;
+}
+
+void Boat3D::calcBoatDegFromPrev()
+{
+    float grad = calcVectorGrad(prevLocation, location);
+    this->boatDeg = gradToDeg(grad);
 }

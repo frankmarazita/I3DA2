@@ -44,7 +44,7 @@ float Wave3D::getGradientForAdvancedSine(float x, float z)
 	float one = a * b * cosf(b * x + k * c);
 	float two = a * b * cosf(b * z + k * c);
 
-	return one + two;
+	return a * b * cos(c * k + b + x);
 }
 
 vec3f Wave3D::getGradientForAdvancedTest(float x, float z)

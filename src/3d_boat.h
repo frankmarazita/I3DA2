@@ -23,16 +23,21 @@ public:
     void draw();
 
     vec3f getLocation();
+    vec3f getPrevLocation();
     void setLocation(vec3f location);
+    void setPrevLocation();
     void setBoatRotation(float boatRotation);
     void updateBoatRotation();
     void setBoatDeg(float boatDeg);
+    void calcBoatDegFromPrev();
 
 private:
     vec3f location;
     float boatDeg;
     float boatRotation;
     vec2fPolar projectilePolar = {0.5, 90};
+
+    vec3f prevLocation;
 
     float scale = 0.1;
     int health = 1;

@@ -15,6 +15,11 @@ float gradToRad(float grad)
     return atan(grad);
 }
 
+float gradToDeg(float grad)
+{
+    return atan(grad) * 180.0 / M_PI;
+}
+
 float calcGrad(float x1, float y1, float x2, float y2)
 {
     return (y2 - y1) / (x2 - x1);
@@ -41,4 +46,18 @@ float calcVectorDistance(vec3f v1, vec3f v2)
     vec3f vec = {-v1.x + v2.x, -v1.y + v2.y, -v1.z + v2.z};
     float distance = sqrt(pow(vec.x, 2) + pow(vec.y, 2) + pow(vec.z, 2));
     return distance;
+}
+
+float calcVectorGrad(vec3f v1, vec3f v2)
+{
+    float rise = v2.y - v1.y;
+
+    float xDist = v2.x - v1.x;
+    float zDist = v2.z - v1.z;
+
+    float run = sqrt(pow(xDist, 2) + pow(zDist, 2));
+
+    float m = rise / run;
+
+    return m;
 }
