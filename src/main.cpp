@@ -21,6 +21,7 @@
 #include "random.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "cylinder.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,6 +44,7 @@ Seafloor *seafloor; // We cannot load the texutre in here, initalise it during i
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
+Cylinder* cylinder = new Cylinder(1.0, 0.5, 64);
 
 std::list<Boat3D *> boats;
 
@@ -133,8 +135,9 @@ void myReshape(int w, int h)
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+	//gluPerspective(45.0, ((float)w / (float)h), 0.01, 100);
 
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -161,6 +164,21 @@ void display()
     displayFPS();
     glLoadIdentity();
 
+	//Draw Health Bars
+	island->drawHealth();
+	boat1->drawHealth();
+	boat2->drawHealth();
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	GLfloat light_ambient[] = { 0.8, 0.8, 0.65, 0.75 };
+	GLfloat light_diffuse[] = { 0.8, 0.8, 0.65, 0.75 };
+	GLfloat light_position[] = { 1.0, 1.0, 0.8, 0.0 };
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
@@ -179,6 +197,7 @@ void display()
     // Draw Axis
     drawAxis(windowSize);
 
+	glDisable(GL_LIGHT0);
     // Draw seafloor
     glPushMatrix();
     seafloor->draw();
@@ -188,6 +207,12 @@ void display()
     glPushMatrix();
     wave->drawAdvanced();
     glPopMatrix();
+
+	glEnable(GL_LIGHT0);
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     // Draw 3D Island
     glPushMatrix();
@@ -243,11 +268,6 @@ void display()
     // drawCircle(boat1->getCannonLocation(), 0.01);
     // drawCircle(boat2->getCannonLocation(), 0.01);
 
-    //Draw Health Bars
-    island->drawHealth();
-    boat1->drawHealth();
-    boat2->drawHealth();
-
     // Draw Projectiles
     /*if (island->getProjectileExists())
         island->drawProjectile(wave);
@@ -281,6 +301,10 @@ void display()
         glPopMatrix();
     }*/
 
+
+	cylinder->draw();
+	
+	glDisable(GL_LIGHTING);
     glPopMatrix();
 
     glutSwapBuffers();

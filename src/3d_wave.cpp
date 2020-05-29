@@ -256,16 +256,16 @@ void Wave3D::draw()
 void Wave3D::setLighting()
 {
 	glBlendFunc(GL_ONE, GL_ONE); // Enables Transparency
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+
+	glEnable(GL_LIGHT1);
 	GLfloat light_ambient[] = {0.2, 0.5, 1.0, 0.75};
 	GLfloat light_diffuse[] = {0.2, 0.5, 1.0, 0.75};
 	GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
 	GLfloat mat_specular[] = {0.2, 0.5, 1.0, 0};
 	GLfloat high_shininess[] = {100.0};
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position);
 	// glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
 	// glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
 }
@@ -273,8 +273,8 @@ void Wave3D::setLighting()
 void Wave3D::disableLighting()
 {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
+	//glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT1);
 }
 
 float Wave3D::getGradientForSine(float x)
