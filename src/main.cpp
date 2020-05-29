@@ -41,12 +41,11 @@ vec2f boat2location = {0.5, 0};
 Boat *boat2 = new Boat(boat2location, 0, 135, 1);
 Island *island = new Island();
 Island3D *island3D = new Island3D();
-Seafloor *seafloor; // We cannot load the texture in here, initalise it during init func
+Seafloor *seafloor;
+Skybox *skybox;
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
-Cylinder *cylinder = new Cylinder(1.0, 0.5, 64);
-Skybox *skybox;
 
 std::list<Boat3D *> boats;
 
@@ -244,37 +243,37 @@ void display()
         (*boat)->draw();
     }
 
-    // Draw Boat 1
-    glPushMatrix();
-    boat1->setLocation({boat1->getLocation().x,
-                        wave->getYfromX(boat1->getLocation().x)});
-    boat1->setBoatDeg(wave->getGrad(boat1->getLocation().x));
-    boat1->setScale(0.1);
-    boat1->draw();
-    glPopMatrix();
-    // Draw Boat 1 Axis
-    glPushMatrix();
-    glTranslatef(boat1->getLocation().x, boat1->getLocation().y, 0.0);
-    glRotatef(boat1->getBoatDeg(), 0, 0, 1.0);
-    drawAxis(0.1);
-    glPopMatrix();
-    // Hitbox (Uncomment for visual)
-    // drawCircle(boat1->getLocation(), boat1->getScale());
+    // // Draw Boat 1
+    // glPushMatrix();
+    // boat1->setLocation({boat1->getLocation().x,
+    //                     wave->getYfromX(boat1->getLocation().x)});
+    // boat1->setBoatDeg(wave->getGrad(boat1->getLocation().x));
+    // boat1->setScale(0.1);
+    // boat1->draw();
+    // glPopMatrix();
+    // // Draw Boat 1 Axis
+    // glPushMatrix();
+    // glTranslatef(boat1->getLocation().x, boat1->getLocation().y, 0.0);
+    // glRotatef(boat1->getBoatDeg(), 0, 0, 1.0);
+    // drawAxis(0.1);
+    // glPopMatrix();
+    // // Hitbox (Uncomment for visual)
+    // // drawCircle(boat1->getLocation(), boat1->getScale());
 
-    // Draw Boat 2
-    glPushMatrix();
-    boat2->setLocation({boat2->getLocation().x,
-                        wave->getYfromX(boat2->getLocation().x)});
-    boat2->setBoatDeg(wave->getGrad(boat2->getLocation().x));
-    boat2->setScale(0.1);
-    boat2->draw();
-    glPopMatrix();
-    // Draw Boat 2 Axis
-    glPushMatrix();
-    glTranslatef(boat2->getLocation().x, boat2->getLocation().y, 0.0);
-    glRotatef(boat2->getBoatDeg(), 0, 0, 1.0);
-    drawAxis(0.1);
-    glPopMatrix();
+    // // Draw Boat 2
+    // glPushMatrix();
+    // boat2->setLocation({boat2->getLocation().x,
+    //                     wave->getYfromX(boat2->getLocation().x)});
+    // boat2->setBoatDeg(wave->getGrad(boat2->getLocation().x));
+    // boat2->setScale(0.1);
+    // boat2->draw();
+    // glPopMatrix();
+    // // Draw Boat 2 Axis
+    // glPushMatrix();
+    // glTranslatef(boat2->getLocation().x, boat2->getLocation().y, 0.0);
+    // glRotatef(boat2->getBoatDeg(), 0, 0, 1.0);
+    // drawAxis(0.1);
+    // glPopMatrix();
     // Hitbox (Uncomment for visual)
     // drawCircle(boat2->getLocation(), boat2->getScale());
 
@@ -420,11 +419,8 @@ void update()
             float destZ = 0;
 
             float grad = calcGrad(location.x, location.z, destX, destZ);
-            // std::cout << grad << std::endl;
             float rad = gradToRad(grad);
-            // std::cout << rad << std::endl;
             float deg = radToDeg(rad);
-            // std::cout << deg << std::endl;
 
             float xChange = dist * cos(deg);
             float zChange = dist * sin(deg);
@@ -441,7 +437,11 @@ void update()
             vec3f prevLocation = (*boat)->getPrevLocation();
             prevLocation.y = wave->getYfromXZ(prevLocation.x, prevLocation.z);
             grad = calcVectorGrad(prevLocation, location);
-            (*boat)->setBoatDeg(gradToDeg(grad));
+            deg = gradToDeg(grad);
+            (*boat)->setBoatDeg(deg);
+            float initialCannonDeg = (*boat)->getInitialCannonDeg();
+            (*boat)->setCannonDeg(initialCannonDeg - deg);
+            (*boat)->calcProjectileOrigin();
         }
 
         for (std::list<Boat3D *>::iterator boat = boats.begin();
@@ -451,6 +451,7 @@ void update()
             if (collision)
             {
                 boats.erase(boat);
+                island3D->damage();
                 break;
             }
         }
@@ -561,26 +562,31 @@ void keyDown(unsigned char key, int x, int y)
     // Keyboard single presses, else require holding
     switch (key)
     {
-    case 27: // ESC - Quit Game
-        exit(EXIT_SUCCESS);
+    case 'p': // Toggle Wireframe
+        global.wireframe = !global.wireframe;
         break;
-    case 'n': // Wave - Normal
+    case 'l': // Toggle Lighting
+        break;
+    case 'n': // Normals and Tangents
         wave->toggleNormal();
-        break;
-    case 't': // Wave - Tangent
         wave->toggleTangent();
         break;
-    case 45: // Wave Segments (-)
-        wave->decreaseNumSegments();
+    case 't': // Toggle Textures
+        break;
+    case 'h': // Pause/Resume Game Animations
+        wave->toggleAnimation();
         break;
     case 61: // Wave Segments (+)
         wave->increaseNumSegments();
         break;
-    case 'g': // Wave Toggle Animation
-        wave->toggleAnimation();
+    case 45: // Wave Segments (-)
+        wave->decreaseNumSegments();
         break;
-    case 'q': // Wave Wireframe
-        global.wireframe = !global.wireframe;
+    case 27: // ESC - Quit Game
+        exit(EXIT_SUCCESS);
+        break;
+    case 'q':
+        exit(EXIT_SUCCESS);
         break;
     default:
         keyboard->keyDown(key);
@@ -616,10 +622,10 @@ void keyPressSpecial(int key)
     {
         switch (key)
         {
-        case GLUT_KEY_LEFT:
+        case GLUT_KEY_LEFT: // Cannon Rotate Left
             island3D->cannonRotation -= CANNON_ROTATION_SPEED;
             break;
-        case GLUT_KEY_RIGHT:
+        case GLUT_KEY_RIGHT: // Cannon Rotate Right
             island3D->cannonRotation += CANNON_ROTATION_SPEED;
             break;
         }
@@ -638,14 +644,9 @@ void keyPress(unsigned char key)
     {
         switch (key)
         {
-        case 'f': // Island Cannon Left
-            island->cannonLeft(2.5);
+        case 'w': // Increase Cannon Power
             break;
-        case 'h': // Island Cannon Right
-            island->cannonRight(2.5);
-            break;
-        case 32: // Island Cannon Fire
-            island->shoot();
+        case 's': // Decrease Cannon Power
             break;
         case 'a': // Cannon Tilt Down
             island3D->tiltCannonDown();
@@ -653,35 +654,9 @@ void keyPress(unsigned char key)
         case 'd': // Cannon Tilt Up
             island3D->tiltCannonUp();
             break;
-        case 'w': // Boat Left Cannon left
-            boat1->cannonLeft(5);
+        case 32: // Island Cannon Fire
             break;
-        case 's': // Boat Left Cannon Right
-            boat1->cannonRight(5);
-            break;
-        case 'e': // Boat Left Fire
-            boat1->shoot();
-            break;
-        case 'r': // Boat Left Defence
-            boat1->defence();
-            break;
-        case 'j': // Boat Right Move Left
-            boat2->moveLeft(0.01);
-            break;
-        case 'l': // Boat Right Move Right
-            boat2->moveRight(0.01);
-            break;
-        case 'i': // Boat Right Cannon Left
-            boat2->cannonLeft(5);
-            break;
-        case 'k': // Boat Right Cannon Right
-            boat2->cannonRight(5);
-            break;
-        case 'o': // Boat Right Fire
-            boat2->shoot();
-            break;
-        case 'p': // Boat Right Defence
-            boat2->defence();
+        case 'v': // Island Cannon Defence
             break;
         default:
             break;

@@ -30,25 +30,34 @@ public:
     void drawScore();
 
     bool collision(vec3f otherLocation, float otherRadius);
+    void damage();
 
-	Cylinder* cannon;
-    Cylinder* cannonBaseMiddle;
-    Cylinder* cannonGunBaseCylinder;
+    Cylinder *cannon;
+    Cylinder *cannonBaseMiddle;
+    Cylinder *cannonGunBaseCylinder;
 
     float cannonRotation = 90.0;
     float cannonPitch = 90.0;
 
     void tiltCannonUp();
     void tiltCannonDown();
+
 private:
     Texture *texture;
     GLUquadric *qobj;
 
-    float radius = 0.25;
+    vec3f location = {0, -0.5, 0};
+    vec3f cannonLocation = {0, 0, 0};
+    vec2fPolar ProjectilePolar = {0.4, 45};
+
     int health = 100;
     int score = 0;
+    float radius = 0.25;
 
-    vec3f location = {0, -0.5, 0};
+    const float cooldownTime = 1000;
+    float shootTime = -1;
+
+    colour col = {0.9, 0.8, 0.5, 1.0};
 };
 
 #endif // THREE_D_ISLAND_H

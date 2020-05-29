@@ -9,6 +9,7 @@
 #include "projectile.h"
 #include "defence.h"
 #include "wave.h"
+#include "cylinder.h"
 
 #include <cmath>
 #include <list>
@@ -29,21 +30,28 @@ public:
     void setBoatRotation(float boatRotation);
     void updateBoatRotation();
     void setBoatDeg(float boatDeg);
+    float getInitialCannonDeg();
+    float getCannonDeg();
+    void setCannonDeg(float cannonDeg);
     float getHitboxRadius();
     void calcBoatDegFromPrev();
+    void calcProjectileOrigin();
+    vec3f getProjectileOrigin();
     bool collision(vec3f otherLocation, float otherRadius);
 
 private:
     vec3f location;
+    vec3f prevLocation;
     float boatDeg;
     float boatRotation;
+    vec3f projectileOrigin;
     vec2fPolar projectilePolar = {0.5, 90};
-
-    vec3f prevLocation;
+    float initialCannonDeg;
 
     float hitboxRadius = 1.1;
     float scale = 0.1;
     int health = 1;
+
     bool projectileExists = false;
 
     colour col = {1, 0, 0, 1};

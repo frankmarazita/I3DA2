@@ -12,6 +12,8 @@ void Island3D::draw()
 {
     texture->enable();
 
+    glColor4f(col.r, col.g, col.b, col.a);
+
     glColor3f(0.9, 0.8, 0.5);
 
     // Very very bottom cylinder
@@ -124,4 +126,9 @@ bool Island3D::collision(vec3f otherLocation, float otherRadius)
     if (dist <= radius + otherRadius)
         return true;
     return false;
+}
+
+void Island3D::damage()
+{
+    health--;
 }

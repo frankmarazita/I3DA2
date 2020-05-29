@@ -13,6 +13,8 @@ void Skybox::draw()
 {
     glPushMatrix();
 
+    glScalef(scale, scale, scale);
+
     glPushMatrix();
     glRotatef(-90, 1, 0, 0);
     textureTop->enable();
