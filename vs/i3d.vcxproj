@@ -168,6 +168,7 @@
     <ClCompile Include="..\src\projectile.cpp" />
     <ClCompile Include="..\src\random.cpp" />
     <ClCompile Include="..\src\seafloor.cpp" />
+    <ClCompile Include="..\src\skybox.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
     <ClCompile Include="..\src\wave.cpp" />
   </ItemGroup>
@@ -187,6 +188,7 @@
     <ClInclude Include="..\src\projectile.h" />
     <ClInclude Include="..\src\random.h" />
     <ClInclude Include="..\src\seafloor.h" />
+    <ClInclude Include="..\src\skybox.h" />
     <ClInclude Include="..\src\stb_image.h" />
     <ClInclude Include="..\src\texture.h" />
     <ClInclude Include="..\src\vec2f.h" />

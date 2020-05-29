@@ -10,14 +10,18 @@ Boat3D::Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDe
 
 void Boat3D::draw()
 {
-    glColor4f(col.r, col.g, col.b, col.a);
-
     glPushMatrix();
 
     glTranslatef(this->location.x, this->location.y, this->location.z);
     glScalef(scale, scale, scale);
     glRotatef(boatRotation, 0, 1, 0);
     glRotatef(boatDeg, 0, 0, 1);
+
+    // Hitbox
+    // glColor4f(1, 1, 1, 1);
+    // glutSolidSphere(hitboxRadius, 10, 10);
+
+    glColor4f(col.r, col.g, col.b, col.a);
 
     // Draw Hull
     glBegin(GL_QUADS);
@@ -162,8 +166,21 @@ void Boat3D::setBoatDeg(float boatDeg)
     this->boatDeg = boatDeg;
 }
 
+float Boat3D::getHitboxRadius()
+{
+    return hitboxRadius * scale;
+}
+
 void Boat3D::calcBoatDegFromPrev()
 {
     float grad = calcVectorGrad(prevLocation, location);
     this->boatDeg = gradToDeg(grad);
+}
+
+bool Boat3D::collision(vec3f otherLocation, float otherRadius)
+{
+    float dist = calcVectorDistance(otherLocation, location);
+    if (dist <= hitboxRadius + otherRadius)
+        return true;
+    return false;
 }

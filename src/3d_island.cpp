@@ -23,23 +23,61 @@ void Island3D::draw()
     gluCylinder(qobj, radius, radius, 0.5, 40, 40);
     glPopMatrix();
     glPushMatrix();
-    glTranslatef(0, -0.5, 0);
+    glTranslatef(location.x, location.y, location.z);
     glRotatef(-90, 1.0, 0, 0);
     glutSolidSphere(radius, 40, 40);
     glPopMatrix();
 
-	// Cannon
-	glPushMatrix();
+    // Cannon
+    glPushMatrix();
 
-	glPopMatrix();
+    glPopMatrix();
 
     texture->disable();
 }
 
-bool Island3D::collision(vec3f location)
+void Island3D::drawHealth()
 {
-    float dist = calcVectorDistance(location, {0, -0.5, 0});
-    if (dist <= radius)
+    float x = -0.95 + 0.005 * 100;
+    glPushMatrix();
+    glColor3f(0, 1, 0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(-0.95, 0.95);
+    glVertex2f(-0.95, 0.92);
+    glVertex2f(x, 0.92);
+    glVertex2f(x, 0.95);
+    glEnd();
+    glPopMatrix();
+
+    x = -0.95 + 0.005 * health;
+    glPushMatrix();
+    glColor3f(0, 1, 0);
+    glBegin(GL_POLYGON);
+    glVertex2f(-0.95, 0.95);
+    glVertex2f(-0.95, 0.92);
+    glVertex2f(x, 0.92);
+    glVertex2f(x, 0.95);
+    glEnd();
+    glPopMatrix();
+}
+
+void Island3D::drawScore()
+{
+    glPushMatrix();
+    std::string text = "Score: " + std::to_string((int)score);
+    int len = text.length();
+    glTranslatef(-0.95, 0.86, 0.0);
+    glColor3f(1, 1, 0);
+    glRasterPos2f(0, 0);
+    for (int i = 0; i < len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
+    glPopMatrix();
+}
+
+bool Island3D::collision(vec3f otherLocation, float otherRadius)
+{
+    float dist = calcVectorDistance(otherLocation, location);
+    if (dist <= radius + otherRadius)
         return true;
     return false;
 }

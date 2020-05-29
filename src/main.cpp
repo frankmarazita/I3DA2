@@ -1,4 +1,4 @@
-// I3D Assignment 01 - Island Defence
+// I3D Assignment 02 - Island Defence
 
 #ifndef M_PI
 #define M_PI 3.141592653589793238463
@@ -22,6 +22,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "cylinder.h"
+#include "skybox.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -44,7 +45,8 @@ Seafloor *seafloor; // We cannot load the texture in here, initalise it during i
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
-Cylinder* cylinder = new Cylinder(1.0, 0.5, 64);
+Cylinder *cylinder = new Cylinder(1.0, 0.5, 64);
+Skybox *skybox;
 
 std::list<Boat3D *> boats;
 
@@ -125,6 +127,7 @@ void myinit()
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
     seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
+    skybox = new Skybox();
 
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
@@ -137,7 +140,7 @@ void myReshape(int w, int h)
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-	//gluPerspective(45.0, ((float)w / (float)h), 0.01, 100);
+    //gluPerspective(45.0, ((float)w / (float)h), 0.01, 100);
 
     glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
     glMatrixMode(GL_MODELVIEW);
@@ -166,20 +169,24 @@ void display()
     displayFPS();
     glLoadIdentity();
 
-	//Draw Health Bars
-	island->drawHealth();
-	boat1->drawHealth();
-	boat2->drawHealth();
+    // Draw Island OSD
+    island3D->drawHealth();
+    island3D->drawScore();
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	GLfloat light_ambient[] = { 0.8, 0.8, 0.65, 0.75 };
-	GLfloat light_diffuse[] = { 0.8, 0.8, 0.65, 0.75 };
-	GLfloat light_position[] = { 1.0, 1.0, 0.8, 0.0 };
+    // Draw Health Bars
+    // island->drawHealth();
+    // boat1->drawHealth();
+    // boat2->drawHealth();
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
+    GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
+    GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -199,22 +206,23 @@ void display()
     // Draw Axis
     drawAxis(windowSize);
 
-	glDisable(GL_LIGHT0);
+    glDisable(GL_LIGHT0);
     // Draw seafloor
-    glPushMatrix();
     seafloor->draw();
-    glPopMatrix();
+
+    // Draw Skybox
+    // skybox->draw();
 
     // Draw Wave
     glPushMatrix();
     wave->drawAdvanced();
     glPopMatrix();
 
-	glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT0);
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     // Draw 3D Island
     glPushMatrix();
@@ -303,10 +311,7 @@ void display()
         glPopMatrix();
     }*/
 
-
-	cylinder->draw();
-	
-	glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
     glPopMatrix();
 
     glutSwapBuffers();
@@ -421,21 +426,17 @@ void update()
             vec3f prevLocation = (*boat)->getPrevLocation();
             prevLocation.y = wave->getYfromXZ(prevLocation.x, prevLocation.z);
             grad = calcVectorGrad(prevLocation, location);
-            // std::cout << gradToDeg(1) << std::endl;
             (*boat)->setBoatDeg(gradToDeg(grad));
-
-            // (*boat)->calcBoatDegFromPrev();
         }
 
         for (std::list<Boat3D *>::iterator boat = boats.begin();
              boat != boats.end(); ++boat)
         {
-            bool collision = island3D->collision((*boat)->getLocation());
+            bool collision = island3D->collision((*boat)->getLocation(), (*boat)->getHitboxRadius());
             if (collision)
             {
                 boats.erase(boat);
                 break;
-                std::cout << "Colides" << std::endl;
             }
         }
 

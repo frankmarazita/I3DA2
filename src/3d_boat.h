@@ -29,7 +29,9 @@ public:
     void setBoatRotation(float boatRotation);
     void updateBoatRotation();
     void setBoatDeg(float boatDeg);
+    float getHitboxRadius();
     void calcBoatDegFromPrev();
+    bool collision(vec3f otherLocation, float otherRadius);
 
 private:
     vec3f location;
@@ -39,6 +41,7 @@ private:
 
     vec3f prevLocation;
 
+    float hitboxRadius = 1.1;
     float scale = 0.1;
     int health = 1;
     bool projectileExists = false;
