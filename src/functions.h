@@ -20,5 +20,7 @@ vec2f polarToCartesian(vec2fPolar polar);
 vec2fPolar cartesianToPolar(vec2f cart);
 float calcVectorDistance(vec3f v1, vec3f v2);
 float calcVectorGrad(vec3f v1, vec3f v2);
+vec3f rotatePointZ(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
+vec3f rotatePointY(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
 
 #endif // FUNCTIONS_H
