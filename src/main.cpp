@@ -416,15 +416,6 @@ void update()
 
             (*boat)->setPrevLocation();
             (*boat)->setLocation(location);
-<<<<<<< HEAD
-            // Update rotation
-            //(*boat)->updateBoatRotation();
-            // Update pitch
-            // TODO gradientFromAdvacnedSine is not returning correct value
-			vec3f pitchsomething = wave->getGradientForAdvancedTest(location.z, location.x);
-            float pitch = radToDeg(gradToRad(pitchsomething.x));
-            (*boat)->setBoatDeg(pitch);
-=======
             (*boat)->updateBoatRotation();
 
             vec3f prevLocation = (*boat)->getPrevLocation();
@@ -434,7 +425,6 @@ void update()
             (*boat)->setBoatDeg(gradToDeg(grad));
 
             // (*boat)->calcBoatDegFromPrev();
->>>>>>> frank
         }
 
         for (std::list<Boat3D *>::iterator boat = boats.begin();
