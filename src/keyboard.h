@@ -14,10 +14,14 @@ public:
     void keyDown(unsigned char key);
     void keyUp(unsigned char key);
 
-    std::list<unsigned char> *getPressed();
+    void keyDownSpecial(int key);
+    void keyUpSpecial(int key);
 
+    std::list<unsigned char> *getPressed();
+    std::list<int>* getPressedSpecial();
 private:
     std::list<unsigned char> pressed;
+    std::list<int> pressedSpecial;
 };
 
 #endif // KEYBOARD_H
