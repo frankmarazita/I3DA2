@@ -15,7 +15,7 @@ void Cylinder::draw()
 	glColor3f(1.0, 0.0, 0.0);
 	// Bottom
 	glBegin(GL_POLYGON);
-	for (int i = 0; i < segments; i++) {
+	for (int i = 0; i < segments + 1; i++) {
 		theta = i / (float)segments * 2.0 * M_PI;
 		x = radius * cosf(theta);
 		z = radius * sinf(theta);
@@ -41,7 +41,7 @@ void Cylinder::draw()
 	// Top
 	glColor3f(0.0, 0.0, 1.0);
 	glBegin(GL_POLYGON);
-	for (int i = 0; i < segments; i++) {
+	for (int i = 0; i < segments + 1; i++) {
 		theta = i / (float)segments * 2.0 * M_PI;
 		x = radius * cosf(theta);
 		z = radius * sinf(theta);
