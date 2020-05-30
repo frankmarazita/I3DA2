@@ -58,6 +58,7 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rectangle.cpp">
+    <ClCompile Include="..\src\skybox.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -129,6 +130,7 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rectangle.h">
+    <ClInclude Include="..\src\skybox.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

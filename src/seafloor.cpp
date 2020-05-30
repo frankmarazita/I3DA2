@@ -8,9 +8,6 @@ Seafloor::Seafloor(float windowSize) // Make it use windowSize instead of -1.0 t
 
 void Seafloor::draw()
 {
-	float x = -1.0;
-	float z = 1.0;
-
 	texture->enable();
 	glColor3f(0.8f, 0.8f, 0.8f);
 
@@ -25,6 +22,6 @@ void Seafloor::draw()
 	glTexCoord2f(0, 1);
 	glVertex3f(-1.0, -1.0, -1.0);
 	glEnd();
-	
+
 	texture->disable();
 }

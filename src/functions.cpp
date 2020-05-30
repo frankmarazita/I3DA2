@@ -61,3 +61,43 @@ float calcVectorGrad(vec3f v1, vec3f v2)
 
     return m;
 }
+
+vec3f rotatePointZ(vec3f pivotPoint, vec3f rotatePoint, float angleRad)
+{
+    float s = sin(angleRad);
+    float c = cos(angleRad);
+
+    // translate point back to origin:
+    rotatePoint.x -= pivotPoint.x;
+    rotatePoint.y -= pivotPoint.y;
+
+    // rotate point
+    float xnew = rotatePoint.x * c - rotatePoint.y * s;
+    float ynew = rotatePoint.x * s + rotatePoint.y * c;
+
+    // translate point back:
+    rotatePoint.x = xnew + pivotPoint.x;
+    rotatePoint.y = ynew + pivotPoint.y;
+
+    return rotatePoint;
+}
+
+vec3f rotatePointY(vec3f pivotPoint, vec3f rotatePoint, float angleRad)
+{
+    float s = sin(-angleRad);
+    float c = cos(-angleRad);
+
+    // translate point back to origin:
+    rotatePoint.x -= pivotPoint.x;
+    rotatePoint.z -= pivotPoint.z;
+
+    // rotate point
+    float xnew = rotatePoint.x * c - rotatePoint.z * s;
+    float znew = rotatePoint.x * s + rotatePoint.z * c;
+
+    // translate point back:
+    rotatePoint.x = xnew + pivotPoint.x;
+    rotatePoint.z = znew + pivotPoint.z;
+
+    return rotatePoint;
+}

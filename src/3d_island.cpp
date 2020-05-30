@@ -39,6 +39,8 @@ void Island3D::draw()
 {
     texture->enable();
 
+    glColor4f(col.r, col.g, col.b, col.a);
+
     glColor3f(0.9, 0.8, 0.5);
 
     // Very very bottom cylinder
@@ -53,7 +55,7 @@ void Island3D::draw()
     // Sphere
     glColor3f(0.8, 0.8, 0.8);
     glPushMatrix();
-    glTranslatef(0, -0.5, 0);
+    glTranslatef(location.x, location.y, location.z);
     glRotatef(-90, 1.0, 0, 0);
     glutSolidSphere(radius, 40, 40);
     glPopMatrix();
@@ -90,7 +92,7 @@ void Island3D::draw()
     glRotatef(cannonPitch, 0.0, 0.0, 1.0);
 
     cannon->draw();
-	glPopMatrix();
+    glPopMatrix();
 
     // Used for testing where the cannon is
     glPushMatrix();
@@ -109,11 +111,49 @@ void Island3D::draw()
     texture->disable();
 }
 
+void Island3D::drawHealth()
+{
+    float x = -0.95 + 0.005 * 100;
+    glPushMatrix();
+    glColor3f(0, 1, 0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(-0.95, 0.95);
+    glVertex2f(-0.95, 0.92);
+    glVertex2f(x, 0.92);
+    glVertex2f(x, 0.95);
+    glEnd();
+    glPopMatrix();
+
+    x = -0.95 + 0.005 * health;
+    glPushMatrix();
+    glColor3f(0, 1, 0);
+    glBegin(GL_POLYGON);
+    glVertex2f(-0.95, 0.95);
+    glVertex2f(-0.95, 0.92);
+    glVertex2f(x, 0.92);
+    glVertex2f(x, 0.95);
+    glEnd();
+    glPopMatrix();
+}
+
+void Island3D::drawScore()
+{
+    glPushMatrix();
+    std::string text = "Score: " + std::to_string((int)score);
+    int len = text.length();
+    glTranslatef(-0.95, 0.86, 0.0);
+    glColor3f(1, 1, 0);
+    glRasterPos2f(0, 0);
+    for (int i = 0; i < len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
+    glPopMatrix();
+}
+
 void Island3D::tiltCannonUp()
 {
     if (cannonPitch + CANNON_TILT_SPEED > CANNON_TILT_MAX)
         return;
-    
+
     cannonPitch += CANNON_TILT_SPEED;
 }
 
@@ -128,10 +168,15 @@ void Island3D::tiltCannonDown()
     cannonPitch -= CANNON_TILT_SPEED;
 }
 
-bool Island3D::collision(vec3f location)
+bool Island3D::collision(vec3f otherLocation, float otherRadius)
 {
-    float dist = calcVectorDistance(location, {0, -0.5, 0});
-    if (dist <= radius)
+    float dist = calcVectorDistance(otherLocation, location);
+    if (dist <= radius + otherRadius)
         return true;
     return false;
+}
+
+void Island3D::damage()
+{
+    health--;
 }
