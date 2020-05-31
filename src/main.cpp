@@ -706,148 +706,148 @@ void displayFPS()
 
 void updateProjectiles(float dt)
 {
-    // Update All Projectiles
-    island->updateProjectile(dt);
-    boat1->updateProjectile(dt);
-    boat2->updateProjectile(dt);
+    // // Update All Projectiles
+    // island->updateProjectile(dt);
+    // boat1->updateProjectile(dt);
+    // boat2->updateProjectile(dt);
 
-    // Lambda function for collision detection
-    auto projectileCollision = [&](std::list<Projectile *> *projectiles) {
-        bool collision = false;
+    // // Lambda function for collision detection
+    // auto projectileCollision = [&](std::list<Projectile *> *projectiles) {
+    //     bool collision = false;
 
-        for (std::list<Projectile *>::iterator p = projectiles->begin();
-             p != projectiles->end(); ++p)
-        {
-            vec2f location = (*p)->getLocation();
+    //     for (std::list<Projectile *>::iterator p = projectiles->begin();
+    //          p != projectiles->end(); ++p)
+    //     {
+    //         vec2f location = (*p)->getLocation();
 
-            // Boat 1 Defences
-            std::list<Defence *> *defences1 = boat1->getDefences();
-            for (std::list<Defence *>::iterator d = defences1->begin();
-                 d != defences1->end(); ++d)
-            {
-                if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
-                    collision = true;
-            }
-            // Boat 2 Defences
-            std::list<Defence *> *defences2 = boat2->getDefences();
-            for (std::list<Defence *>::iterator d = defences2->begin();
-                 d != defences2->end(); ++d)
-            {
-                if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
-                    collision = true;
-            }
+    //         // Boat 1 Defences
+    //         std::list<Defence *> *defences1 = boat1->getDefences();
+    //         for (std::list<Defence *>::iterator d = defences1->begin();
+    //              d != defences1->end(); ++d)
+    //         {
+    //             if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
+    //                 collision = true;
+    //         }
+    //         // Boat 2 Defences
+    //         std::list<Defence *> *defences2 = boat2->getDefences();
+    //         for (std::list<Defence *>::iterator d = defences2->begin();
+    //              d != defences2->end(); ++d)
+    //         {
+    //             if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
+    //                 collision = true;
+    //         }
 
-            // Island
-            if (!(*p)->getIsBoat())
-            {
-                // Boat 1 Collision
-                if ((*p)->getCollision(boat1->getScale(), boat1->getLocation()))
-                {
-                    collision = true;
-                    if (boat1->damage())
-                        global.runnning = false;
-                }
-                // Boat 2 Collision
-                if ((*p)->getCollision(boat2->getScale(), boat2->getLocation()))
-                {
-                    collision = true;
-                    if (boat2->damage())
-                        global.runnning = false;
-                }
-            }
-            else
-            {
-                // Island Collision
-                if (island->collision(location))
-                {
-                    collision = true;
-                    if (island->damage())
-                        global.runnning = false;
-                }
+    //         // Island
+    //         if (!(*p)->getIsBoat())
+    //         {
+    //             // Boat 1 Collision
+    //             if ((*p)->getCollision(boat1->getScale(), boat1->getLocation()))
+    //             {
+    //                 collision = true;
+    //                 if (boat1->damage())
+    //                     global.runnning = false;
+    //             }
+    //             // Boat 2 Collision
+    //             if ((*p)->getCollision(boat2->getScale(), boat2->getLocation()))
+    //             {
+    //                 collision = true;
+    //                 if (boat2->damage())
+    //                     global.runnning = false;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             // Island Collision
+    //             if (island->collision(location))
+    //             {
+    //                 collision = true;
+    //                 if (island->damage())
+    //                     global.runnning = false;
+    //             }
 
-                //Boats
-                if ((*p)->getBoatNum() == 0)
-                {
-                    // Boat 2 Collision
-                    if ((*p)->getCollision(boat2->getScale(),
-                                           boat2->getLocation()))
-                    {
-                        collision = true;
-                        if (boat2->damage())
-                            global.runnning = false;
-                    }
-                }
-                else if ((*p)->getBoatNum() == 1)
-                {
-                    // Boat 1 Collision
-                    if ((*p)->getCollision(boat1->getScale(),
-                                           boat1->getLocation()))
-                    {
-                        collision = true;
-                        if (boat1->damage())
-                            global.runnning = false;
-                    }
-                }
-            }
+    //             //Boats
+    //             if ((*p)->getBoatNum() == 0)
+    //             {
+    //                 // Boat 2 Collision
+    //                 if ((*p)->getCollision(boat2->getScale(),
+    //                                        boat2->getLocation()))
+    //                 {
+    //                     collision = true;
+    //                     if (boat2->damage())
+    //                         global.runnning = false;
+    //                 }
+    //             }
+    //             else if ((*p)->getBoatNum() == 1)
+    //             {
+    //                 // Boat 1 Collision
+    //                 if ((*p)->getCollision(boat1->getScale(),
+    //                                        boat1->getLocation()))
+    //                 {
+    //                     collision = true;
+    //                     if (boat1->damage())
+    //                         global.runnning = false;
+    //                 }
+    //             }
+    //         }
 
-            // Wave Collision
-            if (wave->getYfromX(location.x) >= location.y)
-                collision = true;
+    //         // Wave Collision
+    //         if (wave->getYfromX(location.x) >= location.y)
+    //             collision = true;
 
-            if (collision)
-            {
-                projectiles->erase(p);
-                return collision;
-            }
-        }
-        return collision;
-    };
+    //         if (collision)
+    //         {
+    //             projectiles->erase(p);
+    //             return collision;
+    //         }
+    //     }
+    //     return collision;
+    // };
 
-    // Lambda function calls for all projectiles
-    if (island->getProjectileExists())
-        if (projectileCollision(island->getProjectiles()))
-            island->removeProjectile();
-    if (boat1->getProjectileExists())
-        if (projectileCollision(boat1->getProjectiles()))
-            boat1->removeProjectile();
-    if (boat2->getProjectileExists())
-        if (projectileCollision(boat2->getProjectiles()))
-            boat2->removeProjectile();
+    // // Lambda function calls for all projectiles
+    // if (island->getProjectileExists())
+    //     if (projectileCollision(island->getProjectiles()))
+    //         island->removeProjectile();
+    // if (boat1->getProjectileExists())
+    //     if (projectileCollision(boat1->getProjectiles()))
+    //         boat1->removeProjectile();
+    // if (boat2->getProjectileExists())
+    //     if (projectileCollision(boat2->getProjectiles()))
+    //         boat2->removeProjectile();
 }
 
 void updateDefences(float dt)
 {
-    // Update All Defences
-    boat1->updateDefence(dt);
-    boat2->updateDefence(dt);
+    // // Update All Defences
+    // boat1->updateDefence(dt);
+    // boat2->updateDefence(dt);
 
-    // Lambda function for collision detection
-    auto defenceCollision = [&](std::list<Defence *> *defences) {
-        bool collision = false;
+    // // Lambda function for collision detection
+    // auto defenceCollision = [&](std::list<Defence *> *defences) {
+    //     bool collision = false;
 
-        for (std::list<Defence *>::iterator d = defences->begin();
-             d != defences->end(); ++d)
-        {
-            vec2f location = (*d)->getLocation();
-            // Wave Collision
-            if (wave->getYfromX(location.x) >= location.y)
-            {
-                defences->erase(d);
-                collision = true;
-                break;
-            }
-        }
+    //     for (std::list<Defence *>::iterator d = defences->begin();
+    //          d != defences->end(); ++d)
+    //     {
+    //         vec2f location = (*d)->getLocation();
+    //         // Wave Collision
+    //         if (wave->getYfromX(location.x) >= location.y)
+    //         {
+    //             defences->erase(d);
+    //             collision = true;
+    //             break;
+    //         }
+    //     }
 
-        return collision;
-    };
+    //     return collision;
+    // };
 
-    // Lambda function calls for all defences
-    if (boat1->getDefenceExists())
-        if (defenceCollision(boat1->getDefences()))
-            boat1->removeDefence();
-    if (boat2->getDefenceExists())
-        if (defenceCollision(boat2->getDefences()))
-            boat2->removeDefence();
+    // // Lambda function calls for all defences
+    // if (boat1->getDefenceExists())
+    //     if (defenceCollision(boat1->getDefences()))
+    //         boat1->removeDefence();
+    // if (boat2->getDefenceExists())
+    //     if (defenceCollision(boat2->getDefences()))
+    //         boat2->removeDefence();
 }
 
 // Draw funcitons
