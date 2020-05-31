@@ -44,19 +44,15 @@ float Wave3D::getGradientForAdvancedSine(float x, float z)
 	float one = a * b * cosf(b * x + k * c);
 	float two = a * b * cosf(b * z + k * c);
 
-	return a * b * cos(c * k + b + x);
+	return radToGrad(one);
 }
 
 vec3f Wave3D::getGradientForAdvancedTest(float x, float z)
 {
+	float vx = a * b * cosf(b * x + k * c);
+	float vz = a * b * cosf(b * z + k * c);
 
-	//float one = a * sinf(b * x + k * c);
-	//float two = a * sinf(b * z + k * c);
-	vec3f t;
-	t.x = a * b * cosf(b * x + k * c);
-	t.z = a * b * cosf(b * z + k * c);
-
-	return t;
+	return {vx, 1, vz};
 }
 
 void Wave3D::drawAdvanced()
@@ -109,17 +105,21 @@ void Wave3D::drawAdvanced()
 		glColor3f(1.0, 1.0, 0.0);
 		if (normal)
 		{
-			m = getGradientForAdvancedSine(px, pz);
-			drawVector({px, y, pz}, m, 0.1, true);
-			m = getGradientForAdvancedSine(px, pz);
-			drawVector({px, y, pz}, m, 0.1, true);
+			// m = getGradientForAdvancedSine(px, pz);
+			// drawVector({px, y, pz}, m, 0.03, true);
+
+			vec3f mv = getGradientForAdvancedTest(px, pz);
+			drawVector(vec, mv, 0.03, true);
+			// glPushMatrix();
+			// glTranslatef(px, y, pz);
+			// glRotatef(90, 0, 1, 0);
+			// drawVector({px, y, pz}, mv.z, 0.03, true);
+			// glPopMatrix();
 		}
 		if (tangent)
 		{
-			m = getGradientForAdvancedSine(px, pz);
-			drawVector({px, y, pz}, m, 0.1, false);
-			m = getGradientForAdvancedSine(px, pz);
-			drawVector({px, y, pz}, m, 0.1, false);
+			// m = getGradientForAdvancedSine(px, pz);
+			// drawVector({px, y, pz}, m, 0.03, false);
 		}
 	};
 
@@ -206,51 +206,51 @@ void Wave3D::draw()
 
 	this->disableLighting();
 
-	for (int i = 0; i < numSegments; i++)
-	{
-		if (i % 2 == 0)
-		{
-			for (int j = 0; j <= numSegments; j++)
-			{
-				float px = x + j * dist;
-				float y = getYfromX(px);
+	// for (int i = 0; i < numSegments; i++)
+	// {
+	// 	if (i % 2 == 0)
+	// 	{
+	// 		for (int j = 0; j <= numSegments; j++)
+	// 		{
+	// 			float px = x + j * dist;
+	// 			float y = getYfromX(px);
 
-				float m = getGradientForSine(px);
-				glColor3f(1.0, 1.0, 0.0);
-				if (normal)
-				{
-					drawVector({px, y, z - i * dist}, m, 0.1, true);
-					drawVector({px, y, z - i * dist - dist}, m, 0.1, true);
-				}
-				if (tangent)
-				{
-					drawVector({px, y, z - i * dist}, m, 0.1, false);
-					drawVector({px, y, z - i * dist - dist}, m, 0.1, false);
-				}
-			}
-		}
-		else
-		{
-			for (int j = numSegments; j >= 0; j--)
-			{
-				float px = x + j * dist;
-				float y = getYfromX(px);
+	// 			float m = getGradientForSine(px);
+	// 			glColor3f(1.0, 1.0, 0.0);
+	// 			if (normal)
+	// 			{
+	// 				drawVector({px, y, z - i * dist}, m, 0.1, true);
+	// 				drawVector({px, y, z - i * dist - dist}, m, 0.1, true);
+	// 			}
+	// 			if (tangent)
+	// 			{
+	// 				drawVector({px, y, z - i * dist}, m, 0.1, false);
+	// 				drawVector({px, y, z - i * dist - dist}, m, 0.1, false);
+	// 			}
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		for (int j = numSegments; j >= 0; j--)
+	// 		{
+	// 			float px = x + j * dist;
+	// 			float y = getYfromX(px);
 
-				float m = getGradientForSine(px);
-				glColor3f(1.0, 1.0, 0.0);
-				if (normal)
-				{
-					drawVector({px, y, z - i * dist}, m, 0.1, true);
-					drawVector({px, y, z - i * dist - dist}, m, 0.1, true);
-				}
-				if (tangent)
-				{
-					drawVector({px, y, z - i * dist}, m, 0.1, false);
-					drawVector({px, y, z - i * dist - dist}, m, 0.1, false);
-				}
-			}
-		}
-	}
+	// 			float m = getGradientForSine(px);
+	// 			glColor3f(1.0, 1.0, 0.0);
+	// 			if (normal)
+	// 			{
+	// 				drawVector({px, y, z - i * dist}, m, 0.1, true);
+	// 				drawVector({px, y, z - i * dist - dist}, m, 0.1, true);
+	// 			}
+	// 			if (tangent)
+	// 			{
+	// 				drawVector({px, y, z - i * dist}, m, 0.1, false);
+	// 				drawVector({px, y, z - i * dist - dist}, m, 0.1, false);
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 void Wave3D::setLighting()
@@ -329,10 +329,10 @@ void Wave3D::drawTom()
 				y = getYfromX(x);
 				float m = getGradientForSine(x);
 				glColor3f(1.0, 1.0, 0.0);
-				if (normal)
-					drawVector({x, y, z}, m, 0.1, true);
-				if (tangent)
-					drawVector({x, y, z}, m, 0.1, false);
+				// if (normal)
+				// 	drawVector({x, y, z}, m, 0.1, true);
+				// if (tangent)
+				// 	drawVector({x, y, z}, m, 0.1, false);
 			}
 		}
 	}
@@ -381,10 +381,10 @@ void Wave3D::drawTom2()
 				y = getYfromX(x);
 				float m = getGradientForSine(x);
 				glColor3f(1.0, 1.0, 0.0);
-				if (normal)
-					drawVector({x, y, z}, m, 0.1, true);
-				if (tangent)
-					drawVector({x, y, z}, m, 0.1, false);
+				// if (normal)
+				// 	drawVector({x, y, z}, m, 0.1, true);
+				// if (tangent)
+				// 	drawVector({x, y, z}, m, 0.1, false);
 			}
 		}
 	}
@@ -464,46 +464,46 @@ void Wave3D::decreaseNumSegments()
 	}
 }
 
-void Wave3D::drawVector(vec3f point, float m, float s, bool normalize)
+void Wave3D::drawVector(vec3f point, vec3f m, float s, bool normalize)
 {
-	float x = point.x;
-	float y = point.y;
-	float z = point.z;
+	vec3f endpoint = {0, 0, point.z};
 
-	float x2 = 0.0;
-	float y2 = 0.0;
+	float mx = m.x;
+	float mz = m.z;
 
 	if (normalize)
 	{
 		glColor3f(0.0, 1.0, 0.0);
-		m = -(1 / m);
+		mx = -(1 / m.x);
 	}
 	else
 	{
 		glColor3f(1.0, 0.0, 0.0);
 	}
 
-	if (m < 0)
+	if (mx < 0)
 	{
-		x2 = x - cos(atan(m)) * s;
-		y2 = y - sin(atan(m)) * s;
+		endpoint.x = point.x - cos(atan(mx)) * s;
+		endpoint.y = point.y - sin(atan(mx)) * s;
+		endpoint = rotatePointX(point, endpoint, atan(mz));
 	}
 	else
 	{
-		x2 = x + cos(atan(m)) * s;
-		y2 = y + sin(atan(m)) * s;
+		endpoint.x = point.x + cos(atan(mx)) * s;
+		endpoint.y = point.y + sin(atan(mx)) * s;
+		endpoint = rotatePointX(point, endpoint, atan(mz));
 	}
 
 	glBegin(GL_LINE_STRIP);
-	if (!z)
+	if (!point.z)
 	{
-		glVertex2f(x, y);
-		glVertex2f(x2, y2);
+		glVertex3f(point.x, point.y, point.z);
+		glVertex3f(endpoint.x, endpoint.y, endpoint.z);
 	}
 	else
 	{
-		glVertex3f(x, y, z);
-		glVertex3f(x2, y2, z);
+		glVertex3f(point.x, point.y, point.z);
+		glVertex3f(endpoint.x, endpoint.y, endpoint.z);
 	}
 	glEnd();
 }

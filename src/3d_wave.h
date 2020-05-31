@@ -39,7 +39,7 @@ public:
 	void toggleAnimation();
 	void increaseNumSegments();
 	void decreaseNumSegments();
-	void drawVector(vec3f point, float m, float s, bool normalize);
+	void drawVector(vec3f point, vec3f m, float s, bool normalize);
 
 private:
 	void setLighting();

@@ -135,8 +135,6 @@ void myinit()
 
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
-
-    // std::cout << radToDeg(gradToRad(calcVectorGrad({-1, 1, -1}, {0, 0, 0}))) << std::endl;
 }
 
 void myReshape(int w, int h)
@@ -182,15 +180,15 @@ void display()
     // boat1->drawHealth();
     // boat2->drawHealth();
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    // glEnable(GL_LIGHTING);
+    // glEnable(GL_LIGHT0);
     GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
     GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
     GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    // glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    // glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    // glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
