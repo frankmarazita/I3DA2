@@ -12,11 +12,11 @@ void drawDot(float x, float y, float z) {
 
 vec3f Island3D::endOfCannon()
 {
-    float J = CANNON_LENGTH * cosf(degToRad(cannonRotation));
+    float J = CANNON_LENGTH * cosf(degToRad(cannonSph.polar));
 
-    float x = J * sinf(degToRad(cannonPitch));
-    float y = CANNON_LENGTH * cosf(degToRad(cannonPitch));
-    float z = x * tanf(degToRad(cannonRotation));
+    float x = J * sinf(degToRad(cannonSph.a));
+    float y = CANNON_LENGTH * cosf(degToRad(cannonSph.a));
+    float z = x * tanf(degToRad(cannonSph.polar));
 
     // Apply our constant modifications to set the correct coordinates
     x = -x;
@@ -33,6 +33,31 @@ Island3D::Island3D()
     this->cannonGunBaseCylinder = new HalfCylinder(CANNON_BASE_CYLINDER_RADIUS, CANNON_BASE_CYLINDER_SIZE, 64);
 
     this->gunBox = new Rectangle3D(GUN_BOX_HEIGHT, CANNON_BASE_CYLINDER_RADIUS * 2, CANNON_BASE_CYLINDER_SIZE);
+}
+
+Projectile3D* Island3D::shoot()
+{
+    // Check for projectile shoot cooldown
+    if (glutGet(GLUT_ELAPSED_TIME) - shootTime >= cooldownTime)
+    {
+        shootTime = glutGet(GLUT_ELAPSED_TIME);
+        // Create a new projectile
+
+        // Sync up the angle properly because the rotation we apply to the cylinder isn't good
+        // Should we just + 90.0 to the draw then leave this angle at 0?
+        vec3fSpherical sph;
+        sph.magnitude = cannonSph.magnitude;
+        sph.a = -(cannonSph.a - 90.0);
+        //sph.polar = -(cannonSph.polar - 90.0);
+        sph.polar = -cannonSph.polar;
+
+        Projectile3D* projectile = new Projectile3D(endOfCannon(), sph, false, 0);
+
+        printf("Cannon rotation %f p: %f\n", cannonSph.polar, cannonSph.a);
+        printf("Cannon rotation22222222 %f p: %f\n", sph.polar, sph.a);
+        return projectile;
+    }
+    return NULL;
 }
 
 void Island3D::draw()
@@ -69,14 +94,14 @@ void Island3D::draw()
     // Boxy box
     glPushMatrix();
     glTranslatef(0, -CANNON_BASE_OFFSET, 0);
-    glRotatef(cannonRotation - 180, 0.0, 1.0, 0.0);
+    glRotatef(cannonSph.polar - 180, 0.0, 1.0, 0.0);
     gunBox->draw();
     glPopMatrix();
 
     // Cylinder Base (Gun Base)
     glPushMatrix();
     glTranslatef(0, -CANNON_BASE_OFFSET + GUN_BOX_HEIGHT/2, 0);
-    glRotatef(cannonRotation, 0.0, 1.0, 0.0);
+    glRotatef(cannonSph.polar, 0.0, 1.0, 0.0);
     glRotatef(-90, 1.0, 0.0, 0.0);
     glTranslatef(0, -CANNON_BASE_CYLINDER_SIZE/2, 0);
     cannonGunBaseCylinder->draw();
@@ -87,9 +112,9 @@ void Island3D::draw()
 
     glTranslatef(0, -CANNON_BASE_OFFSET + GUN_BOX_HEIGHT, 0);
     // Rotation
-    glRotatef(cannonRotation, 0.0, 1.0, 0.0);
+    glRotatef(cannonSph.polar, 0.0, 1.0, 0.0);
     // Pitch
-    glRotatef(cannonPitch, 0.0, 0.0, 1.0);
+    glRotatef(cannonSph.a, 0.0, 0.0, 1.0);
 
     cannon->draw();
     glPopMatrix();
@@ -102,7 +127,7 @@ void Island3D::draw()
     drawDot(-CANNON_LENGTH, 0 - CANNON_BASE_OFFSET + GUN_BOX_HEIGHT, 0.0);
 
     vec3f end = endOfCannon();
-    //printf("Cannon rotation %f p: %f x: %f y: %f z: %f\n", cannonRotation, cannonPitch, end.x, end.y, end.z);
+    //printf("Cannon rotation %f p: %f x: %f y: %f z: %f\n", cannonSph.polar, cannonSph.a, end.x, end.y, end.z);
 
     drawDot(end.x, end.y, end.z);
 
@@ -151,21 +176,21 @@ void Island3D::drawScore()
 
 void Island3D::tiltCannonUp()
 {
-    if (cannonPitch + CANNON_TILT_SPEED > CANNON_TILT_MAX)
+    if (cannonSph.a + CANNON_TILT_SPEED > CANNON_TILT_MAX)
         return;
 
-    cannonPitch += CANNON_TILT_SPEED;
+    cannonSph.a += CANNON_TILT_SPEED;
 }
 
 void Island3D::tiltCannonDown()
 {
-    //printf("%f %f\n", cannonPitch, cannonPitch + CANNON_TILT_SPEED);
-    if (cannonPitch + CANNON_TILT_SPEED < CANNON_TILT_MIN) {
+    //printf("%f %f\n", cannonSph.a, cannonSph.a + CANNON_TILT_SPEED);
+    if (cannonSph.a + CANNON_TILT_SPEED < CANNON_TILT_MIN) {
         //printf("RETURNEDDD");
         return;
     }
 
-    cannonPitch -= CANNON_TILT_SPEED;
+    cannonSph.a -= CANNON_TILT_SPEED;
 }
 
 bool Island3D::collision(vec3f otherLocation, float otherRadius)

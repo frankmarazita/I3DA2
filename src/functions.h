@@ -8,6 +8,7 @@
 #include "vec2f.h"
 #include "vec2fPolar.h"
 #include "vec3f.h"
+#include "vec3fSpherical.h"
 
 #include <cmath>
 
@@ -22,5 +23,6 @@ float calcVectorDistance(vec3f v1, vec3f v2);
 float calcVectorGrad(vec3f v1, vec3f v2);
 vec3f rotatePointZ(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
 vec3f rotatePointY(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
+vec3f sphericalToCartesian(vec3fSpherical spherical);
 
 #endif // FUNCTIONS_H

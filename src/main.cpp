@@ -21,8 +21,8 @@
 #include "random.h"
 #include "keyboard.h"
 #include "mouse.h"
-#include "cylinder.h"
 #include "skybox.h"
+#include "sphere.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -46,6 +46,7 @@ Skybox *skybox;
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
+std::list<Projectile3D*> projectiles;
 
 std::list<Boat3D *> boats;
 
@@ -242,6 +243,14 @@ void display()
     {
         (*boat)->draw();
     }
+
+    // Draw projectiles 3D
+    for (std::list<Projectile3D*>::iterator projectile = projectiles.begin();
+        projectile != projectiles.end(); ++projectile)
+    {
+        (*projectile)->draw(wave);
+    }
+    
 
     // // Draw Boat 1
     // glPushMatrix();
@@ -460,7 +469,7 @@ void update()
     }
 
     // Update Defence and Projectile Locations
-    updateDefences(dt);
+    //updateDefences(dt);
     updateProjectiles(dt);
 
     // Boat 1 Defences
@@ -623,10 +632,10 @@ void keyPressSpecial(int key)
         switch (key)
         {
         case GLUT_KEY_LEFT: // Cannon Rotate Left
-            island3D->cannonRotation -= CANNON_ROTATION_SPEED;
+            island3D->cannonSph.polar -= CANNON_ROTATION_SPEED;
             break;
         case GLUT_KEY_RIGHT: // Cannon Rotate Right
-            island3D->cannonRotation += CANNON_ROTATION_SPEED;
+            island3D->cannonSph.polar += CANNON_ROTATION_SPEED;
             break;
         }
         /*default:
@@ -639,6 +648,7 @@ void keyPressSpecial(int key)
 
 void keyPress(unsigned char key)
 {
+    Projectile3D* proj;
     // Keypress functionality for simultaneous holding
     if (global.runnning)
     {
@@ -655,6 +665,11 @@ void keyPress(unsigned char key)
             island3D->tiltCannonUp();
             break;
         case 32: // Island Cannon Fire
+            proj = island3D->shoot();
+            if (proj)
+            {
+                projectiles.push_back(proj);
+            }
             break;
         case 'v': // Island Cannon Defence
             break;
@@ -709,9 +724,15 @@ void displayFPS()
 void updateProjectiles(float dt)
 {
     // Update All Projectiles
-    island->updateProjectile(dt);
+    for (std::list<Projectile3D*>::iterator p = projectiles.begin();
+        p != projectiles.end(); ++p)
+    {
+        (*p)->updateProjectileState(dt);
+    }
+
+    /*island->updateProjectile(dt);
     boat1->updateProjectile(dt);
-    boat2->updateProjectile(dt);
+    boat2->updateProjectile(dt);*/
 
     // Lambda function for collision detection
     auto projectileCollision = [&](std::list<Projectile *> *projectiles) {
@@ -806,7 +827,7 @@ void updateProjectiles(float dt)
     };
 
     // Lambda function calls for all projectiles
-    if (island->getProjectileExists())
+    /*if (island->getProjectileExists())
         if (projectileCollision(island->getProjectiles()))
             island->removeProjectile();
     if (boat1->getProjectileExists())
@@ -814,7 +835,7 @@ void updateProjectiles(float dt)
             boat1->removeProjectile();
     if (boat2->getProjectileExists())
         if (projectileCollision(boat2->getProjectiles()))
-            boat2->removeProjectile();
+            boat2->removeProjectile();*/
 }
 
 void updateDefences(float dt)
