@@ -67,6 +67,7 @@ Skybox *skybox;
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
+std::list<Projectile3D*> projectiles;
 
 std::vector<Boat3D *> boats;
 
