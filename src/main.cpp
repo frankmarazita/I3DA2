@@ -28,13 +28,34 @@
 #include <stdio.h>
 #include <cmath>
 #include <list>
+#include <vector>
 #include <string>
 
-const int milli = 1000;
-const float windowSize = 1;
+typedef struct
+{
+    int milli;
+    float worldSize;
+    int windowHeight;
+    int windowWidth;
+    bool runnning;
+    float startTime;
+    int frames;
+    float FPS;
+    float FPSInterval;
+    float lastFPSTime;
+    bool wireframe;
+    bool lighting;
+    bool textures;
+    bool pause;
+    float keyPressTime;
+    float updateBoatTime;
+    float boatCreationTime;
+} global_t;
+
+global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1};
 
 // Game objects
-Wave3D *wave = new Wave3D(windowSize, 64, 0.07, 9, 0.25 * M_PI, 0, -0.5);
+Wave3D *wave = new Wave3D(global.worldSize, 64, 0.07, 9, 0.25 * M_PI, 0, -0.5);
 vec2f boat1location = {-0.5, 0};
 Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
@@ -46,27 +67,8 @@ Skybox *skybox;
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
-std::list<Projectile3D*> projectiles;
 
-std::list<Boat3D *> boats;
-
-typedef struct
-{
-    int windowHeight;
-    int windowWidth;
-    bool runnning;
-    float startTime;
-    int frames;
-    float FPS;
-    float FPSInterval;
-    float lastFPSTime;
-    bool wireframe;
-    float keyPressTime;
-    float updateBoatTime;
-    float boatCreationTime;
-} global_t;
-
-global_t global = {600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, -1, -1, -1};
+std::vector<Boat3D *> boats;
 
 // Application Functions
 void myinit();
@@ -131,13 +133,11 @@ void myinit()
     //glShadeModel(GL_FLAT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
-    seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
+    seafloor = new Seafloor(global.worldSize); // We have to initialise it here or at least import the texture here
     skybox = new Skybox();
 
     // Set global start time
-    global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
-
-    // std::cout << radToDeg(gradToRad(calcVectorGrad({-1, 1, -1}, {0, 0, 0}))) << std::endl;
+    global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)global.milli;
 }
 
 void myReshape(int w, int h)
@@ -178,20 +178,18 @@ void display()
     island3D->drawHealth();
     island3D->drawScore();
 
-    // Draw Health Bars
-    // island->drawHealth();
-    // boat1->drawHealth();
-    // boat2->drawHealth();
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
+        GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
+        GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
-    GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
-    GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    }
 
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -209,7 +207,7 @@ void display()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Draw Axis
-    drawAxis(windowSize);
+    drawAxis(global.worldSize);
 
     glDisable(GL_LIGHT0);
     // Draw seafloor
@@ -223,11 +221,10 @@ void display()
     wave->drawAdvanced();
     glPopMatrix();
 
-    glEnable(GL_LIGHT0);
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHT0);
+    }
 
     // Draw 3D Island
     glPushMatrix();
@@ -238,10 +235,9 @@ void display()
     // island->draw();
 
     // Draw AI Boats
-    for (std::list<Boat3D *>::iterator boat = boats.begin();
-         boat != boats.end(); ++boat)
+    for (int i = 0; i < boats.size(); i++)
     {
-        (*boat)->draw();
+        boats[i]->draw();
     }
 
     // Draw projectiles 3D
@@ -343,7 +339,7 @@ void update()
     float t;
     float dt;
 
-    t = glutGet(GLUT_ELAPSED_TIME) / (float)milli - global.startTime;
+    t = glutGet(GLUT_ELAPSED_TIME) / (float)global.milli - global.startTime;
 
     if (lastT < 0.0)
     {
@@ -352,9 +348,6 @@ void update()
     }
 
     dt = t - lastT;
-    // Move Wave
-    if (wave->getAnimate())
-        wave->moveWave(glutGet(GLUT_ELAPSED_TIME) / (float)milli / 2);
 
     // Keypresses
     if (global.keyPressTime + 20 < glutGet(GLUT_ELAPSED_TIME))
@@ -376,6 +369,13 @@ void update()
             keyPressSpecial(*i);
         }
         global.keyPressTime = glutGet(GLUT_ELAPSED_TIME);
+    }
+
+    // Move Wave
+    if (wave->getAnimate())
+    {
+        wave->moveWave(glutGet(GLUT_ELAPSED_TIME) / (float)global.milli / 2);
+        wave->update();
     }
 
     // Create Boat AI
@@ -409,7 +409,6 @@ void update()
         boat3DLocation.y = wave->getYfromXZ(boat3DLocation.x, boat3DLocation.z);
 
         Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45);
-
         boats.push_back(boat3D);
 
         global.boatCreationTime = glutGet(GLUT_ELAPSED_TIME);
@@ -418,12 +417,13 @@ void update()
     // Update AI Boats
     if (global.updateBoatTime + 20 < glutGet(GLUT_ELAPSED_TIME))
     {
-        for (std::list<Boat3D *>::iterator boat = boats.begin();
-             boat != boats.end(); ++boat)
+        for (int i = 0; i < boats.size(); i++)
         {
+            Boat3D *boat = boats[i];
+
             float dist = 0.0007;
 
-            vec3f location = (*boat)->getLocation();
+            vec3f location = boat->getLocation();
             float destX = 0;
             float destZ = 0;
 
@@ -439,27 +439,28 @@ void update()
 
             location.y = wave->getYfromXZ(location.x, location.z);
 
-            (*boat)->setPrevLocation();
-            (*boat)->setLocation(location);
-            (*boat)->updateBoatRotation();
+            boat->setPrevLocation();
+            boat->setLocation(location);
+            boat->updateBoatRotation();
 
-            vec3f prevLocation = (*boat)->getPrevLocation();
+            vec3f prevLocation = boat->getPrevLocation();
             prevLocation.y = wave->getYfromXZ(prevLocation.x, prevLocation.z);
             grad = calcVectorGrad(prevLocation, location);
             deg = gradToDeg(grad);
-            (*boat)->setBoatDeg(deg);
-            float initialCannonDeg = (*boat)->getInitialCannonDeg();
-            (*boat)->setCannonDeg(initialCannonDeg - deg);
-            (*boat)->calcProjectileOrigin();
+            boat->setBoatDeg(deg);
+            float initialCannonDeg = boat->getInitialCannonDeg();
+            boat->setCannonDeg(initialCannonDeg - deg);
+            boat->calcProjectileOrigin();
         }
 
-        for (std::list<Boat3D *>::iterator boat = boats.begin();
-             boat != boats.end(); ++boat)
+        for (int i = 0; i < boats.size(); i++)
         {
-            bool collision = island3D->collision((*boat)->getLocation(), (*boat)->getHitboxRadius());
+            Boat3D *boat = boats[i];
+
+            bool collision = island3D->collision(boat->getLocation(), boat->getHitboxRadius());
             if (collision)
             {
-                boats.erase(boat);
+                boats.erase(boats.begin() + i);
                 island3D->damage();
                 break;
             }
@@ -468,27 +469,30 @@ void update()
         global.updateBoatTime = glutGet(GLUT_ELAPSED_TIME);
     }
 
-    // Update Defence and Projectile Locations
-    //updateDefences(dt);
+    // // Update Defence and Projectile Locations
+    // updateDefences(dt);
     updateProjectiles(dt);
 
-    // Boat 1 Defences
-    std::list<Defence *> *defences1 = boat1->getDefences();
-    for (std::list<Defence *>::iterator d = defences1->begin();
-         d != defences1->end(); ++d)
-    {
-        (*d)->increaseRadius();
-    }
-    // Boat 2 Defences
-    std::list<Defence *> *defences2 = boat2->getDefences();
-    for (std::list<Defence *>::iterator d = defences2->begin();
-         d != defences2->end(); ++d)
-    {
-        (*d)->increaseRadius();
-    }
-    lastT = t;
+    // // Boat 1 Defences
+    // std::list<Defence *> *defences1 = boat1->getDefences();
+    // for (std::list<Defence *>::iterator d = defences1->begin();
+    //      d != defences1->end(); ++d)
+    // {
+    //     (*d)->increaseRadius();
+    // }
+    // // Boat 2 Defences
+    // std::list<Defence *> *defences2 = boat2->getDefences();
+    // for (std::list<Defence *>::iterator d = defences2->begin();
+    //      d != defences2->end(); ++d)
+    // {
+    //     (*d)->increaseRadius();
+    // }
+
+    if (!global.pause)
+    {}
 
     // Counter
+    lastT = t;
     dt = t - global.lastFPSTime;
     if (dt > global.FPSInterval)
     {
@@ -575,14 +579,17 @@ void keyDown(unsigned char key, int x, int y)
         global.wireframe = !global.wireframe;
         break;
     case 'l': // Toggle Lighting
+        global.lighting = !global.lighting;
         break;
     case 'n': // Normals and Tangents
         wave->toggleNormal();
         wave->toggleTangent();
         break;
     case 't': // Toggle Textures
+        global.textures = !global.textures;
         break;
     case 'h': // Pause/Resume Game Animations
+        global.pause = !global.pause;
         wave->toggleAnimation();
         break;
     case 61: // Wave Segments (+)
@@ -729,148 +736,149 @@ void updateProjectiles(float dt)
     {
         (*p)->updateProjectileState(dt);
     }
+  
+    // // Update All Projectiles
+    // island->updateProjectile(dt);
+    // boat1->updateProjectile(dt);
+    // boat2->updateProjectile(dt);
 
-    /*island->updateProjectile(dt);
-    boat1->updateProjectile(dt);
-    boat2->updateProjectile(dt);*/
+    // // Lambda function for collision detection
+    // auto projectileCollision = [&](std::list<Projectile *> *projectiles) {
+    //     bool collision = false;
 
-    // Lambda function for collision detection
-    auto projectileCollision = [&](std::list<Projectile *> *projectiles) {
-        bool collision = false;
+    //     for (std::list<Projectile *>::iterator p = projectiles->begin();
+    //          p != projectiles->end(); ++p)
+    //     {
+    //         vec2f location = (*p)->getLocation();
 
-        for (std::list<Projectile *>::iterator p = projectiles->begin();
-             p != projectiles->end(); ++p)
-        {
-            vec2f location = (*p)->getLocation();
+    //         // Boat 1 Defences
+    //         std::list<Defence *> *defences1 = boat1->getDefences();
+    //         for (std::list<Defence *>::iterator d = defences1->begin();
+    //              d != defences1->end(); ++d)
+    //         {
+    //             if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
+    //                 collision = true;
+    //         }
+    //         // Boat 2 Defences
+    //         std::list<Defence *> *defences2 = boat2->getDefences();
+    //         for (std::list<Defence *>::iterator d = defences2->begin();
+    //              d != defences2->end(); ++d)
+    //         {
+    //             if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
+    //                 collision = true;
+    //         }
 
-            // Boat 1 Defences
-            std::list<Defence *> *defences1 = boat1->getDefences();
-            for (std::list<Defence *>::iterator d = defences1->begin();
-                 d != defences1->end(); ++d)
-            {
-                if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
-                    collision = true;
-            }
-            // Boat 2 Defences
-            std::list<Defence *> *defences2 = boat2->getDefences();
-            for (std::list<Defence *>::iterator d = defences2->begin();
-                 d != defences2->end(); ++d)
-            {
-                if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
-                    collision = true;
-            }
+    //         // Island
+    //         if (!(*p)->getIsBoat())
+    //         {
+    //             // Boat 1 Collision
+    //             if ((*p)->getCollision(boat1->getScale(), boat1->getLocation()))
+    //             {
+    //                 collision = true;
+    //                 if (boat1->damage())
+    //                     global.runnning = false;
+    //             }
+    //             // Boat 2 Collision
+    //             if ((*p)->getCollision(boat2->getScale(), boat2->getLocation()))
+    //             {
+    //                 collision = true;
+    //                 if (boat2->damage())
+    //                     global.runnning = false;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             // Island Collision
+    //             if (island->collision(location))
+    //             {
+    //                 collision = true;
+    //                 if (island->damage())
+    //                     global.runnning = false;
+    //             }
 
-            // Island
-            if (!(*p)->getIsBoat())
-            {
-                // Boat 1 Collision
-                if ((*p)->getCollision(boat1->getScale(), boat1->getLocation()))
-                {
-                    collision = true;
-                    if (boat1->damage())
-                        global.runnning = false;
-                }
-                // Boat 2 Collision
-                if ((*p)->getCollision(boat2->getScale(), boat2->getLocation()))
-                {
-                    collision = true;
-                    if (boat2->damage())
-                        global.runnning = false;
-                }
-            }
-            else
-            {
-                // Island Collision
-                if (island->collision(location))
-                {
-                    collision = true;
-                    if (island->damage())
-                        global.runnning = false;
-                }
+    //             //Boats
+    //             if ((*p)->getBoatNum() == 0)
+    //             {
+    //                 // Boat 2 Collision
+    //                 if ((*p)->getCollision(boat2->getScale(),
+    //                                        boat2->getLocation()))
+    //                 {
+    //                     collision = true;
+    //                     if (boat2->damage())
+    //                         global.runnning = false;
+    //                 }
+    //             }
+    //             else if ((*p)->getBoatNum() == 1)
+    //             {
+    //                 // Boat 1 Collision
+    //                 if ((*p)->getCollision(boat1->getScale(),
+    //                                        boat1->getLocation()))
+    //                 {
+    //                     collision = true;
+    //                     if (boat1->damage())
+    //                         global.runnning = false;
+    //                 }
+    //             }
+    //         }
 
-                //Boats
-                if ((*p)->getBoatNum() == 0)
-                {
-                    // Boat 2 Collision
-                    if ((*p)->getCollision(boat2->getScale(),
-                                           boat2->getLocation()))
-                    {
-                        collision = true;
-                        if (boat2->damage())
-                            global.runnning = false;
-                    }
-                }
-                else if ((*p)->getBoatNum() == 1)
-                {
-                    // Boat 1 Collision
-                    if ((*p)->getCollision(boat1->getScale(),
-                                           boat1->getLocation()))
-                    {
-                        collision = true;
-                        if (boat1->damage())
-                            global.runnning = false;
-                    }
-                }
-            }
+    //         // Wave Collision
+    //         if (wave->getYfromX(location.x) >= location.y)
+    //             collision = true;
 
-            // Wave Collision
-            if (wave->getYfromX(location.x) >= location.y)
-                collision = true;
+    //         if (collision)
+    //         {
+    //             projectiles->erase(p);
+    //             return collision;
+    //         }
+    //     }
+    //     return collision;
+    // };
 
-            if (collision)
-            {
-                projectiles->erase(p);
-                return collision;
-            }
-        }
-        return collision;
-    };
-
-    // Lambda function calls for all projectiles
-    /*if (island->getProjectileExists())
-        if (projectileCollision(island->getProjectiles()))
-            island->removeProjectile();
-    if (boat1->getProjectileExists())
-        if (projectileCollision(boat1->getProjectiles()))
-            boat1->removeProjectile();
-    if (boat2->getProjectileExists())
-        if (projectileCollision(boat2->getProjectiles()))
-            boat2->removeProjectile();*/
+    // // Lambda function calls for all projectiles
+    // if (island->getProjectileExists())
+    //     if (projectileCollision(island->getProjectiles()))
+    //         island->removeProjectile();
+    // if (boat1->getProjectileExists())
+    //     if (projectileCollision(boat1->getProjectiles()))
+    //         boat1->removeProjectile();
+    // if (boat2->getProjectileExists())
+    //     if (projectileCollision(boat2->getProjectiles()))
+    //         boat2->removeProjectile();
 }
 
 void updateDefences(float dt)
 {
-    // Update All Defences
-    boat1->updateDefence(dt);
-    boat2->updateDefence(dt);
+    // // Update All Defences
+    // boat1->updateDefence(dt);
+    // boat2->updateDefence(dt);
 
-    // Lambda function for collision detection
-    auto defenceCollision = [&](std::list<Defence *> *defences) {
-        bool collision = false;
+    // // Lambda function for collision detection
+    // auto defenceCollision = [&](std::list<Defence *> *defences) {
+    //     bool collision = false;
 
-        for (std::list<Defence *>::iterator d = defences->begin();
-             d != defences->end(); ++d)
-        {
-            vec2f location = (*d)->getLocation();
-            // Wave Collision
-            if (wave->getYfromX(location.x) >= location.y)
-            {
-                defences->erase(d);
-                collision = true;
-                break;
-            }
-        }
+    //     for (std::list<Defence *>::iterator d = defences->begin();
+    //          d != defences->end(); ++d)
+    //     {
+    //         vec2f location = (*d)->getLocation();
+    //         // Wave Collision
+    //         if (wave->getYfromX(location.x) >= location.y)
+    //         {
+    //             defences->erase(d);
+    //             collision = true;
+    //             break;
+    //         }
+    //     }
 
-        return collision;
-    };
+    //     return collision;
+    // };
 
-    // Lambda function calls for all defences
-    if (boat1->getDefenceExists())
-        if (defenceCollision(boat1->getDefences()))
-            boat1->removeDefence();
-    if (boat2->getDefenceExists())
-        if (defenceCollision(boat2->getDefences()))
-            boat2->removeDefence();
+    // // Lambda function calls for all defences
+    // if (boat1->getDefenceExists())
+    //     if (defenceCollision(boat1->getDefences()))
+    //         boat1->removeDefence();
+    // if (boat2->getDefenceExists())
+    //     if (defenceCollision(boat2->getDefences()))
+    //         boat2->removeDefence();
 }
 
 // Draw funcitons

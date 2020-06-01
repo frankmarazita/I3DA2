@@ -13,6 +13,7 @@
 #include <cmath>
 
 float radToDeg(float rad);
+float radToGrad(float rad);
 float degToRad(float deg);
 float gradToRad(float grad);
 float gradToDeg(float grad);
@@ -23,6 +24,7 @@ float calcVectorDistance(vec3f v1, vec3f v2);
 float calcVectorGrad(vec3f v1, vec3f v2);
 vec3f rotatePointZ(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
 vec3f rotatePointY(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
+vec3f rotatePointX(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
 vec3f sphericalToCartesian(vec3fSpherical spherical);
 
 #endif // FUNCTIONS_H
