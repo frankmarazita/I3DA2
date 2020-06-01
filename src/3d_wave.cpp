@@ -15,19 +15,6 @@ Wave3D::Wave3D(float windowSize, float numSegments, float a, float b, float k, f
     calcVerticies();
 }
 
-float Wave3D::getYfromXZ(float x, float z)
-{
-    return a * sinf(b * x + k * c) + a * sinf(b * z + k * c) + d;
-}
-
-vec3f Wave3D::getGradientForAdvancedSine(float x, float z)
-{
-    float vx = a * b * cosf(b * x + k * c);
-    float vz = a * b * cosf(b * z + k * c);
-
-    return {vx, 1, vz};
-}
-
 void Wave3D::drawAdvanced()
 {
     float x = -windowSize;
@@ -81,8 +68,6 @@ void Wave3D::drawAdvanced()
     };
 
     auto drawFromMemory = [&](vec3f vec1, vec3f vec2) {
-        vec1.y = getYfromXZ(vec1.x, vec1.z);
-        vec2.y = getYfromXZ(vec2.x, vec2.z);
         glNormal3f(vec1.x, vec1.y, vec1.z);
         glVertex3f(vec1.x, vec1.y, vec1.z);
         glNormal3f(vec2.x, vec2.y, vec2.z);
@@ -132,30 +117,6 @@ void Wave3D::drawAdvanced()
     }
 }
 
-void Wave3D::setLighting()
-{
-    glBlendFunc(GL_ONE, GL_ONE); // Enables Transparency
-
-    glEnable(GL_LIGHT1);
-    GLfloat light_ambient[] = {0.2, 0.5, 1.0, 0.75};
-    GLfloat light_diffuse[] = {0.2, 0.5, 1.0, 0.75};
-    GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
-    GLfloat mat_specular[] = {0.2, 0.5, 1.0, 0};
-    GLfloat high_shininess[] = {100.0};
-    glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT1, GL_POSITION, light_position);
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-}
-
-void Wave3D::disableLighting()
-{
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glDisable(GL_LIGHTING);
-    glDisable(GL_LIGHT1);
-}
-
 void Wave3D::moveWave(float amount)
 {
     // Set the wave displacement c value
@@ -176,6 +137,28 @@ void Wave3D::calcVerticies()
             verticies.push_back({x, 0, z});
         }
     }
+}
+
+void Wave3D::update()
+{
+    for (int i = 0; i < verticies.size(); i++)
+    {
+        vec3f point = verticies[i];
+        verticies[i].y = getYfromXZ(point.x, point.z);
+    }
+}
+
+float Wave3D::getYfromXZ(float x, float z)
+{
+    return a * sinf(b * x + k * c) + a * sinf(b * z + k * c) + d;
+}
+
+vec3f Wave3D::getGradientForAdvancedSine(float x, float z)
+{
+    float vx = a * b * cosf(b * x + k * c);
+    float vz = a * b * cosf(b * z + k * c);
+
+    return {vx, 1, vz};
 }
 
 bool Wave3D::getAnimate()
@@ -258,4 +241,28 @@ void Wave3D::drawVector(vec3f point, vec3f m, float s, bool normalize)
     glVertex3f(point.x, point.y, point.z);
     glVertex3f(endpoint.x, endpoint.y, endpoint.z);
     glEnd();
+}
+
+void Wave3D::setLighting()
+{
+    glBlendFunc(GL_ONE, GL_ONE); // Enables Transparency
+
+    glEnable(GL_LIGHT1);
+    GLfloat light_ambient[] = {0.2, 0.5, 1.0, 0.75};
+    GLfloat light_diffuse[] = {0.2, 0.5, 1.0, 0.75};
+    GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
+    GLfloat mat_specular[] = {0.2, 0.5, 1.0, 0};
+    GLfloat high_shininess[] = {100.0};
+    glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT1, GL_POSITION, light_position);
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+}
+
+void Wave3D::disableLighting()
+{
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT1);
 }

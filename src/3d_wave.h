@@ -21,6 +21,7 @@ public:
 
 	void moveWave(float amount);
 	void calcVerticies();
+	void update();
 
 	float getYfromXZ(float x, float z);
 	vec3f getGradientForAdvancedSine(float x, float z);
@@ -41,7 +42,6 @@ private:
 
 	void setLighting();
 	void disableLighting();
-	float getGradientForSine(float x);
 
 	float a, b, c, d, k;
 

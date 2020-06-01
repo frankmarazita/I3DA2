@@ -28,13 +28,34 @@
 #include <stdio.h>
 #include <cmath>
 #include <list>
+#include <vector>
 #include <string>
 
-const int milli = 1000;
-const float windowSize = 1;
+typedef struct
+{
+    int milli;
+    float worldSize;
+    int windowHeight;
+    int windowWidth;
+    bool runnning;
+    float startTime;
+    int frames;
+    float FPS;
+    float FPSInterval;
+    float lastFPSTime;
+    bool wireframe;
+    bool lighting;
+    bool textures;
+    bool pause;
+    float keyPressTime;
+    float updateBoatTime;
+    float boatCreationTime;
+} global_t;
+
+global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1};
 
 // Game objects
-Wave3D *wave = new Wave3D(windowSize, 64, 0.07, 9, 0.25 * M_PI, 0, -0.5);
+Wave3D *wave = new Wave3D(global.worldSize, 64, 0.07, 9, 0.25 * M_PI, 0, -0.5);
 vec2f boat1location = {-0.5, 0};
 Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
@@ -47,25 +68,7 @@ Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
 
-std::list<Boat3D *> boats;
-
-typedef struct
-{
-    int windowHeight;
-    int windowWidth;
-    bool runnning;
-    float startTime;
-    int frames;
-    float FPS;
-    float FPSInterval;
-    float lastFPSTime;
-    bool wireframe;
-    float keyPressTime;
-    float updateBoatTime;
-    float boatCreationTime;
-} global_t;
-
-global_t global = {600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, -1, -1, -1};
+std::vector<Boat3D *> boats;
 
 // Application Functions
 void myinit();
@@ -130,11 +133,11 @@ void myinit()
     //glShadeModel(GL_FLAT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
 
-    seafloor = new Seafloor(windowSize); // We have to initialise it here or at least import the texture here
+    seafloor = new Seafloor(global.worldSize); // We have to initialise it here or at least import the texture here
     skybox = new Skybox();
 
     // Set global start time
-    global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)milli;
+    global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)global.milli;
 }
 
 void myReshape(int w, int h)
@@ -175,20 +178,18 @@ void display()
     island3D->drawHealth();
     island3D->drawScore();
 
-    // Draw Health Bars
-    // island->drawHealth();
-    // boat1->drawHealth();
-    // boat2->drawHealth();
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
+        GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
+        GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
 
-    // glEnable(GL_LIGHTING);
-    // glEnable(GL_LIGHT0);
-    GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
-    GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
-    GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
-
-    // glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    // glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    // glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    }
 
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -206,7 +207,7 @@ void display()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Draw Axis
-    drawAxis(windowSize);
+    drawAxis(global.worldSize);
 
     glDisable(GL_LIGHT0);
     // Draw seafloor
@@ -220,11 +221,10 @@ void display()
     wave->drawAdvanced();
     glPopMatrix();
 
-    glEnable(GL_LIGHT0);
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHT0);
+    }
 
     // Draw 3D Island
     glPushMatrix();
@@ -235,10 +235,9 @@ void display()
     // island->draw();
 
     // Draw AI Boats
-    for (std::list<Boat3D *>::iterator boat = boats.begin();
-         boat != boats.end(); ++boat)
+    for (int i = 0; i < boats.size(); i++)
     {
-        (*boat)->draw();
+        boats[i]->draw();
     }
 
     // // Draw Boat 1
@@ -332,7 +331,7 @@ void update()
     float t;
     float dt;
 
-    t = glutGet(GLUT_ELAPSED_TIME) / (float)milli - global.startTime;
+    t = glutGet(GLUT_ELAPSED_TIME) / (float)global.milli - global.startTime;
 
     if (lastT < 0.0)
     {
@@ -341,9 +340,6 @@ void update()
     }
 
     dt = t - lastT;
-    // Move Wave
-    if (wave->getAnimate())
-        wave->moveWave(glutGet(GLUT_ELAPSED_TIME) / (float)milli / 2);
 
     // Keypresses
     if (global.keyPressTime + 20 < glutGet(GLUT_ELAPSED_TIME))
@@ -365,6 +361,13 @@ void update()
             keyPressSpecial(*i);
         }
         global.keyPressTime = glutGet(GLUT_ELAPSED_TIME);
+    }
+
+    // Move Wave
+    if (wave->getAnimate())
+    {
+        wave->moveWave(glutGet(GLUT_ELAPSED_TIME) / (float)global.milli / 2);
+        wave->update();
     }
 
     // Create Boat AI
@@ -398,7 +401,6 @@ void update()
         boat3DLocation.y = wave->getYfromXZ(boat3DLocation.x, boat3DLocation.z);
 
         Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45);
-
         boats.push_back(boat3D);
 
         global.boatCreationTime = glutGet(GLUT_ELAPSED_TIME);
@@ -407,12 +409,13 @@ void update()
     // Update AI Boats
     if (global.updateBoatTime + 20 < glutGet(GLUT_ELAPSED_TIME))
     {
-        for (std::list<Boat3D *>::iterator boat = boats.begin();
-             boat != boats.end(); ++boat)
+        for (int i = 0; i < boats.size(); i++)
         {
+            Boat3D *boat = boats[i];
+
             float dist = 0.0007;
 
-            vec3f location = (*boat)->getLocation();
+            vec3f location = boat->getLocation();
             float destX = 0;
             float destZ = 0;
 
@@ -428,27 +431,28 @@ void update()
 
             location.y = wave->getYfromXZ(location.x, location.z);
 
-            (*boat)->setPrevLocation();
-            (*boat)->setLocation(location);
-            (*boat)->updateBoatRotation();
+            boat->setPrevLocation();
+            boat->setLocation(location);
+            boat->updateBoatRotation();
 
-            vec3f prevLocation = (*boat)->getPrevLocation();
+            vec3f prevLocation = boat->getPrevLocation();
             prevLocation.y = wave->getYfromXZ(prevLocation.x, prevLocation.z);
             grad = calcVectorGrad(prevLocation, location);
             deg = gradToDeg(grad);
-            (*boat)->setBoatDeg(deg);
-            float initialCannonDeg = (*boat)->getInitialCannonDeg();
-            (*boat)->setCannonDeg(initialCannonDeg - deg);
-            (*boat)->calcProjectileOrigin();
+            boat->setBoatDeg(deg);
+            float initialCannonDeg = boat->getInitialCannonDeg();
+            boat->setCannonDeg(initialCannonDeg - deg);
+            boat->calcProjectileOrigin();
         }
 
-        for (std::list<Boat3D *>::iterator boat = boats.begin();
-             boat != boats.end(); ++boat)
+        for (int i = 0; i < boats.size(); i++)
         {
-            bool collision = island3D->collision((*boat)->getLocation(), (*boat)->getHitboxRadius());
+            Boat3D *boat = boats[i];
+
+            bool collision = island3D->collision(boat->getLocation(), boat->getHitboxRadius());
             if (collision)
             {
-                boats.erase(boat);
+                boats.erase(boats.begin() + i);
                 island3D->damage();
                 break;
             }
@@ -457,27 +461,31 @@ void update()
         global.updateBoatTime = glutGet(GLUT_ELAPSED_TIME);
     }
 
-    // Update Defence and Projectile Locations
-    updateDefences(dt);
-    updateProjectiles(dt);
+    // // Update Defence and Projectile Locations
+    // updateDefences(dt);
+    // updateProjectiles(dt);
 
-    // Boat 1 Defences
-    std::list<Defence *> *defences1 = boat1->getDefences();
-    for (std::list<Defence *>::iterator d = defences1->begin();
-         d != defences1->end(); ++d)
+    // // Boat 1 Defences
+    // std::list<Defence *> *defences1 = boat1->getDefences();
+    // for (std::list<Defence *>::iterator d = defences1->begin();
+    //      d != defences1->end(); ++d)
+    // {
+    //     (*d)->increaseRadius();
+    // }
+    // // Boat 2 Defences
+    // std::list<Defence *> *defences2 = boat2->getDefences();
+    // for (std::list<Defence *>::iterator d = defences2->begin();
+    //      d != defences2->end(); ++d)
+    // {
+    //     (*d)->increaseRadius();
+    // }
+
+    if (!global.pause)
     {
-        (*d)->increaseRadius();
     }
-    // Boat 2 Defences
-    std::list<Defence *> *defences2 = boat2->getDefences();
-    for (std::list<Defence *>::iterator d = defences2->begin();
-         d != defences2->end(); ++d)
-    {
-        (*d)->increaseRadius();
-    }
-    lastT = t;
 
     // Counter
+    lastT = t;
     dt = t - global.lastFPSTime;
     if (dt > global.FPSInterval)
     {
@@ -564,14 +572,17 @@ void keyDown(unsigned char key, int x, int y)
         global.wireframe = !global.wireframe;
         break;
     case 'l': // Toggle Lighting
+        global.lighting = !global.lighting;
         break;
     case 'n': // Normals and Tangents
         wave->toggleNormal();
         wave->toggleTangent();
         break;
     case 't': // Toggle Textures
+        global.textures = !global.textures;
         break;
     case 'h': // Pause/Resume Game Animations
+        global.pause = !global.pause;
         wave->toggleAnimation();
         break;
     case 61: // Wave Segments (+)
