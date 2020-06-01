@@ -19,7 +19,8 @@ class Projectile3D
 public:
     Projectile3D(vec3f location, vec3fSpherical sphr, bool isBoat, int boatNum);
 
-    void draw(Wave3D* wave);
+    void draw(Wave3D *wave);
+    void dradwDot(float x, float y, float z);
 
     void updateProjectileState(float dt);
 
@@ -35,10 +36,10 @@ private:
     bool isBoat;
     int boatNum;
 
-    vec3f r0 = { 0.0, 0.0, 0.0 }; // Initial position
-    vec3f v0 = { 0.0, 0.0, 0.0 }; // Initial velocity
-    vec3f r = { 0.0, 0.0, 0.0 };  // Drawn position
-    vec3f v = { 0.0, 0.0, 0.0 };  // Drawn velocity
+    vec3f r0 = {0.0, 0.0, 0.0}; // Initial position
+    vec3f v0 = {0.0, 0.0, 0.0}; // Initial velocity
+    vec3f r = {0.0, 0.0, 0.0};  // Drawn position
+    vec3f v = {0.0, 0.0, 0.0};  // Drawn velocity
 
     float g = -0.25;
 
