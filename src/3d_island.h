@@ -29,7 +29,7 @@
 //#define CANNON_TILT_MIN 30.0 // 70.0
 
 #define CANNON_TILT_MAX 110.0 // 100.0
-#define CANNON_TILT_MIN 70.0 // 70.0
+#define CANNON_TILT_MIN 0.0   // 70.0
 
 #define CANNON_BASE_CYLINDER_SIZE 0.11
 #define CANNON_BASE_CYLINDER_RADIUS 0.06
@@ -49,15 +49,15 @@ public:
     bool collision(vec3f otherLocation, float otherRadius);
     void damage();
 
-	Cylinder* cannon;
-    Cylinder* cannonBaseMiddle;
-    HalfCylinder* cannonGunBaseCylinder;
-    Rectangle3D* gunBox;
+    Cylinder *cannon;
+    Cylinder *cannonBaseMiddle;
+    HalfCylinder *cannonGunBaseCylinder;
+    Rectangle3D *gunBox;
 
     //vec2fPolar cannonYaw = { 0.4, 90 };
     //vec2fPolar cannonPitch = { 0.4, 90 };
 
-    vec3fSpherical cannonSph = { 0.4, 90.0, 90.0 }; // magnitude, azimuthal, polar
+    vec3fSpherical cannonSph = {0.4, 90.0, 90.0}; // magnitude, azimuthal, polar
 
     /*float cannonRotation = 90.0;
     float cannonPitch = 90.0;*/
@@ -70,7 +70,7 @@ public:
 
     vec3f endOfCannon();
 
-    Projectile3D* shoot();
+    Projectile3D *shoot();
 
     //Projectile3D* shoot();
 private:

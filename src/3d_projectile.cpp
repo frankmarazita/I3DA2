@@ -16,17 +16,19 @@ Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat
     printf("velocity cartesian: %f %f %f\n", v0.x, v0.y, v0.z);
 }
 
-void dradwDot(float x, float y, float z) {
+void Projectile3D::dradwDot(float x, float y, float z)
+{
     glPushMatrix();
+    vec3f draw = rotatePointY(r0, r, degToRad(spherical.polar));
     glColor3f(1.0, 1.0, 1.0);
-    glPointSize(5.0);
+    glPointSize(10.0);
     glBegin(GL_POINTS);
-    glVertex3f(x, y, z);
+    glVertex3f(draw.x, draw.y, draw.z);
     glEnd();
     glPopMatrix();
 }
 
-void Projectile3D::draw(Wave3D* wave)
+void Projectile3D::draw(Wave3D *wave)
 {
     int numSegments = 100;
 
@@ -62,9 +64,11 @@ void Projectile3D::draw(Wave3D* wave)
         rotated = rotatePointY(r0, rTemp, degToRad(spherical.polar));
         glVertex3f(rotated.x, rotated.y, rotated.z);
         //glVertex3f(rTemp.x, rTemp.y, 0.0);
-        y = wave->getYfromX(rTemp.x);
+        y = wave->getYfromXZ(rotated.x, rotated.z);
     }
     glEnd();
+
+    dradwDot(r.x, r.y, r.z);
 }
 
 void Projectile3D::updateProjectileState(float dt)
@@ -75,7 +79,7 @@ void Projectile3D::updateProjectileState(float dt)
     r.z += v.z * dt;
     v.y += g * dt;
 
-    location = { r.x, r.y, r.z };
+    location = {r.x, r.y, r.z};
 }
 
 vec3f Projectile3D::getLocation()
