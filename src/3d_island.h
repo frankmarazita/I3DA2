@@ -16,6 +16,8 @@
 #include "texture.h"
 #include "half_cylinder.h"
 #include "rectangle.h"
+#include "3d_projectile.h"
+#include "vec3fSpherical.h"
 
 #define CANNON_ROTATION_SPEED 2.0
 #define CANNON_TILT_SPEED 1.0
@@ -52,13 +54,25 @@ public:
     HalfCylinder* cannonGunBaseCylinder;
     Rectangle3D* gunBox;
 
-    float cannonRotation = 90.0;
-    float cannonPitch = 90.0;
+    //vec2fPolar cannonYaw = { 0.4, 90 };
+    //vec2fPolar cannonPitch = { 0.4, 90 };
+
+    vec3fSpherical cannonSph = { 0.4, 90.0, 90.0 }; // magnitude, azimuthal, polar
+
+    /*float cannonRotation = 90.0;
+    float cannonPitch = 90.0;*/
 
     void tiltCannonUp();
     void tiltCannonDown();
 
+    void rotateCannonLeft();
+    void rotateCannonRight();
+
     vec3f endOfCannon();
+
+    Projectile3D* shoot();
+
+    //Projectile3D* shoot();
 private:
     Texture *texture;
     GLUquadric *qobj;

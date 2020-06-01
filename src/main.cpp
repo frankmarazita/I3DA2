@@ -21,8 +21,8 @@
 #include "random.h"
 #include "keyboard.h"
 #include "mouse.h"
-#include "cylinder.h"
 #include "skybox.h"
+#include "sphere.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -239,6 +239,14 @@ void display()
     {
         boats[i]->draw();
     }
+
+    // Draw projectiles 3D
+    for (std::list<Projectile3D*>::iterator projectile = projectiles.begin();
+        projectile != projectiles.end(); ++projectile)
+    {
+        (*projectile)->draw(wave);
+    }
+    
 
     // // Draw Boat 1
     // glPushMatrix();
@@ -463,7 +471,7 @@ void update()
 
     // // Update Defence and Projectile Locations
     // updateDefences(dt);
-    // updateProjectiles(dt);
+    updateProjectiles(dt);
 
     // // Boat 1 Defences
     // std::list<Defence *> *defences1 = boat1->getDefences();
@@ -481,8 +489,7 @@ void update()
     // }
 
     if (!global.pause)
-    {
-    }
+    {}
 
     // Counter
     lastT = t;
@@ -632,10 +639,10 @@ void keyPressSpecial(int key)
         switch (key)
         {
         case GLUT_KEY_LEFT: // Cannon Rotate Left
-            island3D->cannonRotation -= CANNON_ROTATION_SPEED;
+            island3D->rotateCannonLeft();
             break;
         case GLUT_KEY_RIGHT: // Cannon Rotate Right
-            island3D->cannonRotation += CANNON_ROTATION_SPEED;
+            island3D->rotateCannonRight();
             break;
         }
         /*default:
@@ -648,6 +655,7 @@ void keyPressSpecial(int key)
 
 void keyPress(unsigned char key)
 {
+    Projectile3D* proj;
     // Keypress functionality for simultaneous holding
     if (global.runnning)
     {
@@ -664,6 +672,11 @@ void keyPress(unsigned char key)
             island3D->tiltCannonUp();
             break;
         case 32: // Island Cannon Fire
+            proj = island3D->shoot();
+            if (proj)
+            {
+                projectiles.push_back(proj);
+            }
             break;
         case 'v': // Island Cannon Defence
             break;
@@ -717,6 +730,13 @@ void displayFPS()
 
 void updateProjectiles(float dt)
 {
+    // Update All Projectiles
+    for (std::list<Projectile3D*>::iterator p = projectiles.begin();
+        p != projectiles.end(); ++p)
+    {
+        (*p)->updateProjectileState(dt);
+    }
+  
     // // Update All Projectiles
     // island->updateProjectile(dt);
     // boat1->updateProjectile(dt);
