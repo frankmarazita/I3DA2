@@ -43,9 +43,34 @@ vec3f sphericalToCartesian(vec3fSpherical spherical)
     cart.z = 0.0;*/
 
     // 2D Code
+    /*cart.x = cosf(degToRad(spherical.a)) * spherical.magnitude;
+    cart.y = sinf(degToRad(spherical.a)) * spherical.magnitude;
+    cart.z = 0.0;*/
+
+   // float s = sin(degToRad(-spherical.polar));
+    //float c = cos(degToRad(-spherical.polar));
+
     cart.x = cosf(degToRad(spherical.a)) * spherical.magnitude;
     cart.y = sinf(degToRad(spherical.a)) * spherical.magnitude;
     cart.z = 0.0;
+
+    //cart.x = cart.x * c - cart.z * s;
+    //cart.z = cart.x * s + cart.z * c;
+
+    /*
+        float s = sin(-angleRad);
+    float c = cos(-angleRad);
+
+    // translate point back to origin:
+    rotatePoint.x -= pivotPoint.x;
+    rotatePoint.z -= pivotPoint.z;
+
+    // rotate point
+    float xnew = rotatePoint.x * c - rotatePoint.z * s;
+    float znew = rotatePoint.x * s + rotatePoint.z * c;
+    
+    */
+
     return cart;
 }
 
