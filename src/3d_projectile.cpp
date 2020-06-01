@@ -49,7 +49,7 @@ void Projectile3D::draw(Wave3D *wave)
     vec3f vTemp = v;
     float t = 0.01;
     // Wave intersection
-    float y = wave->getYfromX(rTemp.x);
+    float y = wave->getYfromXZ(rTemp.x, 0.0);
     glBegin(GL_LINE_STRIP);
     vec3f rotated;
     while (rTemp.y > y)

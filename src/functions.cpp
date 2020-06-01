@@ -5,6 +5,11 @@ float radToDeg(float rad)
     return rad * 180.0 / M_PI;
 }
 
+float radToGrad(float rad)
+{
+    return tan(rad);
+}
+
 float degToRad(float deg)
 {
     return deg * M_PI / 180.0;
@@ -116,6 +121,26 @@ vec3f rotatePointY(vec3f pivotPoint, vec3f rotatePoint, float angleRad)
 
     // translate point back:
     rotatePoint.x = xnew + pivotPoint.x;
+    rotatePoint.z = znew + pivotPoint.z;
+
+    return rotatePoint;
+}
+
+vec3f rotatePointX(vec3f pivotPoint, vec3f rotatePoint, float angleRad)
+{
+    float s = sin(-angleRad);
+    float c = cos(-angleRad);
+
+    // translate point back to origin:
+    rotatePoint.y -= pivotPoint.y;
+    rotatePoint.z -= pivotPoint.z;
+
+    // rotate point
+    float ynew = rotatePoint.y * c - rotatePoint.z * s;
+    float znew = rotatePoint.y * s + rotatePoint.z * c;
+
+    // translate point back:
+    rotatePoint.y = ynew + pivotPoint.y;
     rotatePoint.z = znew + pivotPoint.z;
 
     return rotatePoint;

@@ -7,7 +7,7 @@
 #include "functions.h"
 
 #include <cmath>
-#include <list>
+#include <vector>
 #include <iostream>
 
 #include "opengl.h"
@@ -17,43 +17,33 @@ class Wave3D
 public:
 	Wave3D(float windowSize, float numSegments, float a, float b, float k, float c, float d);
 
-	void draw();
-	void drawTom();
-	void drawTom2();
 	void drawAdvanced();
 
 	void moveWave(float amount);
 	void calcVerticies();
+	void update();
 
-	float getYfromX(float x);
 	float getYfromXZ(float x, float z);
-	float getGradientForAdvancedSine(float x, float z);
-	float getGrad(float x);
+	vec3f getGradientForAdvancedSine(float x, float z);
 	bool getAnimate();
 	int getNumSegments();
-
-	vec3f getGradientForAdvancedTest(float x, float z);
 
 	void toggleNormal();
 	void toggleTangent();
 	void toggleAnimation();
 	void increaseNumSegments();
 	void decreaseNumSegments();
-	void drawVector(vec3f point, float m, float s, bool normalize);
+	void drawVector(vec3f point, vec3f m, float s, bool normalize);
 
 private:
-	void setLighting();
-	void disableLighting();
 	float windowSize;
 	int numSegments;
-	float getGradientForSine(float x);
 	float segmentSize;
 
-	float a;
-	float b;
-	float c;
-	float d;
-	float k;
+	void setLighting();
+	void disableLighting();
+
+	float a, b, c, d, k;
 
 	bool normal = false;
 	bool tangent = false;
@@ -62,7 +52,7 @@ private:
 
 	colour col = {0.2, 0.5, 1.0, 0.75};
 
-	std::list<vec2f> verticies;
+	std::vector<vec3f> verticies;
 };
 
 #endif // THREE_D_WAVE_H
