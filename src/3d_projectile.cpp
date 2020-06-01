@@ -48,7 +48,7 @@ void Projectile3D::draw(Wave3D* wave)
     vec3f vTemp = v;
     float t = 0.01;
     // Wave intersection
-    float y = wave->getYfromX(rTemp.x);
+    float y = wave->getYfromXZ(rTemp.x, 0.0);
     glBegin(GL_LINE_STRIP);
     while (rTemp.y > y)
     {
@@ -57,7 +57,7 @@ void Projectile3D::draw(Wave3D* wave)
         rTemp.z += vTemp.z * t;
         vTemp.y += g * t;
         glVertex3f(rTemp.x, rTemp.y, rTemp.z);
-        y = wave->getYfromX(rTemp.x);
+        y = wave->getYfromXZ(rTemp.x, 0.0);
     }
     glEnd();
 }
