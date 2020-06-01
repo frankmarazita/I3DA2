@@ -12,7 +12,8 @@ Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat
     r = location;
     v = v0;
 
-    printf("%f %f %f\n", v0.x, v0.y, v0.z);
+    printf("velocity spherical: mag: %f, a: %f, polar: %f\n", spherical.magnitude, spherical.a, spherical.polar);
+    printf("velocity cartesian: %f %f %f\n", v0.x, v0.y, v0.z);
 }
 
 void dradwDot(float x, float y, float z) {
@@ -41,8 +42,6 @@ void Projectile3D::draw(Wave3D* wave)
     }
     glEnd();*/
 
-    dradwDot(r.x, r.y, r.z);
-
     // Draw Trajectory Curve
     vec3f rTemp = r;
     vec3f vTemp = v;
@@ -50,13 +49,19 @@ void Projectile3D::draw(Wave3D* wave)
     // Wave intersection
     float y = wave->getYfromX(rTemp.x);
     glBegin(GL_LINE_STRIP);
+    vec3f rotated;
     while (rTemp.y > y)
     {
         rTemp.x += vTemp.x * t;
         rTemp.y += vTemp.y * t;
         rTemp.z += vTemp.z * t;
         vTemp.y += g * t;
-        glVertex3f(rTemp.x, rTemp.y, rTemp.z);
+
+        rTemp.z = r0.z;
+
+        rotated = rotatePointY(r0, rTemp, degToRad(spherical.polar));
+        glVertex3f(rotated.x, rotated.y, rotated.z);
+        //glVertex3f(rTemp.x, rTemp.y, 0.0);
         y = wave->getYfromX(rTemp.x);
     }
     glEnd();

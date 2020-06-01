@@ -49,7 +49,7 @@ Projectile3D* Island3D::shoot()
         sph.magnitude = cannonSph.magnitude;
         sph.a = -(cannonSph.a - 90.0);
         //sph.polar = -(cannonSph.polar - 90.0);
-        sph.polar = cannonSph.polar;
+        sph.polar = cannonSph.polar + 180;
 
         Projectile3D* projectile = new Projectile3D(endOfCannon(), sph, false, 0);
 
