@@ -65,6 +65,9 @@ public:
     void tiltCannonUp();
     void tiltCannonDown();
 
+    void rotateCannonLeft();
+    void rotateCannonRight();
+
     vec3f endOfCannon();
 
     Projectile3D* shoot();

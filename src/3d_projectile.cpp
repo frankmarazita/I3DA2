@@ -54,9 +54,9 @@ void Projectile3D::draw(Wave3D* wave)
     {
         rTemp.x += vTemp.x * t;
         rTemp.y += vTemp.y * t;
-        //rTemp.z += vTemp.z * t;
+        rTemp.z += vTemp.z * t;
         vTemp.y += g * t;
-        glVertex3f(rTemp.x, rTemp.y, 0.0);
+        glVertex3f(rTemp.x, rTemp.y, rTemp.z);
         y = wave->getYfromX(rTemp.x);
     }
     glEnd();
@@ -67,9 +67,10 @@ void Projectile3D::updateProjectileState(float dt)
     // Update projectile values and location
     r.x += v.x * dt;
     r.y += v.y * dt;
+    r.z += v.z * dt;
     v.y += g * dt;
 
-    location = { r.x, r.y, 0.0 };
+    location = { r.x, r.y, r.z };
 }
 
 vec3f Projectile3D::getLocation()

@@ -49,7 +49,7 @@ Projectile3D* Island3D::shoot()
         sph.magnitude = cannonSph.magnitude;
         sph.a = -(cannonSph.a - 90.0);
         //sph.polar = -(cannonSph.polar - 90.0);
-        sph.polar = -cannonSph.polar;
+        sph.polar = cannonSph.polar;
 
         Projectile3D* projectile = new Projectile3D(endOfCannon(), sph, false, 0);
 
@@ -191,6 +191,24 @@ void Island3D::tiltCannonDown()
     }
 
     cannonSph.a -= CANNON_TILT_SPEED;
+}
+
+void Island3D::rotateCannonLeft()
+{
+    //printf("%f\n", cannonSph.polar);
+    if (cannonSph.polar <= -360.0)
+        cannonSph.polar = 0.0;
+
+    cannonSph.polar -= CANNON_ROTATION_SPEED;
+}
+
+void Island3D::rotateCannonRight()
+{
+    //printf("%f\n", cannonSph.polar);
+    if (cannonSph.polar >= 360.0)
+        cannonSph.polar = 0.0;
+
+    cannonSph.polar += CANNON_ROTATION_SPEED;
 }
 
 bool Island3D::collision(vec3f otherLocation, float otherRadius)

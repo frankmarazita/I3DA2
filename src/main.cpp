@@ -632,10 +632,10 @@ void keyPressSpecial(int key)
         switch (key)
         {
         case GLUT_KEY_LEFT: // Cannon Rotate Left
-            island3D->cannonSph.polar -= CANNON_ROTATION_SPEED;
+            island3D->rotateCannonLeft();
             break;
         case GLUT_KEY_RIGHT: // Cannon Rotate Right
-            island3D->cannonSph.polar += CANNON_ROTATION_SPEED;
+            island3D->rotateCannonRight();
             break;
         }
         /*default:
