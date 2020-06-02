@@ -19,8 +19,8 @@ void HalfCylinder::draw()
         theta = i / (float)segments * M_PI;
         x = radius * cosf(theta);
         z = radius * sinf(theta);
-        glNormal3f(x, 0, z);
-        glVertex3f(x, 0, z);
+        glNormal3f(x, -height / 2, z);
+        glVertex3f(x, -height / 2, z);
     }
     glEnd();
 
@@ -31,10 +31,10 @@ void HalfCylinder::draw()
         theta = i / (float)segments * M_PI;
         x = radius * cosf(theta);
         z = radius * sinf(theta);
-        glNormal3f(x, height, z);
-        glVertex3f(x, height, z);
-        glNormal3f(x, 0, z);
-        glVertex3f(x, 0, z);
+        glNormal3f(x, height/2, z);
+        glVertex3f(x, height/2, z);
+        glNormal3f(x, -height / 2, z);
+        glVertex3f(x, -height / 2, z);
     }
     glEnd();
 
@@ -45,8 +45,8 @@ void HalfCylinder::draw()
         theta = i / (float)segments * M_PI;
         x = radius * cosf(theta);
         z = radius * sinf(theta);
-        glNormal3f(x, height, z);
-        glVertex3f(x, height, z);
+        glNormal3f(x, height/2, z);
+        glVertex3f(x, height/2, z);
     }
     glEnd();
 }

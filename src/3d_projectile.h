@@ -20,7 +20,7 @@ public:
     Projectile3D(vec3f location, vec3fSpherical sphr, bool isBoat, int boatNum);
 
     void draw(Wave3D *wave);
-    void dradwDot(float x, float y, float z);
+    void drawDot(float x, float y, float z);
 
     void updateProjectileState(float dt);
 
