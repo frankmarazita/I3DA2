@@ -576,6 +576,12 @@ void keyDown(unsigned char key, int x, int y)
     // Keyboard single presses, else require holding
     switch (key)
     {
+    case 'w': // Increase Cannon Power
+        island3D->increaseCannonPower();
+        break;
+    case 's': // Decrease Cannon Power
+        island3D->decreaseCannonPower();
+        break;
     case 'p': // Toggle Wireframe
         global.wireframe = !global.wireframe;
         break;
@@ -662,15 +668,11 @@ void keyPress(unsigned char key)
     {
         switch (key)
         {
-        case 'w': // Increase Cannon Power
-            break;
-        case 's': // Decrease Cannon Power
-            break;
-        case 'a': // Cannon Tilt Down
-            island3D->tiltCannonDown();
-            break;
-        case 'd': // Cannon Tilt Up
+        case 'a': // Cannon Tilt Up
             island3D->tiltCannonUp();
+            break;
+        case 'd': // Cannon Tilt Down
+            island3D->tiltCannonDown();
             break;
         case 32: // Island Cannon Fire
             proj = island3D->shoot();
@@ -722,6 +724,18 @@ void displayFPS()
     len = text.length();
     dist = ((float)(len * 9) / global.windowWidth * 2);
     glTranslatef(0.95 - dist, 0.80, 0.0);
+    glColor3f(col.r, col.g, col.b);
+    glRasterPos2f(0, 0);
+    for (int i = 0; i < len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
+    glPopMatrix();
+
+    // Display Cannon Magnitude
+    glPushMatrix();
+    text = "Power: " + std::to_string(island3D->cannonSph.magnitude);
+    len = text.length();
+    dist = ((float)(len * 9) / global.windowWidth * 2);
+    glTranslatef(0.95 - dist, 0.74, 0.0);
     glColor3f(col.r, col.g, col.b);
     glRasterPos2f(0, 0);
     for (int i = 0; i < len; i++)
