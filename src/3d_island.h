@@ -18,6 +18,7 @@
 #include "rectangle.h"
 #include "3d_projectile.h"
 #include "vec3fSpherical.h"
+#include "3d_defence.h"
 
 // Rotation speeds for the cannon
 #define CANNON_ROTATION_SPEED 2.0
@@ -96,6 +97,9 @@ public:
     vec3f endOfCannon();
 
     Projectile3D *shoot();
+    Defence3D *defence();
+
+    void point();
 
     //Projectile3D* shoot();
 private:
@@ -111,6 +115,7 @@ private:
 
     const float cooldownTime = 1000;
     float shootTime = -1;
+    float defenceTime = -1;
 
     colour col = {0.9, 0.8, 0.5, 1.0};
 };

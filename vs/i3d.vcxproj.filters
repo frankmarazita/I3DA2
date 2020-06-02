@@ -22,6 +22,7 @@
     <ClCompile Include="..\src\wave.cpp" />
     <ClCompile Include="..\src\sphere.cpp" />
     <ClCompile Include="..\src\3d_projectile.cpp" />
+    <ClCompile Include="..\src\3d_defence.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\3d_boat.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="..\src\sphere.h" />
     <ClInclude Include="..\src\3d_projectile.h" />
     <ClInclude Include="..\src\vec3fSpherical.h" />
+    <ClInclude Include="..\src\3d_defence.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\src\sand.jpg" />

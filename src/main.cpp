@@ -67,8 +67,9 @@ Skybox *skybox;
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
-std::list<Projectile3D*> projectiles;
 
+std::list<Projectile3D *> projectiles;
+std::list<Defence3D *> defences;
 std::vector<Boat3D *> boats;
 
 // Application Functions
@@ -242,12 +243,18 @@ void display()
     }
 
     // Draw projectiles 3D
-    for (std::list<Projectile3D*>::iterator projectile = projectiles.begin();
-        projectile != projectiles.end(); ++projectile)
+    for (std::list<Projectile3D *>::iterator projectile = projectiles.begin();
+         projectile != projectiles.end(); ++projectile)
     {
         (*projectile)->draw(wave);
     }
-    
+
+    // Draw defences 3D
+    for (std::list<Defence3D *>::iterator defence = defences.begin();
+         defence != defences.end(); ++defence)
+    {
+        (*defence)->draw(wave);
+    }
 
     // // Draw Boat 1
     // glPushMatrix();
@@ -467,12 +474,74 @@ void update()
             }
         }
 
+        for (int i = 0; i < boats.size(); i++)
+        {
+            Boat3D *boat = boats[i];
+            Projectile3D *proj = boat->shoot();
+            if (proj)
+                projectiles.push_back(proj);
+        }
+
         global.updateBoatTime = glutGet(GLUT_ELAPSED_TIME);
     }
 
-    // // Update Defence and Projectile Locations
-    // updateDefences(dt);
-    updateProjectiles(dt);
+    // Update Defence and Projectile Locations
+    // Update All Projectiles
+    for (std::list<Projectile3D *>::iterator p = projectiles.begin();
+         p != projectiles.end(); ++p)
+    {
+        (*p)->updateProjectileState(dt);
+        vec3f location = (*p)->getLocation();
+        float radius = (*p)->getRadius();
+        bool isBoat = (*p)->getIsBoat();
+
+        if (wave->getYfromXZ(location.x, location.z) > location.y)
+        {
+            projectiles.erase(p);
+            break;
+        }
+
+        if (isBoat)
+        {
+            bool collision = island3D->collision(location, radius);
+            if (collision)
+            {
+                island3D->damage();
+                projectiles.erase(p);
+                break;
+            }
+        }
+        else
+        {
+            bool erase = false;
+            for (int i = 0; i < boats.size(); i++)
+            {
+                Boat3D *boat = boats[i];
+                bool collision = boat->collision(location, radius);
+                if (collision)
+                {
+                    boats.erase(boats.begin() + i);
+                    island3D->point();
+                    erase = true;
+                    break;
+                }
+            }
+            if (erase)
+            {
+                projectiles.erase(p);
+                break;
+            }
+        }
+    }
+
+    for (std::list<Defence3D *>::iterator d = defences.begin();
+         d != defences.end(); ++d)
+    {
+        (*d)->updateProjectileState(dt);
+        (*d)->increaseRadius();
+        vec3f location = (*d)->getLocation();
+        float radius = (*d)->getRadius();
+    }
 
     // // Boat 1 Defences
     // std::list<Defence *> *defences1 = boat1->getDefences();
@@ -490,7 +559,8 @@ void update()
     // }
 
     if (!global.pause)
-    {}
+    {
+    }
 
     // Counter
     lastT = t;
@@ -662,7 +732,8 @@ void keyPressSpecial(int key)
 
 void keyPress(unsigned char key)
 {
-    Projectile3D* proj;
+    Projectile3D *proj;
+    Defence3D *defence;
     // Keypress functionality for simultaneous holding
     if (global.runnning)
     {
@@ -677,11 +748,12 @@ void keyPress(unsigned char key)
         case 32: // Island Cannon Fire
             proj = island3D->shoot();
             if (proj)
-            {
                 projectiles.push_back(proj);
-            }
             break;
         case 'v': // Island Cannon Defence
+            defence = island3D->defence();
+            if (defence)
+                defences.push_back(defence);
             break;
         default:
             break;
@@ -741,124 +813,6 @@ void displayFPS()
     for (int i = 0; i < len; i++)
         glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
     glPopMatrix();
-}
-
-void updateProjectiles(float dt)
-{
-    // Update All Projectiles
-    for (std::list<Projectile3D*>::iterator p = projectiles.begin();
-        p != projectiles.end(); ++p)
-    {
-        (*p)->updateProjectileState(dt);
-    }
-  
-    // // Update All Projectiles
-    // island->updateProjectile(dt);
-    // boat1->updateProjectile(dt);
-    // boat2->updateProjectile(dt);
-
-    // // Lambda function for collision detection
-    // auto projectileCollision = [&](std::list<Projectile *> *projectiles) {
-    //     bool collision = false;
-
-    //     for (std::list<Projectile *>::iterator p = projectiles->begin();
-    //          p != projectiles->end(); ++p)
-    //     {
-    //         vec2f location = (*p)->getLocation();
-
-    //         // Boat 1 Defences
-    //         std::list<Defence *> *defences1 = boat1->getDefences();
-    //         for (std::list<Defence *>::iterator d = defences1->begin();
-    //              d != defences1->end(); ++d)
-    //         {
-    //             if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
-    //                 collision = true;
-    //         }
-    //         // Boat 2 Defences
-    //         std::list<Defence *> *defences2 = boat2->getDefences();
-    //         for (std::list<Defence *>::iterator d = defences2->begin();
-    //              d != defences2->end(); ++d)
-    //         {
-    //             if ((*p)->getCollision((*d)->getRadius(), (*d)->getLocation()))
-    //                 collision = true;
-    //         }
-
-    //         // Island
-    //         if (!(*p)->getIsBoat())
-    //         {
-    //             // Boat 1 Collision
-    //             if ((*p)->getCollision(boat1->getScale(), boat1->getLocation()))
-    //             {
-    //                 collision = true;
-    //                 if (boat1->damage())
-    //                     global.runnning = false;
-    //             }
-    //             // Boat 2 Collision
-    //             if ((*p)->getCollision(boat2->getScale(), boat2->getLocation()))
-    //             {
-    //                 collision = true;
-    //                 if (boat2->damage())
-    //                     global.runnning = false;
-    //             }
-    //         }
-    //         else
-    //         {
-    //             // Island Collision
-    //             if (island->collision(location))
-    //             {
-    //                 collision = true;
-    //                 if (island->damage())
-    //                     global.runnning = false;
-    //             }
-
-    //             //Boats
-    //             if ((*p)->getBoatNum() == 0)
-    //             {
-    //                 // Boat 2 Collision
-    //                 if ((*p)->getCollision(boat2->getScale(),
-    //                                        boat2->getLocation()))
-    //                 {
-    //                     collision = true;
-    //                     if (boat2->damage())
-    //                         global.runnning = false;
-    //                 }
-    //             }
-    //             else if ((*p)->getBoatNum() == 1)
-    //             {
-    //                 // Boat 1 Collision
-    //                 if ((*p)->getCollision(boat1->getScale(),
-    //                                        boat1->getLocation()))
-    //                 {
-    //                     collision = true;
-    //                     if (boat1->damage())
-    //                         global.runnning = false;
-    //                 }
-    //             }
-    //         }
-
-    //         // Wave Collision
-    //         if (wave->getYfromX(location.x) >= location.y)
-    //             collision = true;
-
-    //         if (collision)
-    //         {
-    //             projectiles->erase(p);
-    //             return collision;
-    //         }
-    //     }
-    //     return collision;
-    // };
-
-    // // Lambda function calls for all projectiles
-    // if (island->getProjectileExists())
-    //     if (projectileCollision(island->getProjectiles()))
-    //         island->removeProjectile();
-    // if (boat1->getProjectileExists())
-    //     if (projectileCollision(boat1->getProjectiles()))
-    //         boat1->removeProjectile();
-    // if (boat2->getProjectileExists())
-    //     if (projectileCollision(boat2->getProjectiles()))
-    //         boat2->removeProjectile();
 }
 
 void updateDefences(float dt)

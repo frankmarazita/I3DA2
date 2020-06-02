@@ -1,5 +1,5 @@
-#ifndef THREE_D_PROJECTILE_H
-#define THREE_D_PROJECTILE_H
+#ifndef THREE_D_DEFENCE_H
+#define THREE_D_DEFENCE_H
 
 #include "vec2f.h"
 #include "vec2fPolar.h"
@@ -14,10 +14,10 @@
 
 #include "opengl.h"
 
-class Projectile3D
+class Defence3D
 {
 public:
-    Projectile3D(vec3f location, vec3fSpherical sphr, bool isBoat, int boatNum);
+    Defence3D(vec3f location, vec3fSpherical sphr, float creationTime);
 
     void draw(Wave3D *wave);
     void drawDot(float x, float y, float z);
@@ -28,14 +28,13 @@ public:
     float getRadius();
 
     bool getCollision(float radius, vec2f location);
-    bool getIsBoat();
-    int getBoatNum();
+
+    void increaseRadius();
 
 private:
     vec3f location;
     vec3fSpherical spherical;
-    bool isBoat;
-    int boatNum;
+    float creationTime;
 
     vec3f r0 = {0.0, 0.0, 0.0}; // Initial position
     vec3f v0 = {0.0, 0.0, 0.0}; // Initial velocity
@@ -44,7 +43,7 @@ private:
 
     float g = -0.25;
 
-    float radius = 0.01;
+    float radius = 0.02;
 };
 
-#endif // THREE_D_PROJECTILE_H
+#endif // THREE_D_DEFENCE_H
