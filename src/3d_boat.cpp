@@ -9,6 +9,20 @@ Boat3D::Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDe
     this->initialCannonDeg = cannonDeg;
 }
 
+Projectile3D *Boat3D::shoot()
+{
+    // Check for projectile shoot cooldown
+    if (glutGet(GLUT_ELAPSED_TIME) - shootTime >= cooldownTime)
+    {
+        shootTime = glutGet(GLUT_ELAPSED_TIME);
+
+        // Create a new projectile and return it
+        Projectile3D *projectile = new Projectile3D(projectileOrigin, sphericalVec, true, 0);
+        return projectile;
+    }
+    return NULL;
+}
+
 void Boat3D::draw()
 {
     glPushMatrix();
@@ -121,6 +135,7 @@ void Boat3D::setPrevLocation()
 void Boat3D::setBoatRotation(float boatRotation)
 {
     this->boatRotation = boatRotation;
+    sphericalVec.polar = boatRotation;
 }
 
 void Boat3D::updateBoatRotation()
@@ -133,9 +148,15 @@ void Boat3D::updateBoatRotation()
     float deg = radToDeg(rad);
 
     if (destX > this->location.x)
+    {
         this->boatRotation = -deg;
+        sphericalVec.polar = boatRotation;
+    }
     else if (destX < this->location.x)
+    {
         this->boatRotation = 180 - deg;
+        sphericalVec.polar = boatRotation;
+    }
 }
 
 void Boat3D::setBoatDeg(float boatDeg)
@@ -195,7 +216,7 @@ vec3f Boat3D::getProjectileOrigin()
 bool Boat3D::collision(vec3f otherLocation, float otherRadius)
 {
     float dist = calcVectorDistance(otherLocation, location);
-    if (dist <= hitboxRadius + otherRadius)
+    if (dist <= hitboxRadius * scale + otherRadius)
         return true;
     return false;
 }
