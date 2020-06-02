@@ -1,11 +1,55 @@
 #include "3d_island.h"
 
+// Util for debugging, remove later
+void drawDot(float x, float y, float z)
+{
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glPointSize(5.0);
+    glBegin(GL_POINTS);
+    glVertex3f(x, y, z);
+    glEnd();
+    glPopMatrix();
+}
+
 Island3D::Island3D()
 {
     this->texture = new Texture("../src/sand.jpg");
-    this->cannon = new Cylinder(0.04, 0.19, 64);
-    this->cannonBaseMiddle = new Cylinder(0.1, 0.25, 64);
-    this->cannonGunBaseCylinder = new Cylinder(0.05, 0.15, 64);
+    this->cannon = new Cylinder(CANNON_RADIUS, CANNON_LENGTH, 64);
+    this->cannonBaseMiddle = new Cylinder(CANNON_BASE_CYLINDER_RADIUS, CANNON_BASE_CYLINDER_HEIGHT, 64);
+    this->cannonGunBaseCylinder = new HalfCylinder(CANNON_BASE_HALF_CYLINDER_RADIUS, CANNON_BASE_HALF_CYLINDER_SIZE, 64);
+
+    this->gunBox = new Rectangle3D(GUN_BOX_HEIGHT, CANNON_BASE_HALF_CYLINDER_RADIUS * 2, CANNON_BASE_HALF_CYLINDER_SIZE);
+}
+
+vec3f Island3D::endOfCannon()
+{
+    float J = CANNON_LENGTH * cosf(degToRad(CANNON_ROTATION_OFFSET + cannonSph.polar));
+
+    float x = J * sinf(degToRad(CANNON_PITCH_OFFSET + cannonSph.a));
+    float y = CANNON_LENGTH * cosf(degToRad(CANNON_PITCH_OFFSET + cannonSph.a));
+    float z = x * tanf(degToRad(CANNON_ROTATION_OFFSET + cannonSph.polar));
+
+    // Apply our constant modifications to set the correct coordinates
+    x = -x;
+    float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT/2;
+    y = y + BOX_OFFSET + GUN_BOX_HEIGHT / 2 + CANNON_RADIUS;
+
+    return { x, y, z };
+}
+
+Projectile3D* Island3D::shoot()
+{
+    // Check for projectile shoot cooldown
+    if (glutGet(GLUT_ELAPSED_TIME) - shootTime >= cooldownTime)
+    {
+        shootTime = glutGet(GLUT_ELAPSED_TIME);
+
+        // Create a new projectile and return it
+        Projectile3D *projectile = new Projectile3D(endOfCannon(), cannonSph, false, 0);
+        return projectile;
+    }
+    return NULL;
 }
 
 void Island3D::draw()
@@ -18,45 +62,67 @@ void Island3D::draw()
 
     // Very very bottom cylinder
     glPushMatrix();
-    glTranslatef(0, -1, 0);
+    glTranslatef(0, -1, 0); // Start from the bottom
     glRotatef(-90, 1.0, 0, 0);
 
     GLUquadric *qobj = gluNewQuadric();
-    gluCylinder(qobj, radius, radius, 0.5, 40, 40);
+    gluCylinder(qobj, ISLAND_BASE_RADIUS, ISLAND_BASE_RADIUS, 0.5, 40, 40);
     glPopMatrix();
 
     // Sphere
     glColor3f(0.8, 0.8, 0.8);
     glPushMatrix();
-    glTranslatef(location.x, location.y, location.z);
+    glTranslatef(location.x, location.y, location.z); // 0.0, -0.5, 0.0
     glRotatef(-90, 1.0, 0, 0);
-    glutSolidSphere(radius, 40, 40);
+    glutSolidSphere(ISLAND_BASE_RADIUS, 40, 40);
     glPopMatrix();
 
     // Cylinder Base (Middle)
     glPushMatrix();
-    glTranslatef(0, -0.49, 0);
+    glTranslatef(0, location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT/2, 0);
     cannonBaseMiddle->draw();
     glPopMatrix();
 
-    // Cylinder Base (Gun Base)
-    /*glPushMatrix();
-    glTranslatef(0, -0.20, 0);
-    //glRotatef(90, 0.0, 0, 1.0);
-    glRotatef(cannonRotation, 0.0, 1.0, 0.0);
-    //glRotatef(-90, 1.0, 0, 0);
-    cannonGunBaseCylinder->draw();
-    glPopMatrix();*/
+    // Origin of the gunbox
+    float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT/2;
 
-    // Cannon
+    // Boxy box
     glPushMatrix();
-    glTranslatef(0, -0.2, 0);
-    // Rotation
-    glRotatef(cannonRotation, 0.0, 1.0, 0.0);
-    // Pitch
-    glRotatef(cannonPitch, 0.0, 0.0, 1.0);
+    glTranslatef(0, BOX_OFFSET, 0);
+    glRotatef(cannonSph.polar, 0.0, 1.0, 0.0);
+    gunBox->draw();
+    glPopMatrix();
 
+    // Half Cylinder Base (Gun Base)
+    glPushMatrix();
+    glTranslatef(0, BOX_OFFSET + GUN_BOX_HEIGHT/2, 0); // Directly above the gunbox
+    // Rotate the half cylinder by rotation
+    glRotatef(cannonSph.polar, 0.0, 1.0, 0.0);
+    // Rotates the half cylinder so it's not sideways
+    glRotatef(-90, 1.0, 0.0, 0.0);
+    cannonGunBaseCylinder->draw();
+    glPopMatrix();
+
+	// Cannon
+	glPushMatrix();
+
+    // Placed above the box
+    glTranslatef(0.0, BOX_OFFSET + GUN_BOX_HEIGHT / 2 + CANNON_RADIUS, 0);
+    // Rotation
+    glRotatef(CANNON_ROTATION_OFFSET + cannonSph.polar, 0.0, 1.0, 0.0);
+    // Pitch
+    glRotatef(CANNON_PITCH_OFFSET + cannonSph.a, 0.0, 0.0, 1.0);
+    // Shifts the cannon across after rotations so its centered inside the gun
+    glTranslatef(0.0, CANNON_BASE_CYLINDER_HEIGHT / 2, 0.0);
     cannon->draw();
+    glPopMatrix();
+
+    // Used for testing where the cannon is
+    glPushMatrix();
+    // End of cannon pos
+    drawDot(-CANNON_LENGTH, BOX_OFFSET + GUN_BOX_HEIGHT / 2 + CANNON_RADIUS, 0.0);
+    vec3f end = endOfCannon();
+    drawDot(end.x, end.y, end.z);
     glPopMatrix();
 
     texture->disable();
@@ -102,28 +168,58 @@ void Island3D::drawScore()
 
 void Island3D::tiltCannonUp()
 {
-    if (cannonPitch + CANNON_TILT_SPEED > CANNON_TILT_MAX)
+    printf("tilt %f\n", cannonSph.a);
+    if (cannonSph.a + CANNON_TILT_SPEED > CANNON_TILT_MAX)
         return;
 
-    cannonPitch += CANNON_TILT_SPEED;
+    cannonSph.a += CANNON_TILT_SPEED;
 }
 
 void Island3D::tiltCannonDown()
 {
-    printf("%f %f\n", cannonPitch, cannonPitch + CANNON_TILT_SPEED);
-    if (cannonPitch + CANNON_TILT_SPEED < CANNON_TILT_MIN)
+    if (cannonSph.a - CANNON_TILT_SPEED < CANNON_TILT_MIN)
+        return;
+
+    cannonSph.a -= CANNON_TILT_SPEED;
+}
+
+void Island3D::rotateCannonLeft()
+{
+    //printf("%f\n", cannonSph.polar);
+    if (cannonSph.polar <= 0.0)
+        cannonSph.polar = 360;
+
+    cannonSph.polar -= CANNON_ROTATION_SPEED;
+}
+
+void Island3D::rotateCannonRight()
+{
+    //printf("%f\n", cannonSph.polar);
+    if (cannonSph.polar >= 360.0)
+        cannonSph.polar = 0.0;
+
+    cannonSph.polar += CANNON_ROTATION_SPEED;
+}
+
+void Island3D::increaseCannonPower()
+{
+    cannonSph.magnitude += CANNON_POWER_INCREASE_FACTOR;
+}
+
+void Island3D::decreaseCannonPower()
+{
+    if (cannonSph.magnitude - CANNON_POWER_INCREASE_FACTOR < 0)
     {
-        printf("RETURNEDDD");
+        cannonSph.magnitude = 0;
         return;
     }
-
-    cannonPitch -= CANNON_TILT_SPEED;
+    cannonSph.magnitude -= CANNON_POWER_DECREASE_FACTOR;
 }
 
 bool Island3D::collision(vec3f otherLocation, float otherRadius)
 {
     float dist = calcVectorDistance(otherLocation, location);
-    if (dist <= radius + otherRadius)
+    if (dist <= ISLAND_BASE_RADIUS + otherRadius)
         return true;
     return false;
 }

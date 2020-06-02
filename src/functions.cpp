@@ -30,6 +30,21 @@ float calcGrad(float x1, float y1, float x2, float y2)
     return (y2 - y1) / (x2 - x1);
 }
 
+vec3f sphericalToCartesian(vec3fSpherical spherical)
+{
+    vec3f cart;
+    
+    // do our rotations with pitch first
+    cart.x = cosf(degToRad(spherical.a)) * spherical.magnitude;
+    cart.y = sinf(degToRad(spherical.a)) * spherical.magnitude;
+
+    // rotate point by polar/theta now
+    cart.z = cart.x * sinf(-degToRad(spherical.polar));
+    cart.x = cart.x * cosf(-degToRad(spherical.polar));
+
+    return cart;
+}
+
 vec2f polarToCartesian(vec2fPolar polar)
 {
     vec2f cart;

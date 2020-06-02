@@ -1,134 +1,58 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="src">
-      <UniqueIdentifier>{e9b2b8c8-28b3-4eff-986f-98a1b2cd3417}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="..\src\3d_boat.cpp" />
+    <ClCompile Include="..\src\3d_island.cpp" />
+    <ClCompile Include="..\src\3d_wave.cpp" />
+    <ClCompile Include="..\src\boat.cpp" />
+    <ClCompile Include="..\src\cylinder.cpp" />
+    <ClCompile Include="..\src\defence.cpp" />
+    <ClCompile Include="..\src\functions.cpp" />
+    <ClCompile Include="..\src\half_cylinder.cpp" />
+    <ClCompile Include="..\src\island.cpp" />
+    <ClCompile Include="..\src\keyboard.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\mouse.cpp" />
+    <ClCompile Include="..\src\projectile.cpp" />
+    <ClCompile Include="..\src\random.cpp" />
+    <ClCompile Include="..\src\rectangle.cpp" />
+    <ClCompile Include="..\src\seafloor.cpp" />
+    <ClCompile Include="..\src\skybox.cpp" />
+    <ClCompile Include="..\src\texture.cpp" />
+    <ClCompile Include="..\src\wave.cpp" />
+    <ClCompile Include="..\src\sphere.cpp" />
+    <ClCompile Include="..\src\3d_projectile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\boat.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\defence.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\functions.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\island.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\keyboard.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\projectile.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\wave.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\3d_wave.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\mouse.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\seafloor.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texture.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\3d_island.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\random.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\3d_boat.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\cylinder.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\skybox.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
+    <ClInclude Include="..\src\3d_boat.h" />
+    <ClInclude Include="..\src\3d_island.h" />
+    <ClInclude Include="..\src\3d_wave.h" />
+    <ClInclude Include="..\src\boat.h" />
+    <ClInclude Include="..\src\colour.h" />
+    <ClInclude Include="..\src\cylinder.h" />
+    <ClInclude Include="..\src\defence.h" />
+    <ClInclude Include="..\src\functions.h" />
+    <ClInclude Include="..\src\half_cylinder.h" />
+    <ClInclude Include="..\src\island.h" />
+    <ClInclude Include="..\src\keyboard.h" />
+    <ClInclude Include="..\src\mouse.h" />
+    <ClInclude Include="..\src\opengl.h" />
+    <ClInclude Include="..\src\projectile.h" />
+    <ClInclude Include="..\src\random.h" />
+    <ClInclude Include="..\src\rectangle.h" />
+    <ClInclude Include="..\src\seafloor.h" />
+    <ClInclude Include="..\src\skybox.h" />
+    <ClInclude Include="..\src\stb_image.h" />
+    <ClInclude Include="..\src\texture.h" />
+    <ClInclude Include="..\src\vec2f.h" />
+    <ClInclude Include="..\src\vec2fPolar.h" />
+    <ClInclude Include="..\src\vec3f.h" />
+    <ClInclude Include="..\src\wave.h" />
+    <ClInclude Include="..\src\sphere.h" />
+    <ClInclude Include="..\src\3d_projectile.h" />
+    <ClInclude Include="..\src\vec3fSpherical.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\boat.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\colour.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\defence.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\functions.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\island.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\keyboard.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\projectile.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\vec2f.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\vec2fPolar.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\vec3f.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\wave.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\opengl.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\3d_wave.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\mouse.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\seafloor.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texture.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\stb_image.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\3d_island.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\random.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\3d_boat.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\cylinder.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\skybox.h">
-      <Filter>src</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\src\sand.jpg">
-      <Filter>src</Filter>
-    </Image>
+    <Image Include="..\src\sand.jpg" />
   </ItemGroup>
 </Project>

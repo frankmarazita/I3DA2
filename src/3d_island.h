@@ -14,12 +14,51 @@
 
 #include "opengl.h"
 #include "texture.h"
+#include "half_cylinder.h"
+#include "rectangle.h"
+#include "3d_projectile.h"
+#include "vec3fSpherical.h"
 
+// Rotation speeds for the cannon
 #define CANNON_ROTATION_SPEED 2.0
 #define CANNON_TILT_SPEED 1.0
 
-#define CANNON_TILT_MAX 180.0
-#define CANNON_TILT_MIN 0.0
+#define CANNON_DEFAULT_POWER 0.4
+#define CANNON_POWER_INCREASE_FACTOR 0.02
+#define CANNON_POWER_DECREASE_FACTOR 0.02
+
+#define ISLAND_BASE_RADIUS 0.25
+
+// The offsets applied on top of the angles so the position of 0 degrees is moved
+#define CANNON_PITCH_OFFSET -90.0
+#define CANNON_ROTATION_OFFSET 0.0
+
+// Limits applied to the cannons tilt and rotation
+#define CANNON_TILT_MAX 90.0
+#define CANNON_TILT_MIN -10.0
+
+// Cannon cylinder, the actual gun
+#define CANNON_RADIUS 0.02
+#define CANNON_LENGTH 0.19
+
+// Island/cannon base holder cylinder
+// the one that pokes out from the island and the gun base sits on
+// not the half cylinder
+
+#define CANNON_BASE_CYLINDER_RADIUS 0.10
+#define CANNON_BASE_CYLINDER_HEIGHT 0.20
+#define CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE 0.06 // The offset from the central position of the sphere on the y axis
+
+// Dimensions of the cannon gun bases half cylinder
+#define CANNON_BASE_HALF_CYLINDER_SIZE 0.11
+#define CANNON_BASE_HALF_CYLINDER_RADIUS 0.06
+
+// Height of the square box holding the half cylinder
+#define GUN_BOX_HEIGHT 0.04
+
+// Offset of the base from the island cylinder holding it
+// 1 - 0.51 - 0.25 - 0.04/2.0
+#define CANNON_BASE_OFFSET 0.22
 
 class Island3D
 {
@@ -34,14 +73,31 @@ public:
 
     Cylinder *cannon;
     Cylinder *cannonBaseMiddle;
-    Cylinder *cannonGunBaseCylinder;
+    HalfCylinder *cannonGunBaseCylinder;
+    Rectangle3D *gunBox;
 
-    float cannonRotation = 90.0;
-    float cannonPitch = 90.0;
+    //vec2fPolar cannonYaw = { 0.4, 90 };
+    //vec2fPolar cannonPitch = { 0.4, 90 };
+
+    vec3fSpherical cannonSph = {CANNON_DEFAULT_POWER, 0.0, 0.0}; // magnitude, azimuthal, polar
+
+    /*float cannonRotation = 90.0;
+    float cannonPitch = 90.0;*/
 
     void tiltCannonUp();
     void tiltCannonDown();
 
+    void rotateCannonLeft();
+    void rotateCannonRight();
+
+    void increaseCannonPower();
+    void decreaseCannonPower();
+
+    vec3f endOfCannon();
+
+    Projectile3D *shoot();
+
+    //Projectile3D* shoot();
 private:
     Texture *texture;
     GLUquadric *qobj;
@@ -52,7 +108,6 @@ private:
 
     int health = 100;
     int score = 0;
-    float radius = 0.25;
 
     const float cooldownTime = 1000;
     float shootTime = -1;

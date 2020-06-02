@@ -21,8 +21,8 @@
 #include "random.h"
 #include "keyboard.h"
 #include "mouse.h"
-#include "cylinder.h"
 #include "skybox.h"
+#include "sphere.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -67,6 +67,7 @@ Skybox *skybox;
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
+std::list<Projectile3D*> projectiles;
 
 std::vector<Boat3D *> boats;
 
@@ -239,6 +240,14 @@ void display()
     {
         boats[i]->draw();
     }
+
+    // Draw projectiles 3D
+    for (std::list<Projectile3D*>::iterator projectile = projectiles.begin();
+        projectile != projectiles.end(); ++projectile)
+    {
+        (*projectile)->draw(wave);
+    }
+    
 
     // // Draw Boat 1
     // glPushMatrix();
@@ -463,7 +472,7 @@ void update()
 
     // // Update Defence and Projectile Locations
     // updateDefences(dt);
-    // updateProjectiles(dt);
+    updateProjectiles(dt);
 
     // // Boat 1 Defences
     // std::list<Defence *> *defences1 = boat1->getDefences();
@@ -481,8 +490,7 @@ void update()
     // }
 
     if (!global.pause)
-    {
-    }
+    {}
 
     // Counter
     lastT = t;
@@ -568,6 +576,12 @@ void keyDown(unsigned char key, int x, int y)
     // Keyboard single presses, else require holding
     switch (key)
     {
+    case 'w': // Increase Cannon Power
+        island3D->increaseCannonPower();
+        break;
+    case 's': // Decrease Cannon Power
+        island3D->decreaseCannonPower();
+        break;
     case 'p': // Toggle Wireframe
         global.wireframe = !global.wireframe;
         break;
@@ -632,10 +646,10 @@ void keyPressSpecial(int key)
         switch (key)
         {
         case GLUT_KEY_LEFT: // Cannon Rotate Left
-            island3D->cannonRotation -= CANNON_ROTATION_SPEED;
+            island3D->rotateCannonLeft();
             break;
         case GLUT_KEY_RIGHT: // Cannon Rotate Right
-            island3D->cannonRotation += CANNON_ROTATION_SPEED;
+            island3D->rotateCannonRight();
             break;
         }
         /*default:
@@ -648,22 +662,24 @@ void keyPressSpecial(int key)
 
 void keyPress(unsigned char key)
 {
+    Projectile3D* proj;
     // Keypress functionality for simultaneous holding
     if (global.runnning)
     {
         switch (key)
         {
-        case 'w': // Increase Cannon Power
-            break;
-        case 's': // Decrease Cannon Power
-            break;
-        case 'a': // Cannon Tilt Down
-            island3D->tiltCannonDown();
-            break;
-        case 'd': // Cannon Tilt Up
+        case 'a': // Cannon Tilt Up
             island3D->tiltCannonUp();
             break;
+        case 'd': // Cannon Tilt Down
+            island3D->tiltCannonDown();
+            break;
         case 32: // Island Cannon Fire
+            proj = island3D->shoot();
+            if (proj)
+            {
+                projectiles.push_back(proj);
+            }
             break;
         case 'v': // Island Cannon Defence
             break;
@@ -713,10 +729,29 @@ void displayFPS()
     for (int i = 0; i < len; i++)
         glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
     glPopMatrix();
+
+    // Display Cannon Magnitude
+    glPushMatrix();
+    text = "Power: " + std::to_string(island3D->cannonSph.magnitude);
+    len = text.length();
+    dist = ((float)(len * 9) / global.windowWidth * 2);
+    glTranslatef(0.95 - dist, 0.74, 0.0);
+    glColor3f(col.r, col.g, col.b);
+    glRasterPos2f(0, 0);
+    for (int i = 0; i < len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
+    glPopMatrix();
 }
 
 void updateProjectiles(float dt)
 {
+    // Update All Projectiles
+    for (std::list<Projectile3D*>::iterator p = projectiles.begin();
+        p != projectiles.end(); ++p)
+    {
+        (*p)->updateProjectileState(dt);
+    }
+  
     // // Update All Projectiles
     // island->updateProjectile(dt);
     // boat1->updateProjectile(dt);
