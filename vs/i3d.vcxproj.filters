@@ -24,6 +24,8 @@
     <ClCompile Include="..\src\3d_projectile.cpp" />
     <ClCompile Include="..\src\3d_defence.cpp" />
     <ClCompile Include="..\src\time.cpp" />
+    <ClCompile Include="..\src\effect.cpp" />
+    <ClCompile Include="..\src\particle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\3d_boat.h" />
@@ -56,6 +58,8 @@
     <ClInclude Include="..\src\tex2f.h" />
     <ClInclude Include="..\src\3d_defence.h" />
     <ClInclude Include="..\src\time.h" />
+    <ClInclude Include="..\src\effect.h" />
+    <ClInclude Include="..\src\particle.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\src\sand.jpg" />
