@@ -18,6 +18,7 @@
 #include "rectangle.h"
 #include "3d_projectile.h"
 #include "vec3fSpherical.h"
+#include "sphere.h"
 #include "3d_defence.h"
 
 // Rotation speeds for the cannon
@@ -72,10 +73,13 @@ public:
     bool collision(vec3f otherLocation, float otherRadius);
     void damage();
 
+    Cylinder *bottomCylinder;
     Cylinder *cannon;
     Cylinder *cannonBaseMiddle;
     HalfCylinder *cannonGunBaseCylinder;
     Rectangle3D *gunBox;
+
+    Sphere *sphere = new Sphere(ISLAND_BASE_RADIUS, 40, 40);
 
     //vec2fPolar cannonYaw = { 0.4, 90 };
     //vec2fPolar cannonPitch = { 0.4, 90 };
@@ -102,8 +106,8 @@ public:
     void point();
 
     //Projectile3D* shoot();
-private:
     Texture *texture;
+private:
     GLUquadric *qobj;
 
     vec3f location = {0, -0.5, 0};

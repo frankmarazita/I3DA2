@@ -12,7 +12,7 @@ void Rectangle3D::draw()
     float x, y, z;
 
     // Walls
-    glColor3f(1.0, 0.0, 0.0);
+    //glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_QUADS);
 
     glColor3f(0.0f, 1.0f, 0.0f);     // Green
