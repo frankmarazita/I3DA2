@@ -60,7 +60,7 @@ Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
 Boat *boat2 = new Boat(boat2location, 0, 135, 1);
 Island *island = new Island();
-Island3D* island3D;
+Island3D *island3D;
 Seafloor *seafloor;
 Skybox *skybox;
 Random *random = new Random();
@@ -180,9 +180,9 @@ void display()
 
     gluLookAt(xyz.x, 0.3, xyz.z, 0.0, 0.0, 0.0, xyz.x, 1.0, xyz.z);
 
-    GLfloat light_ambient[] = { 0.8, 0.8, 0.65, 0.75 };
-    GLfloat light_diffuse[] = { 0.8, 0.8, 0.65, 0.75 };
-    GLfloat light_position[] = { 1.0, 1.0, 0.8, 0.0 };
+    GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
+    GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
+    GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
 
     if (global.lighting)
     {
@@ -317,6 +317,25 @@ void display()
     // End Wireframe
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    */
+
+    glDisable(GL_LIGHTING);
+    glPopMatrix();
+
+    // Push forward a matrix so we can draw to the screen
+    glMatrixMode(GL_PROJECTION);                // change the current matrix to PROJECTION
+    double matrix[16];                          // 16 doubles in stack memory
+    glGetDoublev(GL_PROJECTION_MATRIX, matrix); // get the values from PROJECTION matrix to local variable
+    glLoadIdentity();                           // reset PROJECTION matrix to identity matrix
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
+    glMatrixMode(GL_MODELVIEW); // change current matrix to MODELVIEW matrix again
+    glLoadIdentity();           // reset it to identity matrix
+    glPushMatrix();             // push current state of MODELVIEW matrix to stack
+
+    // Draw Island OSD
+    island3D->drawHealth();
+    island3D->drawScore();
+    displayFPS();
 
     // Game Over Message
     if (!global.runnning)
@@ -331,31 +350,13 @@ void display()
         for (int i = 0; i < len; i++)
             glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
         glPopMatrix();
-    }*/
-
-    glDisable(GL_LIGHTING);
-    glPopMatrix();
-
-    // Push forward a matrix so we can draw to the screen
-    glMatrixMode(GL_PROJECTION); // change the current matrix to PROJECTION
-    double matrix[16]; // 16 doubles in stack memory
-    glGetDoublev(GL_PROJECTION_MATRIX, matrix); // get the values from PROJECTION matrix to local variable
-    glLoadIdentity(); // reset PROJECTION matrix to identity matrix
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
-    glMatrixMode(GL_MODELVIEW); // change current matrix to MODELVIEW matrix again
-    glLoadIdentity(); // reset it to identity matrix
-    glPushMatrix(); // push current state of MODELVIEW matrix to stack
-
-    // Draw Island OSD
-    island3D->drawHealth();
-    island3D->drawScore();
-    displayFPS();
+    }
 
     // Reset back
-    glPopMatrix(); // get MODELVIEW matrix value from stack
+    glPopMatrix();               // get MODELVIEW matrix value from stack
     glMatrixMode(GL_PROJECTION); // change current matrix mode to PROJECTION
-    glLoadMatrixd(matrix); // reset
-    glMatrixMode(GL_MODELVIEW); // change current matrix mode to MODELVIEW
+    glLoadMatrixd(matrix);       // reset
+    glMatrixMode(GL_MODELVIEW);  // change current matrix mode to MODELVIEW
 
     glutSwapBuffers();
 
@@ -485,6 +486,7 @@ void update()
             float initialCannonDeg = boat->getInitialCannonDeg();
             boat->setCannonDeg(initialCannonDeg - deg);
             boat->calcProjectileOrigin();
+            boat->calcProjectilePower();
         }
 
         for (int i = 0; i < boats.size(); i++)
@@ -591,20 +593,11 @@ void update()
         }
     }
 
-    // // Boat 1 Defences
-    // std::list<Defence *> *defences1 = boat1->getDefences();
-    // for (std::list<Defence *>::iterator d = defences1->begin();
-    //      d != defences1->end(); ++d)
-    // {
-    //     (*d)->increaseRadius();
-    // }
-    // // Boat 2 Defences
-    // std::list<Defence *> *defences2 = boat2->getDefences();
-    // for (std::list<Defence *>::iterator d = defences2->begin();
-    //      d != defences2->end(); ++d)
-    // {
-    //     (*d)->increaseRadius();
-    // }
+    if (!island3D->getAlive())
+    {
+        global.pause = true;
+        global.runnning = false;
+    }
 
     if (!global.pause)
     {

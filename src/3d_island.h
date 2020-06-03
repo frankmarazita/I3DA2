@@ -105,8 +105,11 @@ public:
 
     void point();
 
+    bool getAlive();
+
     //Projectile3D* shoot();
     Texture *texture;
+
 private:
     GLUquadric *qobj;
 

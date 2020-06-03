@@ -95,12 +95,12 @@ void Island3D::draw()
 
     //glDisable(GL_LIGHT0);
     glEnable(GL_LIGHT2);
-    GLfloat light_ambient[] = { 0.1, 0.3, 0.6, 1.0 };
-    GLfloat light_diffuse[] = { 0.3, 0.3, 0.1, 1.0 };
-    GLfloat light_position[] = { 1.0, 0.0, 0.0, 0.0 };
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_emission[] = { -1.0, 0.0, -1.0, 1.0 };
-    GLfloat high_shininess[] = { 100.0 };
+    GLfloat light_ambient[] = {0.1, 0.3, 0.6, 1.0};
+    GLfloat light_diffuse[] = {0.3, 0.3, 0.1, 1.0};
+    GLfloat light_position[] = {1.0, 0.0, 0.0, 0.0};
+    GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat mat_emission[] = {-1.0, 0.0, -1.0, 1.0};
+    GLfloat high_shininess[] = {100.0};
 
     //glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
     //glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
@@ -122,8 +122,8 @@ void Island3D::draw()
     // Origin of the gunbox
     float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT / 2;
 
-    GLfloat light_ambient3[] = { 0.1, 0.3, 0.9, 1.0 };
-    GLfloat light_diffuse3[] = { 0.3, 0.3, 0.1, 1.0 };
+    GLfloat light_ambient3[] = {0.1, 0.3, 0.9, 1.0};
+    GLfloat light_diffuse3[] = {0.3, 0.3, 0.1, 1.0};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient3);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_diffuse3);
 
@@ -166,9 +166,9 @@ void Island3D::draw()
     drawDot(end.x, end.y, end.z);
     glPopMatrix();
 
-    GLfloat light_ambient2[] = { 0.2, 0.2, 0.2, 1.0 };
-    GLfloat light_diffuse2[] = { 0.8, 0.8, 0.8, 1.0 };
-    GLfloat mat_emission2[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_ambient2[] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat light_diffuse2[] = {0.8, 0.8, 0.8, 1.0};
+    GLfloat mat_emission2[] = {0.0, 0.0, 0.0, 1.0};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient2);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_ambient2);
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission2);
@@ -275,10 +275,18 @@ bool Island3D::collision(vec3f otherLocation, float otherRadius)
 
 void Island3D::damage()
 {
-    health--;
+    if (health > 0)
+        health--;
 }
 
 void Island3D::point()
 {
     score++;
+}
+
+bool Island3D::getAlive()
+{
+    if (health > 0)
+        return true;
+    return false;
 }
