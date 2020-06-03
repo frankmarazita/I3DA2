@@ -81,5 +81,5 @@ bool Defence3D::collision(vec3f otherLocation, float otherRadius)
 void Defence3D::increaseRadius()
 {
     // Grow defence size based on time
-    radius = 0.0001 * (glutGet(GLUT_ELAPSED_TIME) - creationTime);
+    radius = 0.0001 * (this->time - creationTime);
 }

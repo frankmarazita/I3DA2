@@ -22,6 +22,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "skybox.h"
+#include "time.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -66,6 +67,7 @@ Skybox *skybox;
 Random *random = new Random();
 Keyboard *keyboard = new Keyboard();
 Mouse *mouse = new Mouse();
+Time *time;
 
 std::list<Projectile3D *> projectiles;
 std::list<Defence3D *> defences;
@@ -137,8 +139,10 @@ void myinit()
     seafloor = new Seafloor(global.worldSize); // We have to initialise it here or at least import the texture here
     skybox = new Skybox();
     island3D = new Island3D();
+    time = new Time();
 
     // Set global start time
+    time->update(glutGet(GLUT_ELAPSED_TIME));
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)global.milli;
 }
 
@@ -170,34 +174,56 @@ void display()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
+
     glColor3f(0.8f, 0.8f, 0.8f);
     glLoadIdentity();
 
-    vec3fSpherical sph = {0.9, 0.0, 170.0 + island3D->cannonSph.polar};
+    vec3fSpherical sph = {0.9, 0.0, 165.0 + island3D->cannonSph.polar};
     vec3f xyz;
     xyz = sphericalToCartesian(sph);
     //printf("x: %f, y: %f, z: %f\n", xyz.x, xyz.y, xyz.z);
 
     gluLookAt(xyz.x, 0.3, xyz.z, 0.0, 0.0, 0.0, xyz.x, 1.0, xyz.z);
 
-    GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
-    GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
-    GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
+    /*lightingShader.setVec3("viewPos", camera.Position);
+    lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+    lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);*/
+
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_specular[] = { 0.13, 0.13, 0.13, 1.0 };
+    GLfloat light_position[] = { 1.0, 1.0, 0.0, 0.0 };
+    GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
+
+    skybox->draw();
 
     if (global.lighting)
     {
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
 
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
         glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
     }
 
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    if (global.textures)
+        glEnable(GL_TEXTURE_2D);
+    else
+        glDisable(GL_TEXTURE_2D);
 
     glRotatef(mouse->cameraRotationX, 0, 1.0, 0);
     glRotatef(mouse->cameraRotationY, 1.0, 0, 0);
@@ -212,26 +238,23 @@ void display()
     // Draw Axis
     drawAxis(global.worldSize);
 
-    glDisable(GL_LIGHT0);
+    //glDisable(GL_LIGHT0);
     // Draw seafloor
     seafloor->draw();
-
-    // Draw Skybox
-    skybox->draw();
 
     // Draw Wave
     glPushMatrix();
     wave->drawAdvanced();
     glPopMatrix();
 
-    if (global.lighting)
+    /*if (global.lighting)
     {
         glEnable(GL_LIGHT0);
 
         glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
         glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    }
+    }*/
 
     // Draw 3D Island
     glPushMatrix();
@@ -374,7 +397,7 @@ void update()
     float t;
     float dt;
 
-    t = glutGet(GLUT_ELAPSED_TIME) / (float)global.milli - global.startTime;
+    t = time->getTime() / (float)global.milli - global.startTime;
 
     if (lastT < 0.0)
     {
@@ -384,8 +407,21 @@ void update()
 
     dt = t - lastT;
 
+    time->update(glutGet(GLUT_ELAPSED_TIME));
+    if (time->paused)
+        return;
+
+    for (int i = 0; i < boats.size(); i++)
+    {
+        Boat3D* boat = boats[i];
+        boat->time = time->getTime();
+    }
+    island3D->time = time->getTime();
+
+    printf("time: %i %i\n", time->glutTime, time->getTime());
+
     // Keypresses
-    if (global.keyPressTime + 20 < glutGet(GLUT_ELAPSED_TIME))
+    if (global.keyPressTime + 20 < time->getTime())
     {
         std::list<unsigned char> *pressed = keyboard->getPressed();
 
@@ -403,18 +439,18 @@ void update()
         {
             keyPressSpecial(*i);
         }
-        global.keyPressTime = glutGet(GLUT_ELAPSED_TIME);
+        global.keyPressTime = time->getTime();
     }
 
     // Move Wave
     if (wave->getAnimate())
     {
-        wave->moveWave(glutGet(GLUT_ELAPSED_TIME) / (float)global.milli / 2);
+        wave->moveWave(time->getTime() / (float)global.milli / 2);
         wave->update();
     }
 
     // Create Boat AI
-    if (global.boatCreationTime + 3000 < glutGet(GLUT_ELAPSED_TIME))
+    if (global.boatCreationTime + 3000 < time->getTime())
     {
         float location = (float)random->getRandom(-1000, 1000) / 1000;
         int side = random->getRandom(1, 4);
@@ -446,11 +482,11 @@ void update()
         Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45);
         boats.push_back(boat3D);
 
-        global.boatCreationTime = glutGet(GLUT_ELAPSED_TIME);
+        global.boatCreationTime = time->getTime();
     }
 
     // Update AI Boats
-    if (global.updateBoatTime + 20 < glutGet(GLUT_ELAPSED_TIME))
+    if (global.updateBoatTime + 20 < time->getTime())
     {
         for (int i = 0; i < boats.size(); i++)
         {
@@ -510,13 +546,14 @@ void update()
                 projectiles.push_back(proj);
         }
 
-        global.updateBoatTime = glutGet(GLUT_ELAPSED_TIME);
+        global.updateBoatTime = time->getTime();
     }
 
     // Update Defences
     for (std::list<Defence3D *>::iterator d = defences.begin();
          d != defences.end(); ++d)
     {
+        (*d)->time = time->getTime();
         (*d)->updateProjectileState(dt);
         (*d)->increaseRadius();
         vec3f location = (*d)->getLocation();
@@ -709,6 +746,7 @@ void keyDown(unsigned char key, int x, int y)
     case 'h': // Pause/Resume Game Animations
         global.pause = !global.pause;
         wave->toggleAnimation();
+        time->toggle();
         break;
     case 61: // Wave Segments (+)
         wave->increaseNumSegments();

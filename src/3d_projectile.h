@@ -37,6 +37,8 @@ private:
     bool isBoat;
     int boatNum;
 
+    Sphere *sphere;
+
     vec3f r0 = {0.0, 0.0, 0.0}; // Initial position
     vec3f v0 = {0.0, 0.0, 0.0}; // Initial velocity
     vec3f r = {0.0, 0.0, 0.0};  // Drawn position

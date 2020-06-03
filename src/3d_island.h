@@ -41,7 +41,7 @@
 
 // Cannon cylinder, the actual gun
 #define CANNON_RADIUS 0.02
-#define CANNON_LENGTH 0.19
+#define CANNON_LENGTH 0.12
 
 // Island/cannon base holder cylinder
 // the one that pokes out from the island and the gun base sits on
@@ -109,7 +109,7 @@ public:
 
     //Projectile3D* shoot();
     Texture *texture;
-
+    int time = 0;
 private:
     GLUquadric *qobj;
 

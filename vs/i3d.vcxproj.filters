@@ -23,6 +23,7 @@
     <ClCompile Include="..\src\sphere.cpp" />
     <ClCompile Include="..\src\3d_projectile.cpp" />
     <ClCompile Include="..\src\3d_defence.cpp" />
+    <ClCompile Include="..\src\time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\3d_boat.h" />
@@ -54,6 +55,7 @@
     <ClInclude Include="..\src\vec3fSpherical.h" />
     <ClInclude Include="..\src\tex2f.h" />
     <ClInclude Include="..\src\3d_defence.h" />
+    <ClInclude Include="..\src\time.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\src\sand.jpg" />
