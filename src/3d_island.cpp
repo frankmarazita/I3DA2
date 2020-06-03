@@ -33,13 +33,13 @@ vec3f Island3D::endOfCannon()
 
     // Apply our constant modifications to set the correct coordinates
     x = -x;
-    float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT/2;
+    float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT / 2;
     y = y + BOX_OFFSET + GUN_BOX_HEIGHT / 2 + CANNON_RADIUS;
 
-    return { x, y, z };
+    return {x, y, z};
 }
 
-Projectile3D* Island3D::shoot()
+Projectile3D *Island3D::shoot()
 {
     // Check for projectile shoot cooldown
     if (glutGet(GLUT_ELAPSED_TIME) - shootTime >= cooldownTime)
@@ -49,6 +49,20 @@ Projectile3D* Island3D::shoot()
         // Create a new projectile and return it
         Projectile3D *projectile = new Projectile3D(endOfCannon(), cannonSph, false, 0);
         return projectile;
+    }
+    return NULL;
+}
+
+Defence3D *Island3D::defence()
+{
+    // Check for defence shoot cooldown
+    if (glutGet(GLUT_ELAPSED_TIME) - defenceTime >= cooldownTime)
+    {
+        defenceTime = glutGet(GLUT_ELAPSED_TIME);
+
+        // Create a new defence and return it
+        Defence3D *defence = new Defence3D(endOfCannon(), cannonSph, defenceTime);
+        return defence;
     }
     return NULL;
 }
@@ -101,12 +115,12 @@ void Island3D::draw()
 
     // Cylinder Base (Middle)
     glPushMatrix();
-    glTranslatef(0, location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT/2, 0);
+    glTranslatef(0, location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT / 2, 0);
     cannonBaseMiddle->draw();
     glPopMatrix();
 
     // Origin of the gunbox
-    float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT/2;
+    float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT / 2;
 
     GLfloat light_ambient3[] = { 0.1, 0.3, 0.9, 1.0 };
     GLfloat light_diffuse3[] = { 0.3, 0.3, 0.1, 1.0 };
@@ -122,7 +136,7 @@ void Island3D::draw()
 
     // Half Cylinder Base (Gun Base)
     glPushMatrix();
-    glTranslatef(0, BOX_OFFSET + GUN_BOX_HEIGHT/2, 0); // Directly above the gunbox
+    glTranslatef(0, BOX_OFFSET + GUN_BOX_HEIGHT / 2, 0); // Directly above the gunbox
     // Rotate the half cylinder by rotation
     glRotatef(cannonSph.polar, 0.0, 1.0, 0.0);
     // Rotates the half cylinder so it's not sideways
@@ -130,8 +144,8 @@ void Island3D::draw()
     cannonGunBaseCylinder->draw();
     glPopMatrix();
 
-	// Cannon
-	glPushMatrix();
+    // Cannon
+    glPushMatrix();
 
     // Placed above the box
     glTranslatef(0.0, BOX_OFFSET + GUN_BOX_HEIGHT / 2 + CANNON_RADIUS, 0);
@@ -262,4 +276,9 @@ bool Island3D::collision(vec3f otherLocation, float otherRadius)
 void Island3D::damage()
 {
     health--;
+}
+
+void Island3D::point()
+{
+    score++;
 }

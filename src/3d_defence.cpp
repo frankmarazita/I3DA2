@@ -1,11 +1,10 @@
-#include "3d_projectile.h"
+#include "3d_defence.h"
 
-Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat, int boatNum)
+Defence3D::Defence3D(vec3f location, vec3fSpherical spherical, float creationTime)
 {
     this->location = location;
     this->spherical = spherical;
-    this->isBoat = isBoat;
-    this->boatNum = boatNum;
+    this->creationTime = creationTime;
 
     r0 = location;
     v0 = sphericalToCartesian(spherical);
@@ -13,19 +12,16 @@ Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat
     v = v0;
 }
 
-// In place of a sphere for now
-void Projectile3D::drawDot(float x, float y, float z)
+void Defence3D::drawDot(float x, float y, float z)
 {
     glPushMatrix();
     glColor3f(1.0, 1.0, 1.0);
-    glPointSize(10.0);
-    glBegin(GL_POINTS);
-    glVertex3f(x, y, z);
-    glEnd();
+    glTranslated(location.x, location.y, location.z);
+    glutWireSphere(radius, 8, 8);
     glPopMatrix();
 }
 
-void Projectile3D::draw(Wave3D *wave)
+void Defence3D::draw(Wave3D *wave)
 {
     // Draw Projectile
     glColor3f(1, 1, 1);
@@ -53,7 +49,7 @@ void Projectile3D::draw(Wave3D *wave)
     glEnd();
 }
 
-void Projectile3D::updateProjectileState(float dt)
+void Defence3D::updateProjectileState(float dt)
 {
     // Update projectile values and location
     r.x += v.x * dt;
@@ -64,17 +60,17 @@ void Projectile3D::updateProjectileState(float dt)
     location = {r.x, r.y, r.z};
 }
 
-vec3f Projectile3D::getLocation()
+vec3f Defence3D::getLocation()
 {
     return location;
 }
 
-float Projectile3D::getRadius()
+float Defence3D::getRadius()
 {
     return radius;
 }
 
-bool Projectile3D::getCollision(float radius, vec2f location)
+bool Defence3D::getCollision(float radius, vec2f location)
 {
     float dx = this->location.x - location.x;
     float dy = this->location.y - location.y;
@@ -85,12 +81,8 @@ bool Projectile3D::getCollision(float radius, vec2f location)
     return false;
 }
 
-bool Projectile3D::getIsBoat()
+void Defence3D::increaseRadius()
 {
-    return isBoat;
-}
-
-int Projectile3D::getBoatNum()
-{
-    return boatNum;
+    // Grow defence size based on time
+    radius = 0.00005 * (glutGet(GLUT_ELAPSED_TIME) - creationTime);
 }

@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\3d_boat.cpp" />
+    <ClCompile Include="..\src\3d_defence.cpp" />
     <ClCompile Include="..\src\3d_island.cpp" />
     <ClCompile Include="..\src\3d_projectile.cpp" />
     <ClCompile Include="..\src\3d_wave.cpp" />
@@ -178,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\3d_boat.h" />
+    <ClInclude Include="..\src\3d_defence.h" />
     <ClInclude Include="..\src\3d_island.h" />
     <ClInclude Include="..\src\3d_projectile.h" />
     <ClInclude Include="..\src\3d_wave.h" />

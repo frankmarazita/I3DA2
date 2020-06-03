@@ -10,6 +10,8 @@
 #include "defence.h"
 #include "wave.h"
 #include "cylinder.h"
+#include "3d_projectile.h"
+#include "vec3fSpherical.h"
 
 #include <cmath>
 #include <list>
@@ -21,6 +23,7 @@ class Boat3D
 public:
     Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg);
 
+    Projectile3D *shoot();
     void draw();
 
     vec3f getLocation();
@@ -52,9 +55,12 @@ private:
     float scale = 0.1;
     int health = 1;
 
-    bool projectileExists = false;
+    const float cooldownTime = 2500;
+    float shootTime = -1;
 
     colour col = {1, 0, 0, 1};
+
+    vec3fSpherical sphericalVec = {0.4, 45, 0.0};
 };
 
 #endif // THREE_D_BOAT_H
