@@ -4,6 +4,7 @@
 #include "vec2f.h"
 #include "vec2fPolar.h"
 #include "vec3f.h"
+#include "tex2f.h"
 #include "colour.h"
 #include "functions.h"
 #include "projectile.h"
@@ -28,9 +29,8 @@ private:
     int slices;
     float r;
 
-    int nv;
-
-    std::list<vec3f> verticies;
+    vec3f** vertices;
+    tex2f** texes;
 };
 
 #endif // SPHERE_H
