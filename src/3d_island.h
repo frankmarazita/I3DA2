@@ -105,6 +105,8 @@ public:
 
     void point();
 
+    bool getAlive();
+
     //Projectile3D* shoot();
     Texture *texture;
     int time = 0;

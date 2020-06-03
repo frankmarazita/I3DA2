@@ -220,3 +220,16 @@ bool Boat3D::collision(vec3f otherLocation, float otherRadius)
         return true;
     return false;
 }
+
+void Boat3D::calcProjectilePower()
+{
+    vec3fSpherical tempSphericalVec;
+    vec3f destination = {0, projectileOrigin.y, 0};
+    float distance = sqrt(pow(destination.x - projectileOrigin.x, 2) + pow(destination.z - projectileOrigin.z, 2));
+    float g = 0.25;
+
+    tempSphericalVec.magnitude = sqrt((g * distance) / sin(2 * sphericalVec.a));
+
+    if (tempSphericalVec.magnitude < 0.4)
+        sphericalVec.magnitude = tempSphericalVec.magnitude;
+}

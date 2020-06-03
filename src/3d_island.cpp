@@ -273,10 +273,18 @@ bool Island3D::collision(vec3f otherLocation, float otherRadius)
 
 void Island3D::damage()
 {
-    health--;
+    if (health > 0)
+        health--;
 }
 
 void Island3D::point()
 {
     score++;
+}
+
+bool Island3D::getAlive()
+{
+    if (health > 0)
+        return true;
+    return false;
 }
