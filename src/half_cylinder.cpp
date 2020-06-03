@@ -12,7 +12,7 @@ void HalfCylinder::draw()
     float x, y, z;
     float theta;
 
-    glColor3f(1.0, 0.0, 0.0);
+    //glColor3f(1.0, 0.0, 0.0);
     // Bottom
     glBegin(GL_POLYGON);
     for (int i = 0; i < segments + 1; i++) {
@@ -25,7 +25,7 @@ void HalfCylinder::draw()
     glEnd();
 
     // Walls
-    glColor3f(1.0, 0.0, 0.0);
+    //glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_QUAD_STRIP);
     for (int i = 0; i < segments + 1; i++) {
         theta = i / (float)segments * M_PI;
@@ -39,7 +39,7 @@ void HalfCylinder::draw()
     glEnd();
 
     // Top
-    glColor3f(0.0, 0.0, 1.0);
+    //glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_POLYGON);
     for (int i = 0; i < segments + 1; i++) {
         theta = i / (float)segments * M_PI;

@@ -11,19 +11,18 @@ Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat
     v0 = sphericalToCartesian(spherical);
     r = location;
     v = v0;
+    this->sphere = new Sphere(radius, 64, 64);
 }
 
-// In place of a sphere for now
 void Projectile3D::drawDot(float x, float y, float z)
 {
     glPushMatrix();
     glColor3f(1.0, 1.0, 1.0);
-    glPointSize(10.0);
-    glBegin(GL_POINTS);
-    glVertex3f(x, y, z);
-    glEnd();
+    glTranslated(location.x, location.y, location.z);
+    sphere->draw();
     glPopMatrix();
 }
+
 
 void Projectile3D::draw(Wave3D *wave)
 {

@@ -175,6 +175,7 @@
     <ClCompile Include="..\src\skybox.cpp" />
     <ClCompile Include="..\src\sphere.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
+    <ClCompile Include="..\src\time.cpp" />
     <ClCompile Include="..\src\wave.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +203,7 @@
     <ClInclude Include="..\src\stb_image.h" />
     <ClInclude Include="..\src\tex2f.h" />
     <ClInclude Include="..\src\texture.h" />
+    <ClInclude Include="..\src\time.h" />
     <ClInclude Include="..\src\vec2f.h" />
     <ClInclude Include="..\src\vec2fPolar.h" />
     <ClInclude Include="..\src\vec3f.h" />

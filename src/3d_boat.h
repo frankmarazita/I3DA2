@@ -41,6 +41,7 @@ public:
     void calcProjectileOrigin();
     vec3f getProjectileOrigin();
     bool collision(vec3f otherLocation, float otherRadius);
+    int time = 0;
 
 private:
     vec3f location;
