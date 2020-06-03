@@ -70,13 +70,10 @@ float Defence3D::getRadius()
     return radius;
 }
 
-bool Defence3D::getCollision(float radius, vec2f location)
+bool Defence3D::collision(vec3f otherLocation, float otherRadius)
 {
-    float dx = this->location.x - location.x;
-    float dy = this->location.y - location.y;
-    float distance = sqrt(pow(dx, 2) + pow(dy, 2));
-    // Check projectile collision with other based on radius
-    if (distance < radius + this->radius)
+    float dist = calcVectorDistance(otherLocation, location);
+    if (dist <= radius + otherRadius)
         return true;
     return false;
 }
@@ -84,5 +81,5 @@ bool Defence3D::getCollision(float radius, vec2f location)
 void Defence3D::increaseRadius()
 {
     // Grow defence size based on time
-    radius = 0.00005 * (glutGet(GLUT_ELAPSED_TIME) - creationTime);
+    radius = 0.0001 * (glutGet(GLUT_ELAPSED_TIME) - creationTime);
 }

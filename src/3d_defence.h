@@ -27,7 +27,7 @@ public:
     vec3f getLocation();
     float getRadius();
 
-    bool getCollision(float radius, vec2f location);
+    bool collision(vec3f otherLocation, float otherRadius);
 
     void increaseRadius();
 

@@ -485,8 +485,23 @@ void update()
         global.updateBoatTime = glutGet(GLUT_ELAPSED_TIME);
     }
 
-    // Update Defence and Projectile Locations
-    // Update All Projectiles
+    // Update Defences
+    for (std::list<Defence3D *>::iterator d = defences.begin();
+         d != defences.end(); ++d)
+    {
+        (*d)->updateProjectileState(dt);
+        (*d)->increaseRadius();
+        vec3f location = (*d)->getLocation();
+        float radius = (*d)->getRadius();
+
+        if (wave->getYfromXZ(location.x, location.z) > location.y)
+        {
+            defences.erase(d);
+            break;
+        }
+    }
+
+    // Update Projectiles
     for (std::list<Projectile3D *>::iterator p = projectiles.begin();
          p != projectiles.end(); ++p)
     {
@@ -532,15 +547,22 @@ void update()
                 break;
             }
         }
-    }
 
-    for (std::list<Defence3D *>::iterator d = defences.begin();
-         d != defences.end(); ++d)
-    {
-        (*d)->updateProjectileState(dt);
-        (*d)->increaseRadius();
-        vec3f location = (*d)->getLocation();
-        float radius = (*d)->getRadius();
+        bool erase = false;
+        for (std::list<Defence3D *>::iterator d = defences.begin();
+             d != defences.end(); ++d)
+        {
+            if ((*d)->collision(location, radius))
+            {
+                erase = true;
+                break;
+            }
+        }
+        if (erase)
+        {
+            projectiles.erase(p);
+            break;
+        }
     }
 
     // // Boat 1 Defences
