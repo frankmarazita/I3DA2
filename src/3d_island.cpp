@@ -42,9 +42,9 @@ vec3f Island3D::endOfCannon()
 Projectile3D *Island3D::shoot()
 {
     // Check for projectile shoot cooldown
-    if (glutGet(GLUT_ELAPSED_TIME) - shootTime >= cooldownTime)
+    if (this->time - shootTime >= cooldownTime)
     {
-        shootTime = glutGet(GLUT_ELAPSED_TIME);
+        shootTime = this->time;
 
         // Create a new projectile and return it
         Projectile3D *projectile = new Projectile3D(endOfCannon(), cannonSph, false, 0);
@@ -56,9 +56,9 @@ Projectile3D *Island3D::shoot()
 Defence3D *Island3D::defence()
 {
     // Check for defence shoot cooldown
-    if (glutGet(GLUT_ELAPSED_TIME) - defenceTime >= cooldownTime)
+    if (this->time - defenceTime >= cooldownTime)
     {
-        defenceTime = glutGet(GLUT_ELAPSED_TIME);
+        defenceTime = this->time;
 
         // Create a new defence and return it
         Defence3D *defence = new Defence3D(endOfCannon(), cannonSph, defenceTime);
@@ -74,6 +74,8 @@ void Island3D::draw()
 
     //glColor3f(0.9, 0.8, 0.5);
 
+    glColor3f(0.8, 0.8, 0.8);
+    texture->enable();
     // Very very bottom cylinder
     glPushMatrix();
     glTranslatef(0, -1 + 0.25, 0); // Start from the bottom
@@ -83,20 +85,18 @@ void Island3D::draw()
     glPopMatrix();
 
     // Sphere
-    glColor3f(0.8, 0.8, 0.8);
     glPushMatrix();
     glTranslatef(location.x, location.y, location.z); // 0.0, -0.5, 0.0
     glRotatef(-90, 1.0, 0, 0);
     //glutSolidSphere(ISLAND_BASE_RADIUS, 40, 40);
-    texture->enable();
     sphere->draw();
     texture->disable();
     glPopMatrix();
 
     //glDisable(GL_LIGHT0);
-    glEnable(GL_LIGHT2);
+    /*glEnable(GL_LIGHT2);
     GLfloat light_ambient[] = { 0.1, 0.3, 0.6, 1.0 };
-    GLfloat light_diffuse[] = { 0.3, 0.3, 0.1, 1.0 };
+    GLfloat light_diffuse[] = { 0.1, 0.3, 0.6, 1.0 };
     GLfloat light_position[] = { 1.0, 0.0, 0.0, 0.0 };
     GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat mat_emission[] = { -1.0, 0.0, -1.0, 1.0 };
@@ -104,14 +104,12 @@ void Island3D::draw()
 
     //glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
     //glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_diffuse);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+
     glLightfv(GL_LIGHT2, GL_POSITION, light_position);
     glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);*/
+
+    glColor4f(0.1, 0.1, 0.8, 1.0);
 
     // Cylinder Base (Middle)
     glPushMatrix();
@@ -122,10 +120,10 @@ void Island3D::draw()
     // Origin of the gunbox
     float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT / 2;
 
-    GLfloat light_ambient3[] = { 0.1, 0.3, 0.9, 1.0 };
+    /*GLfloat light_ambient3[] = { 0.1, 0.3, 0.9, 1.0 };
     GLfloat light_diffuse3[] = { 0.3, 0.3, 0.1, 1.0 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient3);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_diffuse3);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_diffuse3);*/
 
     // Boxy box
     glPushMatrix();
@@ -166,12 +164,12 @@ void Island3D::draw()
     drawDot(end.x, end.y, end.z);
     glPopMatrix();
 
-    GLfloat light_ambient2[] = { 0.2, 0.2, 0.2, 1.0 };
+    /*GLfloat light_ambient2[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_diffuse2[] = { 0.8, 0.8, 0.8, 1.0 };
     GLfloat mat_emission2[] = { 0.0, 0.0, 0.0, 1.0 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient2);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_ambient2);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission2);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission2);*/
 
     glDisable(GL_LIGHT2);
     glEnable(GL_LIGHT0);
@@ -217,7 +215,7 @@ void Island3D::drawScore()
 
 void Island3D::tiltCannonUp()
 {
-    printf("tilt %f\n", cannonSph.a);
+    //printf("tilt %f\n", cannonSph.a);
     if (cannonSph.a + CANNON_TILT_SPEED > CANNON_TILT_MAX)
         return;
 

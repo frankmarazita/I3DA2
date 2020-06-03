@@ -12,9 +12,9 @@ Boat3D::Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDe
 Projectile3D *Boat3D::shoot()
 {
     // Check for projectile shoot cooldown
-    if (glutGet(GLUT_ELAPSED_TIME) - shootTime >= cooldownTime)
+    if (this->time - shootTime >= cooldownTime)
     {
-        shootTime = glutGet(GLUT_ELAPSED_TIME);
+        shootTime = this->time;
 
         // Create a new projectile and return it
         Projectile3D *projectile = new Projectile3D(projectileOrigin, sphericalVec, true, 0);

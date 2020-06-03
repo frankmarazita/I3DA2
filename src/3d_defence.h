@@ -30,6 +30,7 @@ public:
     bool collision(vec3f otherLocation, float otherRadius);
 
     void increaseRadius();
+    int time = 0;
 
 private:
     vec3f location;
