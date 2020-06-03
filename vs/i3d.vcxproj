@@ -198,6 +198,7 @@
     <ClInclude Include="..\src\skybox.h" />
     <ClInclude Include="..\src\sphere.h" />
     <ClInclude Include="..\src\stb_image.h" />
+    <ClInclude Include="..\src\tex2f.h" />
     <ClInclude Include="..\src\texture.h" />
     <ClInclude Include="..\src\vec2f.h" />
     <ClInclude Include="..\src\vec2fPolar.h" />

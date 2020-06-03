@@ -22,7 +22,6 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "skybox.h"
-#include "sphere.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -61,7 +60,7 @@ Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
 Boat *boat2 = new Boat(boat2location, 0, 135, 1);
 Island *island = new Island();
-Island3D *island3D = new Island3D();
+Island3D* island3D;
 Seafloor *seafloor;
 Skybox *skybox;
 Random *random = new Random();
@@ -110,7 +109,7 @@ int main(int argc, char **argv)
 
     myinit();
 
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     glutReshapeFunc(myReshape);
     glutDisplayFunc(display);
@@ -136,6 +135,7 @@ void myinit()
 
     seafloor = new Seafloor(global.worldSize); // We have to initialise it here or at least import the texture here
     skybox = new Skybox();
+    island3D = new Island3D();
 
     // Set global start time
     global.startTime = glutGet(GLUT_ELAPSED_TIME) / (float)global.milli;
@@ -146,9 +146,9 @@ void myReshape(int w, int h)
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //gluPerspective(45.0, ((float)w / (float)h), 0.01, 100);
+    gluPerspective(45.0, ((float)w / (float)h), 0.01, 100);
 
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
+    //glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -170,22 +170,23 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glColor3f(0.8f, 0.8f, 0.8f);
-    // FPS Counter
-    glLoadIdentity();
-    displayFPS();
     glLoadIdentity();
 
-    // Draw Island OSD
-    island3D->drawHealth();
-    island3D->drawScore();
+    vec3fSpherical sph = {0.9, 0.0, 170.0 + island3D->cannonSph.polar};
+    vec3f xyz;
+    xyz = sphericalToCartesian(sph);
+    //printf("x: %f, y: %f, z: %f\n", xyz.x, xyz.y, xyz.z);
+
+    gluLookAt(xyz.x, 0.3, xyz.z, 0.0, 0.0, 0.0, xyz.x, 1.0, xyz.z);
+
+    GLfloat light_ambient[] = { 0.8, 0.8, 0.65, 0.75 };
+    GLfloat light_diffuse[] = { 0.8, 0.8, 0.65, 0.75 };
+    GLfloat light_position[] = { 1.0, 1.0, 0.8, 0.0 };
 
     if (global.lighting)
     {
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
-        GLfloat light_ambient[] = {0.8, 0.8, 0.65, 0.75};
-        GLfloat light_diffuse[] = {0.8, 0.8, 0.65, 0.75};
-        GLfloat light_position[] = {1.0, 1.0, 0.8, 0.0};
 
         glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -215,7 +216,7 @@ void display()
     seafloor->draw();
 
     // Draw Skybox
-    // skybox->draw();
+    skybox->draw();
 
     // Draw Wave
     glPushMatrix();
@@ -225,6 +226,10 @@ void display()
     if (global.lighting)
     {
         glEnable(GL_LIGHT0);
+
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     }
 
     // Draw 3D Island
@@ -323,6 +328,27 @@ void display()
 
     glDisable(GL_LIGHTING);
     glPopMatrix();
+
+    // Push forward a matrix so we can draw to the screen
+    glMatrixMode(GL_PROJECTION); // change the current matrix to PROJECTION
+    double matrix[16]; // 16 doubles in stack memory
+    glGetDoublev(GL_PROJECTION_MATRIX, matrix); // get the values from PROJECTION matrix to local variable
+    glLoadIdentity(); // reset PROJECTION matrix to identity matrix
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
+    glMatrixMode(GL_MODELVIEW); // change current matrix to MODELVIEW matrix again
+    glLoadIdentity(); // reset it to identity matrix
+    glPushMatrix(); // push current state of MODELVIEW matrix to stack
+
+    // Draw Island OSD
+    island3D->drawHealth();
+    island3D->drawScore();
+    displayFPS();
+
+    // Reset back
+    glPopMatrix(); // get MODELVIEW matrix value from stack
+    glMatrixMode(GL_PROJECTION); // change current matrix mode to PROJECTION
+    glLoadMatrixd(matrix); // reset
+    glMatrixMode(GL_MODELVIEW); // change current matrix mode to MODELVIEW
 
     glutSwapBuffers();
 
@@ -693,7 +719,6 @@ void keyPress(unsigned char key)
 void displayFPS()
 {
     colour col = {1.0, 1.0, 1.0, 1.0};
-
     // Display FPS Counter
     glPushMatrix();
     std::string text = "FPS: " + std::to_string((int)global.FPS);

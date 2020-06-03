@@ -7,37 +7,58 @@ Sphere::Sphere(float r, int stacks, int slices)
 
     this->r = r;
 
+    // Allocate arrays 
+    this->vertices = (vec3f**)calloc(stacks + 1, sizeof(vec3f*));
+    this->texes = (tex2f**)calloc(stacks + 1, sizeof(tex2f*));
+    for (int stack = 0; stack <= stacks; stack++) {
+        this->vertices[stack] = (vec3f*)calloc(slices + 1, sizeof(vec3f));
+        this->texes[stack] = (tex2f*)calloc(slices + 1, sizeof(tex2f));
+    }
+
+    // Initialise arrays
+    for (int stack = 0; stack <= stacks; stack++) {
+        float theta = stack * M_PI / (float)stacks;
+        for (int slice = 0; slice <= slices; slice++) {
+            float phi = slice * 2 * M_PI / (float)slices;
+
+            // Vertex coordinates
+            vec3f v;
+            v.x = r * sinf(theta) * cosf(phi);
+            v.z = r * sinf(theta) * sinf(phi);
+            v.y = r * cosf(theta);
+            this->vertices[stack][slice] = v;
+
+            // Texture coordinates
+            tex2f tc;
+            tc.u = 1 - (float)slice / (float)slices,
+            tc.v = 1 - (float)stack / (float)stacks;
+            this->texes[stack][slice] = tc;
+        }
+    }
+
 }
 
 void Sphere::draw()
 {
-    float theta, phi;
-    float x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4;
-    float step_theta = 2.0 * M_PI / slices, step_phi = M_PI / stacks;
+    glBegin(GL_QUADS);
+    for (int stack = 0; stack < this->stacks; stack++) {
+        for (int slice = 0; slice < this->slices; slice++) {
+            glTexCoord2fv((GLfloat*)& this->texes[stack][slice]);
+            glNormal3fv((GLfloat*)& this->vertices[stack][slice]);
+            glVertex3fv((GLfloat*)& this->vertices[stack][slice]);
 
-   // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    //  glBegin(GL_QUAD_STRIP) - mistake to put it here! Why?
-    for (int j = 0; j <= stacks; j++) {
-        phi = j / (float)stacks * M_PI;
-        glBegin(GL_QUAD_STRIP);
-        for (int i = 0; i <= slices; i++) {
-            theta = i / (float)slices * 2.0 * M_PI;
-            x1 = r * sinf(phi) * cosf(theta);
-            y1 = r * sinf(phi) * sinf(theta);
-            z1 = r * cosf(phi);
-            x2 = r * sinf(phi + step_phi) * cosf(theta);
-            y2 = r * sinf(phi + step_phi) * sinf(theta);
-            z2 = r * cosf(phi + step_phi);
-            glNormal3f(x1, y1, z1);
-            glVertex3f(x1, y1, z1);
-            glNormal3f(x2, y2, z2);
-            glVertex3f(x2, y2, z2);
+            glTexCoord2fv((GLfloat*)& this->texes[stack + 1][slice]);
+            glNormal3fv((GLfloat*)& this->vertices[stack + 1][slice]);
+            glVertex3fv((GLfloat*)& this->vertices[stack + 1][slice]);
+
+            glTexCoord2fv((GLfloat*)& this->texes[stack + 1][slice + 1]);
+            glNormal3fv((GLfloat*)& this->vertices[stack + 1][slice + 1]);
+            glVertex3fv((GLfloat*)& this->vertices[stack + 1][slice + 1]);
+
+            glTexCoord2fv((GLfloat*)& this->texes[stack][slice + 1]);
+            glNormal3fv((GLfloat*)& this->vertices[stack][slice + 1]);
+            glVertex3fv((GLfloat*)& this->vertices[stack][slice + 1]);
         }
-        glEnd();
     }
-    /*int i;
-    glBegin(GL_POLYGON);
-    for (i = 0; i < nv; i++)
-        glVertex3fv((float*)& vertices[i]);
-    glEnd();*/
+    glEnd();
 }

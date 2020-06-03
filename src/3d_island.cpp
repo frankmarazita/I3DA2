@@ -20,6 +20,7 @@ Island3D::Island3D()
     this->cannonGunBaseCylinder = new HalfCylinder(CANNON_BASE_HALF_CYLINDER_RADIUS, CANNON_BASE_HALF_CYLINDER_SIZE, 64);
 
     this->gunBox = new Rectangle3D(GUN_BOX_HEIGHT, CANNON_BASE_HALF_CYLINDER_RADIUS * 2, CANNON_BASE_HALF_CYLINDER_SIZE);
+    this->bottomCylinder = new Cylinder(ISLAND_BASE_RADIUS, 0.5, 64);
 }
 
 vec3f Island3D::endOfCannon()
@@ -54,19 +55,17 @@ Projectile3D* Island3D::shoot()
 
 void Island3D::draw()
 {
-    texture->enable();
 
-    glColor4f(col.r, col.g, col.b, col.a);
+    glColor4f(0.08, 0.08, 1.0, 1.0);
 
-    glColor3f(0.9, 0.8, 0.5);
+    //glColor3f(0.9, 0.8, 0.5);
 
     // Very very bottom cylinder
     glPushMatrix();
-    glTranslatef(0, -1, 0); // Start from the bottom
-    glRotatef(-90, 1.0, 0, 0);
+    glTranslatef(0, -1 + 0.25, 0); // Start from the bottom
 
-    GLUquadric *qobj = gluNewQuadric();
-    gluCylinder(qobj, ISLAND_BASE_RADIUS, ISLAND_BASE_RADIUS, 0.5, 40, 40);
+    bottomCylinder->draw();
+
     glPopMatrix();
 
     // Sphere
@@ -74,8 +73,31 @@ void Island3D::draw()
     glPushMatrix();
     glTranslatef(location.x, location.y, location.z); // 0.0, -0.5, 0.0
     glRotatef(-90, 1.0, 0, 0);
-    glutSolidSphere(ISLAND_BASE_RADIUS, 40, 40);
+    //glutSolidSphere(ISLAND_BASE_RADIUS, 40, 40);
+    texture->enable();
+    sphere->draw();
+    texture->disable();
     glPopMatrix();
+
+    //glDisable(GL_LIGHT0);
+    glEnable(GL_LIGHT2);
+    GLfloat light_ambient[] = { 0.1, 0.3, 0.6, 1.0 };
+    GLfloat light_diffuse[] = { 0.3, 0.3, 0.1, 1.0 };
+    GLfloat light_position[] = { 1.0, 0.0, 0.0, 0.0 };
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_emission[] = { -1.0, 0.0, -1.0, 1.0 };
+    GLfloat high_shininess[] = { 100.0 };
+
+    //glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
+    //glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+    glLightfv(GL_LIGHT2, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
 
     // Cylinder Base (Middle)
     glPushMatrix();
@@ -85,6 +107,11 @@ void Island3D::draw()
 
     // Origin of the gunbox
     float BOX_OFFSET = location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT + GUN_BOX_HEIGHT/2;
+
+    GLfloat light_ambient3[] = { 0.1, 0.3, 0.9, 1.0 };
+    GLfloat light_diffuse3[] = { 0.3, 0.3, 0.1, 1.0 };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient3);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_diffuse3);
 
     // Boxy box
     glPushMatrix();
@@ -120,12 +147,20 @@ void Island3D::draw()
     // Used for testing where the cannon is
     glPushMatrix();
     // End of cannon pos
-    drawDot(-CANNON_LENGTH, BOX_OFFSET + GUN_BOX_HEIGHT / 2 + CANNON_RADIUS, 0.0);
+    //drawDot(-CANNON_LENGTH, BOX_OFFSET + GUN_BOX_HEIGHT / 2 + CANNON_RADIUS, 0.0);
     vec3f end = endOfCannon();
     drawDot(end.x, end.y, end.z);
     glPopMatrix();
 
-    texture->disable();
+    GLfloat light_ambient2[] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat light_diffuse2[] = { 0.8, 0.8, 0.8, 1.0 };
+    GLfloat mat_emission2[] = { 0.0, 0.0, 0.0, 1.0 };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient2);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light_ambient2);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission2);
+
+    glDisable(GL_LIGHT2);
+    glEnable(GL_LIGHT0);
 }
 
 void Island3D::drawHealth()
@@ -183,7 +218,7 @@ void Island3D::tiltCannonDown()
     cannonSph.a -= CANNON_TILT_SPEED;
 }
 
-void Island3D::rotateCannonLeft()
+void Island3D::rotateCannonRight()
 {
     //printf("%f\n", cannonSph.polar);
     if (cannonSph.polar <= 0.0)
@@ -192,7 +227,7 @@ void Island3D::rotateCannonLeft()
     cannonSph.polar -= CANNON_ROTATION_SPEED;
 }
 
-void Island3D::rotateCannonRight()
+void Island3D::rotateCannonLeft()
 {
     //printf("%f\n", cannonSph.polar);
     if (cannonSph.polar >= 360.0)
