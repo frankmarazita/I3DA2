@@ -21,7 +21,6 @@ public:
 
 
 private:
-	Texture* texture;
 	float segments;
 	float radius;
 	float height;

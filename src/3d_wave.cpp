@@ -186,14 +186,17 @@ void Wave3D::toggleAnimation()
     animate = !animate;
 }
 
-void Wave3D::increaseNumSegments()
+void Wave3D::setNumSegments(int segments)
 {
-    numSegments *= 2;
-    segmentSize = windowSize * 2 / numSegments;
-    calcVerticies();
+    if (segments >= 4)
+    {
+        numSegments = segments;
+        segmentSize = windowSize * 2 / segments;
+        calcVerticies();
+    }
 }
 
-void Wave3D::decreaseNumSegments()
+/*void Wave3D::decreaseNumSegments()
 {
     // Halve the number of segments
     int newNumSegments = numSegments / 2;
@@ -205,7 +208,7 @@ void Wave3D::decreaseNumSegments()
         // Recalulate verticies
         calcVerticies();
     }
-}
+}*/
 
 void Wave3D::drawVector(vec3f point, vec3f m, float s, bool normalize)
 {

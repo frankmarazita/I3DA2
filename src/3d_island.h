@@ -41,7 +41,7 @@
 
 // Cannon cylinder, the actual gun
 #define CANNON_RADIUS 0.02
-#define CANNON_LENGTH 0.12
+#define CANNON_LENGTH 0.19
 
 // Island/cannon base holder cylinder
 // the one that pokes out from the island and the gun base sits on
@@ -65,7 +65,7 @@
 class Island3D
 {
 public:
-    Island3D();
+    Island3D(int segments);
     void draw();
     void drawHealth();
     void drawScore();
@@ -79,7 +79,7 @@ public:
     HalfCylinder *cannonGunBaseCylinder;
     Rectangle3D *gunBox;
 
-    Sphere *sphere = new Sphere(ISLAND_BASE_RADIUS, 40, 40);
+    Sphere* sphere;
 
     //vec2fPolar cannonYaw = { 0.4, 90 };
     //vec2fPolar cannonPitch = { 0.4, 90 };
@@ -110,6 +110,9 @@ public:
     //Projectile3D* shoot();
     Texture *texture;
     int time = 0;
+    void drawTrajectory(Wave3D * wave);
+
+    void setSegments(int segments);
 private:
     GLUquadric *qobj;
 
@@ -125,6 +128,15 @@ private:
     float defenceTime = -1;
 
     colour col = {0.9, 0.8, 0.5, 1.0};
+
+    vec3f r0 = { 0.0, 0.0, 0.0 }; // Initial position
+    vec3f v0 = { 0.0, 0.0, 0.0 }; // Initial velocity
+    vec3f r = { 0.0, 0.0, 0.0 };  // Drawn position
+    vec3f v = { 0.0, 0.0, 0.0 };  // Drawn velocity
+    float g = -0.25;
+
+    void resetTrajectoryData();
+    int segments;
 };
 
 #endif // THREE_D_ISLAND_H

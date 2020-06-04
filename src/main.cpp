@@ -32,6 +32,8 @@
 #include <vector>
 #include <string>
 
+#define DEFAULT_SEGMENTS 64
+
 typedef struct
 {
     int milli;
@@ -51,12 +53,13 @@ typedef struct
     float keyPressTime;
     float updateBoatTime;
     float boatCreationTime;
+    int segments;
 } global_t;
 
-global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1};
+global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1, 64};
 
 // Game objects
-Wave3D *wave = new Wave3D(global.worldSize, 64, 0.07, 9, 0.25 * M_PI, 0, -0.5);
+Wave3D *wave = new Wave3D(global.worldSize, DEFAULT_SEGMENTS, 0.07, 9, 0.25 * M_PI, 0, -0.5);
 vec2f boat1location = {-0.5, 0};
 Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
@@ -140,7 +143,7 @@ void myinit()
 
     seafloor = new Seafloor(global.worldSize); // We have to initialise it here or at least import the texture here
     skybox = new Skybox();
-    island3D = new Island3D();
+    island3D = new Island3D(DEFAULT_SEGMENTS);
     time = new Time();
 
     // Set global start time
@@ -195,27 +198,32 @@ void display()
     lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
     lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);*/
 
-    GLfloat light_ambient[] = {0.0, 0.0, 0.0, 1.0};
-    GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat mat_specular[] = {0.13, 0.13, 0.13, 1.0};
-    GLfloat light_position[] = {1.0, 1.0, 0.0, 0.0};
-    GLfloat mat_emission[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_specular[] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat light_position[] = { 0.5, 0.5, 0.0, 0.0 };
+    GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
 
     skybox->draw();
 
     if (global.lighting)
     {
         glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
     }
+    else
+    {
+        glDisable(GL_LIGHTING);
+    }
+
+    glEnable(GL_LIGHT0);
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -261,7 +269,19 @@ void display()
     // Draw 3D Island
     glPushMatrix();
     island3D->draw();
+    island3D->drawTrajectory(wave);
     glPopMatrix();
+
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHTING);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
+    }
+    else
+    {
+        glDisable(GL_LIGHTING);
+    }
 
     // Draw Island
     // island->draw();
@@ -277,6 +297,17 @@ void display()
          projectile != projectiles.end(); ++projectile)
     {
         (*projectile)->draw(wave);
+    }
+
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHTING);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
+    }
+    else
+    {
+        glDisable(GL_LIGHTING);
     }
 
     // Draw defences 3D
@@ -508,7 +539,7 @@ void update()
 
         boat3DLocation.y = wave->getYfromXZ(boat3DLocation.x, boat3DLocation.z);
 
-        Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45);
+        Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45, wave->getNumSegments());
         boats.push_back(boat3D);
 
         global.boatCreationTime = time->getTime();
@@ -769,6 +800,7 @@ void mouseFunction(int button, int state, int x, int y)
 
 void keyDown(unsigned char key, int x, int y)
 {
+    int numSegments;
     // Keyboard single presses, else require holding
     switch (key)
     {
@@ -797,10 +829,20 @@ void keyDown(unsigned char key, int x, int y)
         time->toggle();
         break;
     case 61: // Wave Segments (+)
-        wave->increaseNumSegments();
+        global.segments *= 2;
+        wave->setNumSegments(global.segments);
+        island3D->setSegments(global.segments);
         break;
     case 45: // Wave Segments (-)
-        wave->decreaseNumSegments();
+        // Halve the number of segments
+        numSegments = global.segments / 2;
+        // Check for minimum 4
+        if (numSegments >= 4)
+        {
+            global.segments = numSegments;
+            wave->setNumSegments(numSegments);
+            island3D->setSegments(numSegments);
+        }
         break;
     case 27: // ESC - Quit Game
         exit(EXIT_SUCCESS);
