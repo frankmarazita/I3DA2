@@ -1,17 +1,16 @@
 #include "3d_projectile.h"
 
-Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat, int boatNum)
+Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat, int segments)
 {
     this->location = location;
     this->spherical = spherical;
     this->isBoat = isBoat;
-    this->boatNum = boatNum;
 
     r0 = location;
     v0 = sphericalToCartesian(spherical);
     r = location;
     v = v0;
-    this->sphere = new Sphere(radius, 64, 64);
+    this->sphere = new Sphere(radius, segments, segments);
 }
 
 void Projectile3D::drawDot(float x, float y, float z)
@@ -89,9 +88,4 @@ bool Projectile3D::getCollision(float radius, vec2f location)
 bool Projectile3D::getIsBoat()
 {
     return isBoat;
-}
-
-int Projectile3D::getBoatNum()
-{
-    return boatNum;
 }

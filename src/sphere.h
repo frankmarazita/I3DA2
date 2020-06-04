@@ -21,6 +21,7 @@ class Sphere
 {
 public:
     Sphere(float r, int stacks, int slices);
+    ~Sphere();
 
     void draw();
 

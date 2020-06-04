@@ -65,7 +65,7 @@
 class Island3D
 {
 public:
-    Island3D();
+    Island3D(int segments);
     void draw();
     void drawHealth();
     void drawScore();
@@ -79,7 +79,7 @@ public:
     HalfCylinder *cannonGunBaseCylinder;
     Rectangle3D *gunBox;
 
-    Sphere *sphere = new Sphere(ISLAND_BASE_RADIUS, 40, 40);
+    Sphere* sphere;
 
     //vec2fPolar cannonYaw = { 0.4, 90 };
     //vec2fPolar cannonPitch = { 0.4, 90 };
@@ -111,6 +111,8 @@ public:
     Texture *texture;
     int time = 0;
     void drawTrajectory(Wave3D * wave);
+
+    void setSegments(int segments);
 private:
     GLUquadric *qobj;
 
@@ -134,6 +136,7 @@ private:
     float g = -0.25;
 
     void resetTrajectoryData();
+    int segments;
 };
 
 #endif // THREE_D_ISLAND_H

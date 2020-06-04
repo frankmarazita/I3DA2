@@ -38,6 +38,16 @@ Sphere::Sphere(float r, int stacks, int slices)
 
 }
 
+Sphere::~Sphere()
+{
+    for (int stack = 0; stack <= stacks; stack++) {
+        free(this->vertices[stack]);
+        free(this->texes[stack]);
+    }
+    free(this->vertices);
+    free(this->texes);
+}
+
 void Sphere::draw()
 {
     glBegin(GL_QUADS);

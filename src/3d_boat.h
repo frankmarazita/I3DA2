@@ -21,7 +21,7 @@
 class Boat3D
 {
 public:
-    Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg);
+    Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg, int segments);
 
     Projectile3D *shoot();
     void draw();
@@ -63,6 +63,8 @@ private:
     colour col = {1, 0, 0, 1};
 
     vec3fSpherical sphericalVec = {0.4, 45, 0.0};
+
+    int segments;
 };
 
 #endif // THREE_D_BOAT_H

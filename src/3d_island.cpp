@@ -12,17 +12,28 @@ void drawDot(float x, float y, float z)
     glPopMatrix();
 }
 
-Island3D::Island3D()
+Island3D::Island3D(int segments)
 {
     this->texture = new Texture("../src/sand.jpg");
-    this->cannon = new Cylinder(CANNON_RADIUS, CANNON_LENGTH, 64);
-    this->cannonBaseMiddle = new Cylinder(CANNON_BASE_CYLINDER_RADIUS, CANNON_BASE_CYLINDER_HEIGHT, 64);
-    this->cannonGunBaseCylinder = new HalfCylinder(CANNON_BASE_HALF_CYLINDER_RADIUS, CANNON_BASE_HALF_CYLINDER_SIZE, 64);
-
-    this->gunBox = new Rectangle3D(GUN_BOX_HEIGHT, CANNON_BASE_HALF_CYLINDER_RADIUS * 2, CANNON_BASE_HALF_CYLINDER_SIZE);
-    this->bottomCylinder = new Cylinder(ISLAND_BASE_RADIUS, 0.5, 64);
+    this->setSegments(segments);
 
     this->resetTrajectoryData();
+}
+
+void Island3D::setSegments(int segments)
+{
+    if (this->sphere)
+        delete this->sphere;
+
+    this->segments = segments;
+
+    this->sphere = new Sphere(ISLAND_BASE_RADIUS, segments, segments);
+    this->cannon = new Cylinder(CANNON_RADIUS, CANNON_LENGTH, segments);
+    this->cannonBaseMiddle = new Cylinder(CANNON_BASE_CYLINDER_RADIUS, CANNON_BASE_CYLINDER_HEIGHT, segments);
+    this->cannonGunBaseCylinder = new HalfCylinder(CANNON_BASE_HALF_CYLINDER_RADIUS, CANNON_BASE_HALF_CYLINDER_SIZE, segments);
+
+    this->gunBox = new Rectangle3D(GUN_BOX_HEIGHT, CANNON_BASE_HALF_CYLINDER_RADIUS * 2, CANNON_BASE_HALF_CYLINDER_SIZE);
+    this->bottomCylinder = new Cylinder(ISLAND_BASE_RADIUS, 0.5, segments);
 }
 
 void Island3D::resetTrajectoryData()
@@ -57,7 +68,7 @@ Projectile3D *Island3D::shoot()
         shootTime = this->time;
 
         // Create a new projectile and return it
-        Projectile3D *projectile = new Projectile3D(endOfCannon(), cannonSph, false, 0);
+        Projectile3D *projectile = new Projectile3D(endOfCannon(), cannonSph, false, segments);
         return projectile;
     }
     return NULL;

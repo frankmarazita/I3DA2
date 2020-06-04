@@ -31,6 +31,8 @@
 #include <vector>
 #include <string>
 
+#define DEFAULT_SEGMENTS 64
+
 typedef struct
 {
     int milli;
@@ -50,12 +52,13 @@ typedef struct
     float keyPressTime;
     float updateBoatTime;
     float boatCreationTime;
+    int segments;
 } global_t;
 
-global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1};
+global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1, 64};
 
 // Game objects
-Wave3D *wave = new Wave3D(global.worldSize, 64, 0.07, 9, 0.25 * M_PI, 0, -0.5);
+Wave3D *wave = new Wave3D(global.worldSize, DEFAULT_SEGMENTS, 0.07, 9, 0.25 * M_PI, 0, -0.5);
 vec2f boat1location = {-0.5, 0};
 Boat *boat1 = new Boat(boat1location, 0, 45, 0);
 vec2f boat2location = {0.5, 0};
@@ -138,7 +141,7 @@ void myinit()
 
     seafloor = new Seafloor(global.worldSize); // We have to initialise it here or at least import the texture here
     skybox = new Skybox();
-    island3D = new Island3D();
+    island3D = new Island3D(DEFAULT_SEGMENTS);
     time = new Time();
 
     // Set global start time
@@ -507,7 +510,7 @@ void update()
 
         boat3DLocation.y = wave->getYfromXZ(boat3DLocation.x, boat3DLocation.z);
 
-        Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45);
+        Boat3D *boat3D = new Boat3D(boat3DLocation, 0, 0, 45, wave->getNumSegments());
         boats.push_back(boat3D);
 
         global.boatCreationTime = time->getTime();
@@ -749,6 +752,7 @@ void mouseFunction(int button, int state, int x, int y)
 
 void keyDown(unsigned char key, int x, int y)
 {
+    int numSegments;
     // Keyboard single presses, else require holding
     switch (key)
     {
@@ -777,10 +781,20 @@ void keyDown(unsigned char key, int x, int y)
         time->toggle();
         break;
     case 61: // Wave Segments (+)
-        wave->increaseNumSegments();
+        global.segments *= 2;
+        wave->setNumSegments(global.segments);
+        island3D->setSegments(global.segments);
         break;
     case 45: // Wave Segments (-)
-        wave->decreaseNumSegments();
+        // Halve the number of segments
+        numSegments = global.segments / 2;
+        // Check for minimum 4
+        if (numSegments >= 4)
+        {
+            global.segments = numSegments;
+            wave->setNumSegments(numSegments);
+            island3D->setSegments(numSegments);
+        }
         break;
     case 27: // ESC - Quit Game
         exit(EXIT_SUCCESS);
