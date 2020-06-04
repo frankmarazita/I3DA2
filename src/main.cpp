@@ -196,8 +196,8 @@ void display()
     GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_specular[] = { 0.13, 0.13, 0.13, 1.0 };
-    GLfloat light_position[] = { 1.0, 1.0, 0.0, 0.0 };
+    GLfloat mat_specular[] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat light_position[] = { 0.5, 0.5, 0.0, 0.0 };
     GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
 
     skybox->draw();
@@ -205,15 +205,20 @@ void display()
     if (global.lighting)
     {
         glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
     }
+    else
+    {
+        glDisable(GL_LIGHTING);
+    }
+
+    glEnable(GL_LIGHT0);
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -259,7 +264,19 @@ void display()
     // Draw 3D Island
     glPushMatrix();
     island3D->draw();
+    island3D->drawTrajectory(wave);
     glPopMatrix();
+
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHTING);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
+    }
+    else
+    {
+        glDisable(GL_LIGHTING);
+    }
 
     // Draw Island
     // island->draw();
@@ -275,6 +292,17 @@ void display()
          projectile != projectiles.end(); ++projectile)
     {
         (*projectile)->draw(wave);
+    }
+
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHTING);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
+    }
+    else
+    {
+        glDisable(GL_LIGHTING);
     }
 
     // Draw defences 3D
@@ -418,7 +446,7 @@ void update()
     }
     island3D->time = time->getTime();
 
-    printf("time: %i %i\n", time->glutTime, time->getTime());
+    //printf("time: %i %i\n", time->glutTime, time->getTime());
 
     // Keypresses
     if (global.keyPressTime + 20 < time->getTime())

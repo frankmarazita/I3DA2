@@ -21,6 +21,16 @@ Island3D::Island3D()
 
     this->gunBox = new Rectangle3D(GUN_BOX_HEIGHT, CANNON_BASE_HALF_CYLINDER_RADIUS * 2, CANNON_BASE_HALF_CYLINDER_SIZE);
     this->bottomCylinder = new Cylinder(ISLAND_BASE_RADIUS, 0.5, 64);
+
+    this->resetTrajectoryData();
+}
+
+void Island3D::resetTrajectoryData()
+{
+    r0 = endOfCannon();
+    v0 = sphericalToCartesian(cannonSph);
+    r = endOfCannon();
+    v = v0;
 }
 
 vec3f Island3D::endOfCannon()
@@ -94,12 +104,12 @@ void Island3D::draw()
     glPopMatrix();
 
     //glDisable(GL_LIGHT0);
-    /*glEnable(GL_LIGHT2);
-    GLfloat light_ambient[] = { 0.1, 0.3, 0.6, 1.0 };
-    GLfloat light_diffuse[] = { 0.1, 0.3, 0.6, 1.0 };
-    GLfloat light_position[] = { 1.0, 0.0, 0.0, 0.0 };
+    glEnable(GL_LIGHT2);
+    GLfloat light_ambient[] = { 0.13, 0.32, 0.55, 1.0 };
+    GLfloat light_diffuse[] = { 0.13, 0.32, 0.55, 1.0 };
+    GLfloat light_position[] = { 0.0, 0.0, 0.0, 0.0 };
     GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_emission[] = { -1.0, 0.0, -1.0, 1.0 };
+    GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat high_shininess[] = { 100.0 };
 
     //glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
@@ -107,9 +117,10 @@ void Island3D::draw()
 
     glLightfv(GL_LIGHT2, GL_POSITION, light_position);
     glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);*/
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
 
-    glColor4f(0.1, 0.1, 0.8, 1.0);
+
+    glColor4f(0.13, 0.32, 0.55, 1.0);
 
     // Cylinder Base (Middle)
     glPushMatrix();
@@ -175,6 +186,45 @@ void Island3D::draw()
     glEnable(GL_LIGHT0);
 }
 
+void Island3D::drawTrajectory(Wave3D * wave)
+{
+    vec3f rTemp = r;
+    vec3f vTemp = v;
+
+    //drawDot(r.x, r.y, r.z);
+
+    // Turn off lighting because
+    glDisable(GL_LIGHTING);
+
+    // Draw velocity vector
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_LINE_STRIP);
+    glVertex3f(rTemp.x, rTemp.y, rTemp.z);
+    glVertex3f(v.x, rTemp.y, v.z);
+    glEnd();
+
+    // Draw Trajectory Curve
+    float t = 0.01;
+    // Wave intersection
+    float y = wave->getYfromXZ(rTemp.x, 0.0);
+
+    glColor3f(1.0, 1.0, 0.0);
+    glBegin(GL_LINE_STRIP);
+    while (rTemp.y > y)
+    {
+        rTemp.x += vTemp.x * t;
+        rTemp.y += vTemp.y * t;
+        rTemp.z += vTemp.z * t;
+        vTemp.y += g * t;
+
+        glVertex3f(rTemp.x, rTemp.y, rTemp.z);
+        y = wave->getYfromXZ(rTemp.x, rTemp.z);
+    }
+    glEnd();
+
+    glEnable(GL_LIGHTING);
+}
+
 void Island3D::drawHealth()
 {
     float x = -0.95 + 0.005 * 100;
@@ -220,6 +270,7 @@ void Island3D::tiltCannonUp()
         return;
 
     cannonSph.a += CANNON_TILT_SPEED;
+    this->resetTrajectoryData();
 }
 
 void Island3D::tiltCannonDown()
@@ -228,6 +279,7 @@ void Island3D::tiltCannonDown()
         return;
 
     cannonSph.a -= CANNON_TILT_SPEED;
+    this->resetTrajectoryData();
 }
 
 void Island3D::rotateCannonRight()
@@ -237,6 +289,7 @@ void Island3D::rotateCannonRight()
         cannonSph.polar = 360;
 
     cannonSph.polar -= CANNON_ROTATION_SPEED;
+    this->resetTrajectoryData();
 }
 
 void Island3D::rotateCannonLeft()
@@ -246,11 +299,13 @@ void Island3D::rotateCannonLeft()
         cannonSph.polar = 0.0;
 
     cannonSph.polar += CANNON_ROTATION_SPEED;
+    this->resetTrajectoryData();
 }
 
 void Island3D::increaseCannonPower()
 {
     cannonSph.magnitude += CANNON_POWER_INCREASE_FACTOR;
+    this->resetTrajectoryData();
 }
 
 void Island3D::decreaseCannonPower()
@@ -261,6 +316,7 @@ void Island3D::decreaseCannonPower()
         return;
     }
     cannonSph.magnitude -= CANNON_POWER_DECREASE_FACTOR;
+    this->resetTrajectoryData();
 }
 
 bool Island3D::collision(vec3f otherLocation, float otherRadius)
