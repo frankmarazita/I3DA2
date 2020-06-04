@@ -24,7 +24,7 @@ public:
     Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg, int segments);
 
     Projectile3D *shoot();
-    void draw();
+    void draw(bool showNormals);
 
     vec3f getLocation();
     vec3f getPrevLocation();

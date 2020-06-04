@@ -82,6 +82,42 @@ float calcVectorGrad(vec3f v1, vec3f v2)
     return m;
 }
 
+void drawVector(vec3f point, vec3f m, float s, bool normalize)
+{
+    vec3f endpoint = { 0, 0, point.z };
+
+    float mx = m.x;
+    float mz = m.z;
+
+    if (normalize)
+    {
+        glColor3f(0.0, 1.0, 0.0);
+        mx = -(1 / m.x);
+    }
+    else
+    {
+        glColor3f(1.0, 0.0, 0.0);
+    }
+
+    if (mx < 0)
+    {
+        endpoint.x = point.x - cos(atan(mx)) * s;
+        endpoint.y = point.y - sin(atan(mx)) * s;
+        endpoint = rotatePointX(point, endpoint, atan(mz));
+    }
+    else
+    {
+        endpoint.x = point.x + cos(atan(mx)) * s;
+        endpoint.y = point.y + sin(atan(mx)) * s;
+        endpoint = rotatePointX(point, endpoint, atan(mz));
+    }
+
+    glBegin(GL_LINE_STRIP);
+    glVertex3f(point.x, point.y, point.z);
+    glVertex3f(endpoint.x, endpoint.y, endpoint.z);
+    glEnd();
+}
+
 vec3f rotatePointZ(vec3f pivotPoint, vec3f rotatePoint, float angleRad)
 {
     float s = sin(angleRad);

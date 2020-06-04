@@ -7,7 +7,7 @@ Cylinder::Cylinder(float radius, float height, float segments)
 	this->segments = segments;
 }
 
-void Cylinder::draw()
+void Cylinder::draw(bool showNormals)
 {
 	float x, y, z;
 	float theta;

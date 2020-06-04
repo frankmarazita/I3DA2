@@ -23,7 +23,8 @@ public:
     Sphere(float r, int stacks, int slices);
     ~Sphere();
 
-    void draw();
+    void draw(bool showNormals);
+    void drawNormals(vec3f v);
 
 private:
     int stacks;

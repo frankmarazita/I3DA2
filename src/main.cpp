@@ -54,9 +54,10 @@ typedef struct
     float updateBoatTime;
     float boatCreationTime;
     int segments;
+    bool showNormals;
 } global_t;
 
-global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1, 64};
+global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1, 64, false};
 
 // Game objects
 Wave3D *wave = new Wave3D(global.worldSize, DEFAULT_SEGMENTS, 0.07, 9, 0.25 * M_PI, 0, -0.5);
@@ -246,7 +247,7 @@ void display()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Draw Axis
-    drawAxis(global.worldSize);
+    //drawAxis(global.worldSize);
 
     //glDisable(GL_LIGHT0);
     // Draw seafloor
@@ -268,7 +269,7 @@ void display()
 
     // Draw 3D Island
     glPushMatrix();
-    island3D->draw();
+    island3D->draw(global.showNormals);
     island3D->drawTrajectory(wave);
     glPopMatrix();
 
@@ -289,14 +290,14 @@ void display()
     // Draw AI Boats
     for (int i = 0; i < boats.size(); i++)
     {
-        boats[i]->draw();
+        boats[i]->draw(global.showNormals);
     }
 
     // Draw projectiles 3D
     for (std::list<Projectile3D *>::iterator projectile = projectiles.begin();
          projectile != projectiles.end(); ++projectile)
     {
-        (*projectile)->draw(wave);
+        (*projectile)->draw(wave, global.showNormals);
     }
 
     if (global.lighting)
@@ -817,6 +818,7 @@ void keyDown(unsigned char key, int x, int y)
         global.lighting = !global.lighting;
         break;
     case 'n': // Normals and Tangents
+        global.showNormals = !global.showNormals;
         wave->toggleNormal();
         wave->toggleTangent();
         break;

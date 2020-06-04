@@ -17,7 +17,7 @@ class HalfCylinder
 {
 public:
     HalfCylinder(float radius, float height, float segments);
-    void draw();
+    void draw(bool showNormals);
 
 
 private:
