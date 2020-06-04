@@ -66,7 +66,7 @@ class Island3D
 {
 public:
     Island3D(int segments);
-    void draw();
+    void draw(bool showNormals);
     void drawHealth();
     void drawScore();
 

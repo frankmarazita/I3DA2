@@ -24,7 +24,7 @@ Projectile3D *Boat3D::shoot()
     return NULL;
 }
 
-void Boat3D::draw()
+void Boat3D::draw(bool showNormals)
 {
     glPushMatrix();
 
@@ -107,7 +107,7 @@ void Boat3D::draw()
     glTranslatef(0.35, 0.25, 0.0);
     glRotatef(-90 + projectilePolar.angle, 0.0, 0.0, 1.0);
     Cylinder *cylinder = new Cylinder(0.1, 0.7, segments);
-    cylinder->draw();
+    cylinder->draw(showNormals);
     glPopMatrix();
 
     glPopMatrix();

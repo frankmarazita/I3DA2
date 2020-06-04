@@ -7,7 +7,7 @@ HalfCylinder::HalfCylinder(float radius, float height, float segments)
     this->segments = segments;
 }
 
-void HalfCylinder::draw()
+void HalfCylinder::draw(bool showNormals)
 {
     float x, y, z;
     float theta;

@@ -9,6 +9,7 @@
 #include "vec2fPolar.h"
 #include "vec3f.h"
 #include "vec3fSpherical.h"
+#include "opengl.h"
 
 #include <cmath>
 
@@ -26,5 +27,6 @@ vec3f rotatePointZ(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
 vec3f rotatePointY(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
 vec3f rotatePointX(vec3f pivotPoint, vec3f rotatePoint, float angleRad);
 vec3f sphericalToCartesian(vec3fSpherical spherical);
+void drawVector(vec3f point, vec3f m, float s, bool normalize);
 
 #endif // FUNCTIONS_H

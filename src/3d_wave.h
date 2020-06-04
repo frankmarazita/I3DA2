@@ -32,7 +32,6 @@ public:
 	void toggleTangent();
 	void toggleAnimation();
     void setNumSegments(int segments);
-	void drawVector(vec3f point, vec3f m, float s, bool normalize);
 
 private:
 	float windowSize;

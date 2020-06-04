@@ -17,7 +17,7 @@ class Cylinder
 {
 public:
 	Cylinder(float radius, float height, float segments);
-	void draw();
+	void draw(bool showNormals);
 
 
 private:

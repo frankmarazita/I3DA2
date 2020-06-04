@@ -13,20 +13,20 @@ Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat
     this->sphere = new Sphere(radius, segments, segments);
 }
 
-void Projectile3D::drawDot(float x, float y, float z)
+void Projectile3D::drawDot(float x, float y, float z, bool showNormals)
 {
     glPushMatrix();
     glColor3f(0.3, 0.3, 1.0);
     glTranslated(location.x, location.y, location.z);
-    sphere->draw();
+    sphere->draw(showNormals);
     glPopMatrix();
 }
 
 
-void Projectile3D::draw(Wave3D *wave)
+void Projectile3D::draw(Wave3D *wave, bool showNormals)
 {
     // Draw Projectile
-    drawDot(r.x, r.y, r.z);
+    drawDot(r.x, r.y, r.z, showNormals);
     // Draw Trajectory Curve, if boat
     if (isBoat) {
         vec3f rTemp = r;

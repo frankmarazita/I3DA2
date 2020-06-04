@@ -88,7 +88,7 @@ Defence3D *Island3D::defence()
     return NULL;
 }
 
-void Island3D::draw()
+void Island3D::draw(bool showNormals)
 {
 
     glColor4f(0.08, 0.08, 1.0, 1.0);
@@ -101,7 +101,7 @@ void Island3D::draw()
     glPushMatrix();
     glTranslatef(0, -1 + 0.25, 0); // Start from the bottom
 
-    bottomCylinder->draw();
+    bottomCylinder->draw(showNormals);
 
     glPopMatrix();
 
@@ -110,7 +110,7 @@ void Island3D::draw()
     glTranslatef(location.x, location.y, location.z); // 0.0, -0.5, 0.0
     glRotatef(-90, 1.0, 0, 0);
     //glutSolidSphere(ISLAND_BASE_RADIUS, 40, 40);
-    sphere->draw();
+    sphere->draw(showNormals);
     texture->disable();
     glPopMatrix();
 
@@ -136,7 +136,7 @@ void Island3D::draw()
     // Cylinder Base (Middle)
     glPushMatrix();
     glTranslatef(0, location.y + CANNON_BASE_CYLINDER_OFFSET_FROM_SPHERE + CANNON_BASE_CYLINDER_HEIGHT / 2, 0);
-    cannonBaseMiddle->draw();
+    cannonBaseMiddle->draw(showNormals);
     glPopMatrix();
 
     // Origin of the gunbox
@@ -161,7 +161,7 @@ void Island3D::draw()
     glRotatef(cannonSph.polar, 0.0, 1.0, 0.0);
     // Rotates the half cylinder so it's not sideways
     glRotatef(-90, 1.0, 0.0, 0.0);
-    cannonGunBaseCylinder->draw();
+    cannonGunBaseCylinder->draw(showNormals);
     glPopMatrix();
 
     // Cannon
@@ -175,7 +175,7 @@ void Island3D::draw()
     glRotatef(CANNON_PITCH_OFFSET + cannonSph.a, 0.0, 0.0, 1.0);
     // Shifts the cannon across after rotations so its centered inside the gun
     glTranslatef(0.0, CANNON_BASE_CYLINDER_HEIGHT / 2, 0.0);
-    cannon->draw();
+    cannon->draw(showNormals);
     glPopMatrix();
 
     // Used for testing where the cannon is
