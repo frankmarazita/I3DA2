@@ -17,10 +17,10 @@
 class Projectile3D
 {
 public:
-    Projectile3D(vec3f location, vec3fSpherical sphr, bool isBoat, int boatNum);
+    Projectile3D(vec3f location, vec3fSpherical sphr, bool isBoat, int segments);
 
-    void draw(Wave3D *wave);
-    void drawDot(float x, float y, float z);
+    void draw(Wave3D *wave, bool showNormals);
+    void drawDot(float x, float y, float z, bool showNormals);
 
     void updateProjectileState(float dt);
 
@@ -29,13 +29,10 @@ public:
 
     bool getCollision(float radius, vec2f location);
     bool getIsBoat();
-    int getBoatNum();
-
 private:
     vec3f location;
     vec3fSpherical spherical;
     bool isBoat;
-    int boatNum;
 
     Sphere *sphere;
 

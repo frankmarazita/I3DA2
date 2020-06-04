@@ -1,55 +1,56 @@
 #include "3d_projectile.h"
 
-Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat, int boatNum)
+Projectile3D::Projectile3D(vec3f location, vec3fSpherical spherical, bool isBoat, int segments)
 {
     this->location = location;
     this->spherical = spherical;
     this->isBoat = isBoat;
-    this->boatNum = boatNum;
 
     r0 = location;
     v0 = sphericalToCartesian(spherical);
     r = location;
     v = v0;
-    this->sphere = new Sphere(radius, 64, 64);
+    this->sphere = new Sphere(radius, segments, segments);
 }
 
-void Projectile3D::drawDot(float x, float y, float z)
+void Projectile3D::drawDot(float x, float y, float z, bool showNormals)
 {
     glPushMatrix();
-    glColor3f(1.0, 1.0, 1.0);
+    glColor3f(0.3, 0.3, 1.0);
     glTranslated(location.x, location.y, location.z);
-    sphere->draw();
+    sphere->draw(showNormals);
     glPopMatrix();
 }
 
 
-void Projectile3D::draw(Wave3D *wave)
+void Projectile3D::draw(Wave3D *wave, bool showNormals)
 {
     // Draw Projectile
-    glColor3f(1, 1, 1);
-    drawDot(r.x, r.y, r.z);
+    drawDot(r.x, r.y, r.z, showNormals);
+    // Draw Trajectory Curve, if boat
+    if (isBoat) {
+        vec3f rTemp = r;
+        vec3f vTemp = v;
 
-    // Draw Trajectory Curve
-    vec3f rTemp = r;
-    vec3f vTemp = v;
+        float t = 0.01;
+        // Wave intersection
+        float y = wave->getYfromXZ(rTemp.x, 0.0);
+        glDisable(GL_LIGHTING);
+        glColor3f(0.0, 1.0, 1.0);
+        glBegin(GL_LINE_STRIP);
+        while (rTemp.y > y)
+        {
+            rTemp.x += vTemp.x * t;
+            rTemp.y += vTemp.y * t;
+            rTemp.z += vTemp.z * t;
+            vTemp.y += g * t;
 
-    float t = 0.01;
-    // Wave intersection
-    float y = wave->getYfromXZ(rTemp.x, 0.0);
-    glBegin(GL_LINE_STRIP);
-    vec3f rotated;
-    while (rTemp.y > y)
-    {
-        rTemp.x += vTemp.x * t;
-        rTemp.y += vTemp.y * t;
-        rTemp.z += vTemp.z * t;
-        vTemp.y += g * t;
-
-        glVertex3f(rTemp.x, rTemp.y, rTemp.z);
-        y = wave->getYfromXZ(rTemp.x, rTemp.z);
+            glVertex3f(rTemp.x, rTemp.y, rTemp.z);
+            y = wave->getYfromXZ(rTemp.x, rTemp.z);
+        }
+        glEnd();
+        glEnable(GL_LIGHTING);
     }
-    glEnd();
 }
 
 void Projectile3D::updateProjectileState(float dt)
@@ -87,9 +88,4 @@ bool Projectile3D::getCollision(float radius, vec2f location)
 bool Projectile3D::getIsBoat()
 {
     return isBoat;
-}
-
-int Projectile3D::getBoatNum()
-{
-    return boatNum;
 }

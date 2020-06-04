@@ -10,15 +10,18 @@ Sphere::Sphere(float r, int stacks, int slices)
     // Allocate arrays 
     this->vertices = (vec3f**)calloc(stacks + 1, sizeof(vec3f*));
     this->texes = (tex2f**)calloc(stacks + 1, sizeof(tex2f*));
-    for (int stack = 0; stack <= stacks; stack++) {
+    for (int stack = 0; stack <= stacks; stack++)
+    {
         this->vertices[stack] = (vec3f*)calloc(slices + 1, sizeof(vec3f));
         this->texes[stack] = (tex2f*)calloc(slices + 1, sizeof(tex2f));
     }
 
     // Initialise arrays
-    for (int stack = 0; stack <= stacks; stack++) {
+    for (int stack = 0; stack <= stacks; stack++)
+    {
         float theta = stack * M_PI / (float)stacks;
-        for (int slice = 0; slice <= slices; slice++) {
+        for (int slice = 0; slice <= slices; slice++)
+        {
             float phi = slice * 2 * M_PI / (float)slices;
 
             // Vertex coordinates
@@ -38,11 +41,24 @@ Sphere::Sphere(float r, int stacks, int slices)
 
 }
 
-void Sphere::draw()
+Sphere::~Sphere()
+{
+    for (int stack = 0; stack <= stacks; stack++)
+    {
+        free(this->vertices[stack]);
+        free(this->texes[stack]);
+    }
+    free(this->vertices);
+    free(this->texes);
+}
+
+void Sphere::draw(bool showNormals)
 {
     glBegin(GL_QUADS);
-    for (int stack = 0; stack < this->stacks; stack++) {
-        for (int slice = 0; slice < this->slices; slice++) {
+    for (int stack = 0; stack < this->stacks; stack++)
+    {
+        for (int slice = 0; slice < this->slices; slice++)
+        {
             glTexCoord2fv((GLfloat*)& this->texes[stack][slice]);
             glNormal3fv((GLfloat*)& this->vertices[stack][slice]);
             glVertex3fv((GLfloat*)& this->vertices[stack][slice]);

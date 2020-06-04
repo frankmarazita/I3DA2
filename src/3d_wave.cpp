@@ -186,14 +186,17 @@ void Wave3D::toggleAnimation()
     animate = !animate;
 }
 
-void Wave3D::increaseNumSegments()
+void Wave3D::setNumSegments(int segments)
 {
-    numSegments *= 2;
-    segmentSize = windowSize * 2 / numSegments;
-    calcVerticies();
+    if (segments >= 4)
+    {
+        numSegments = segments;
+        segmentSize = windowSize * 2 / segments;
+        calcVerticies();
+    }
 }
 
-void Wave3D::decreaseNumSegments()
+/*void Wave3D::decreaseNumSegments()
 {
     // Halve the number of segments
     int newNumSegments = numSegments / 2;
@@ -205,43 +208,7 @@ void Wave3D::decreaseNumSegments()
         // Recalulate verticies
         calcVerticies();
     }
-}
-
-void Wave3D::drawVector(vec3f point, vec3f m, float s, bool normalize)
-{
-    vec3f endpoint = {0, 0, point.z};
-
-    float mx = m.x;
-    float mz = m.z;
-
-    if (normalize)
-    {
-        glColor3f(0.0, 1.0, 0.0);
-        mx = -(1 / m.x);
-    }
-    else
-    {
-        glColor3f(1.0, 0.0, 0.0);
-    }
-
-    if (mx < 0)
-    {
-        endpoint.x = point.x - cos(atan(mx)) * s;
-        endpoint.y = point.y - sin(atan(mx)) * s;
-        endpoint = rotatePointX(point, endpoint, atan(mz));
-    }
-    else
-    {
-        endpoint.x = point.x + cos(atan(mx)) * s;
-        endpoint.y = point.y + sin(atan(mx)) * s;
-        endpoint = rotatePointX(point, endpoint, atan(mz));
-    }
-
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(point.x, point.y, point.z);
-    glVertex3f(endpoint.x, endpoint.y, endpoint.z);
-    glEnd();
-}
+}*/
 
 void Wave3D::setLighting()
 {

@@ -1,12 +1,13 @@
 #include "3d_boat.h"
 
-Boat3D::Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg)
+Boat3D::Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg, int segments)
 {
     this->location = location;
     this->boatDeg = boatDeg;
     this->boatRotation = boatRotation;
     this->projectilePolar.angle = cannonDeg;
     this->initialCannonDeg = cannonDeg;
+    this->segments = segments;
 }
 
 Projectile3D *Boat3D::shoot()
@@ -17,13 +18,13 @@ Projectile3D *Boat3D::shoot()
         shootTime = this->time;
 
         // Create a new projectile and return it
-        Projectile3D *projectile = new Projectile3D(projectileOrigin, sphericalVec, true, 0);
+        Projectile3D *projectile = new Projectile3D(projectileOrigin, sphericalVec, true, segments);
         return projectile;
     }
     return NULL;
 }
 
-void Boat3D::draw()
+void Boat3D::draw(bool showNormals)
 {
     glPushMatrix();
 
@@ -105,8 +106,8 @@ void Boat3D::draw()
     glPushMatrix();
     glTranslatef(0.35, 0.25, 0.0);
     glRotatef(-90 + projectilePolar.angle, 0.0, 0.0, 1.0);
-    Cylinder *cylinder = new Cylinder(0.1, 0.7, 8);
-    cylinder->draw();
+    Cylinder *cylinder = new Cylinder(0.1, 0.7, segments);
+    cylinder->draw(showNormals);
     glPopMatrix();
 
     glPopMatrix();

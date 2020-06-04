@@ -31,9 +31,7 @@ public:
 	void toggleNormal();
 	void toggleTangent();
 	void toggleAnimation();
-	void increaseNumSegments();
-	void decreaseNumSegments();
-	void drawVector(vec3f point, vec3f m, float s, bool normalize);
+    void setNumSegments(int segments);
 
 private:
 	float windowSize;
