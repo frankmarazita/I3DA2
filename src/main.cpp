@@ -55,9 +55,10 @@ typedef struct
     float boatCreationTime;
     int segments;
     bool showNormals;
+    bool gameStarted;
 } global_t;
 
-global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1, 64, false};
+global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, true, false, -1, -1, -1, 64, false, false};
 
 // Game objects
 Wave3D *wave = new Wave3D(global.worldSize, DEFAULT_SEGMENTS, 0.07, 9, 0.25 * M_PI, 0, -0.5);
@@ -401,7 +402,22 @@ void display()
     displayFPS();
 
     // Paused Message
-    if (time->paused && global.runnning)
+    if (!global.gameStarted)
+    {
+        glPushMatrix();
+        std::string text = "Press SPACE to start...";
+        int len = text.length();
+        float dist = ((float)(len * 9) / global.windowWidth);
+        glTranslatef(-dist, 0.0, 0.0);
+        glColor3f(0.0, 0.0, 0.0);
+        glRasterPos2f(0, 0);
+        for (int i = 0; i < len; i++)
+            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
+        glPopMatrix();
+    }
+
+    // Paused Message
+    if (time->paused && global.runnning && global.gameStarted)
     {
         glPushMatrix();
         std::string text = "Paused";
@@ -730,6 +746,9 @@ void update()
         global.frames = 0;
     }
 
+    if (!global.gameStarted && !time->paused)
+        time->pause();
+
     glutPostRedisplay();
 }
 
@@ -826,9 +845,22 @@ void keyDown(unsigned char key, int x, int y)
         global.textures = !global.textures;
         break;
     case 'h': // Pause/Resume Game Animations
+        if (!global.gameStarted)
+            break;
         global.pause = !global.pause;
         wave->toggleAnimation();
         time->toggle();
+        break;
+    case 32:
+        if (!global.gameStarted)
+        {
+            global.gameStarted = true;
+            time->resume();
+        }
+        else
+        {
+            keyboard->keyDown(key);
+        }
         break;
     case 61: // Wave Segments (+)
         global.segments *= 2;
@@ -917,9 +949,12 @@ void keyPress(unsigned char key)
             island3D->tiltCannonDown();
             break;
         case 32: // Island Cannon Fire
-            proj = island3D->shoot();
-            if (proj)
-                projectiles.push_back(proj);
+            if (global.gameStarted)
+            {
+                proj = island3D->shoot();
+                if (proj)
+                    projectiles.push_back(proj);
+            }
             break;
         case 'v': // Island Cannon Defence
             defence = island3D->defence();
