@@ -23,6 +23,7 @@
 #include "mouse.h"
 #include "skybox.h"
 #include "time.h"
+#include "effect.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -75,6 +76,7 @@ Time *time;
 std::list<Projectile3D *> projectiles;
 std::list<Defence3D *> defences;
 std::vector<Boat3D *> boats;
+std::vector<Effect *> effects;
 
 // Application Functions
 void myinit();
@@ -315,6 +317,12 @@ void display()
         (*defence)->draw(wave);
     }
 
+    // Draw effects
+    for (int i = 0; i < effects.size(); i++)
+    {
+        effects[i]->draw();
+    }
+
     // // Draw Boat 1
     // glPushMatrix();
     // boat1->setLocation({boat1->getLocation().x,
@@ -391,6 +399,21 @@ void display()
     island3D->drawScore();
     displayFPS();
 
+    // Paused Message
+    if (time->paused && global.runnning)
+    {
+        glPushMatrix();
+        std::string text = "Paused";
+        int len = text.length();
+        float dist = ((float)(len * 9) / global.windowWidth);
+        glTranslatef(-dist, 0.0, 0.0);
+        glColor3f(0.0, 0.0, 0.0);
+        glRasterPos2f(0, 0);
+        for (int i = 0; i < len; i++)
+            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
+        glPopMatrix();
+    }
+
     // Game Over Message
     if (!global.runnning)
     {
@@ -444,12 +467,18 @@ void update()
 
     for (int i = 0; i < boats.size(); i++)
     {
-        Boat3D* boat = boats[i];
+        Boat3D *boat = boats[i];
         boat->time = time->getTime();
     }
     island3D->time = time->getTime();
 
-    //printf("time: %i %i\n", time->glutTime, time->getTime());
+    for (int i = 0; i < effects.size(); i++)
+    {
+        Effect *effect = effects[i];
+        effect->time = time->getTime();
+    }
+
+    // printf("time: %i %i\n", time->glutTime, time->getTime());
 
     // Keypresses
     if (global.keyPressTime + 20 < time->getTime())
@@ -563,6 +592,9 @@ void update()
             bool collision = island3D->collision(boat->getLocation(), boat->getHitboxRadius());
             if (collision)
             {
+                Effect *effect = new Effect(boat->getLocation(), time->getTime());
+                effects.push_back(effect);
+
                 boats.erase(boats.begin() + i);
                 island3D->damage();
                 break;
@@ -631,6 +663,9 @@ void update()
                 bool collision = boat->collision(location, radius);
                 if (collision)
                 {
+                    Effect *effect = new Effect(boat->getLocation(), time->getTime());
+                    effects.push_back(effect);
+
                     boats.erase(boats.begin() + i);
                     island3D->point();
                     erase = true;
@@ -661,14 +696,27 @@ void update()
         }
     }
 
-    if (!island3D->getAlive())
+    // Update Effects
+    for (int i = 0; i < effects.size(); i++)
     {
-        global.pause = true;
-        global.runnning = false;
+        effects[i]->update(dt);
     }
 
-    if (!global.pause)
+    for (int i = 0; i < effects.size(); i++)
     {
+        Effect *effect = effects[i];
+        if (effect->getNumParticles() == 0)
+        {
+            effects.erase(effects.begin() + i);
+            delete effect;
+            break;
+        }
+    }
+
+    if (!island3D->getAlive())
+    {
+        time->pause();
+        global.runnning = false;
     }
 
     // Counter
