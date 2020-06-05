@@ -2,6 +2,12 @@
 
 Sphere::Sphere(float r, int stacks, int slices)
 {
+    if (stacks > SPHERE_STACKS_MAX)
+        stacks = SPHERE_STACKS_MAX;
+
+    if (slices > SPHERE_SLICES_MAX)
+        slices = SPHERE_SLICES_MAX;
+
     this->stacks = stacks;
     this->slices = slices;
 

@@ -1,7 +1,6 @@
 #ifndef THREE_D_WAVE_H
 #define THREE_D_WAVE_H
 
-#include "vec2f.h"
 #include "vec3f.h"
 #include "colour.h"
 #include "functions.h"

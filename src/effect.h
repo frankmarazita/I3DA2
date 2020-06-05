@@ -28,7 +28,7 @@ public:
 private:
     Random *random = new Random();
 
-    const int numParticles = 50;
+    const int numParticles = 90;
     int creationTime;
 
     vec3f location;

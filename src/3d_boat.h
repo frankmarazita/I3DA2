@@ -1,20 +1,13 @@
 #ifndef THREE_D_BOAT_H
 #define THREE_D_BOAT_H
 
-#include "vec2f.h"
-#include "vec2fPolar.h"
 #include "vec3f.h"
-#include "colour.h"
 #include "functions.h"
-#include "projectile.h"
-#include "defence.h"
-#include "wave.h"
 #include "cylinder.h"
 #include "3d_projectile.h"
 #include "vec3fSpherical.h"
 
 #include <cmath>
-#include <list>
 
 #include "opengl.h"
 
@@ -55,7 +48,7 @@ private:
     float initialCannonDeg;
 
     float hitboxRadius = 1.1;
-    float scale = 0.05;
+    float scale = 0.07;
     int health = 1;
 
     const float cooldownTime = 2500;

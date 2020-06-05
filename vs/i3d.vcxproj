@@ -159,18 +159,14 @@
     <ClCompile Include="..\src\3d_island.cpp" />
     <ClCompile Include="..\src\3d_projectile.cpp" />
     <ClCompile Include="..\src\3d_wave.cpp" />
-    <ClCompile Include="..\src\boat.cpp" />
     <ClCompile Include="..\src\cylinder.cpp" />
-    <ClCompile Include="..\src\defence.cpp" />
     <ClCompile Include="..\src\effect.cpp" />
     <ClCompile Include="..\src\functions.cpp" />
     <ClCompile Include="..\src\half_cylinder.cpp" />
-    <ClCompile Include="..\src\island.cpp" />
     <ClCompile Include="..\src\keyboard.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\mouse.cpp" />
     <ClCompile Include="..\src\particle.cpp" />
-    <ClCompile Include="..\src\projectile.cpp" />
     <ClCompile Include="..\src\random.cpp" />
     <ClCompile Include="..\src\rectangle.cpp" />
     <ClCompile Include="..\src\seafloor.cpp" />
@@ -178,7 +174,6 @@
     <ClCompile Include="..\src\sphere.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
     <ClCompile Include="..\src\time.cpp" />
-    <ClCompile Include="..\src\wave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\3d_boat.h" />
@@ -186,19 +181,15 @@
     <ClInclude Include="..\src\3d_island.h" />
     <ClInclude Include="..\src\3d_projectile.h" />
     <ClInclude Include="..\src\3d_wave.h" />
-    <ClInclude Include="..\src\boat.h" />
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\cylinder.h" />
-    <ClInclude Include="..\src\defence.h" />
     <ClInclude Include="..\src\effect.h" />
     <ClInclude Include="..\src\functions.h" />
     <ClInclude Include="..\src\half_cylinder.h" />
-    <ClInclude Include="..\src\island.h" />
     <ClInclude Include="..\src\keyboard.h" />
     <ClInclude Include="..\src\mouse.h" />
     <ClInclude Include="..\src\opengl.h" />
     <ClInclude Include="..\src\particle.h" />
-    <ClInclude Include="..\src\projectile.h" />
     <ClInclude Include="..\src\random.h" />
     <ClInclude Include="..\src\rectangle.h" />
     <ClInclude Include="..\src\seafloor.h" />
@@ -212,7 +203,6 @@
     <ClInclude Include="..\src\vec2fPolar.h" />
     <ClInclude Include="..\src\vec3f.h" />
     <ClInclude Include="..\src\vec3fSpherical.h" />
-    <ClInclude Include="..\src\wave.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\src\sand.jpg" />

@@ -1,13 +1,9 @@
 #ifndef THREE_D_DEFENCE_H
 #define THREE_D_DEFENCE_H
 
-#include "vec2f.h"
-#include "vec2fPolar.h"
 #include "vec3f.h"
-#include "colour.h"
 #include "functions.h"
-#include "wave.h"
-#include "sphere.h"
+#include "3d_wave.h"
 #include "vec3fSpherical.h"
 
 #include <cmath>

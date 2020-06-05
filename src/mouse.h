@@ -1,8 +1,6 @@
 #ifndef MOUSE_H
 #define MOUSE_H
 
-#include "opengl.h"
-
 // We can't parse in class methods to GLUT so we have to make all these public
 
 class Mouse
