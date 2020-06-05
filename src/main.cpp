@@ -7,13 +7,9 @@
 #include "opengl.h"
 
 #include "vec2f.h"
-#include "vec2fPolar.h"
 #include "vec3f.h"
 #include "colour.h"
 
-#include "wave.h"
-#include "island.h"
-#include "boat.h"
 #include "3d_wave.h"
 #include "3d_island.h"
 #include "3d_boat.h"
@@ -62,11 +58,6 @@ global_t global = {1000, 1, 600, 600, true, 0.0, 0, 0.0, 1, 0.0, false, true, tr
 
 // Game objects
 Wave3D *wave = new Wave3D(global.worldSize, DEFAULT_SEGMENTS, 0.07, 9, 0.25 * M_PI, 0, -0.5);
-vec2f boat1location = {-0.5, 0};
-Boat *boat1 = new Boat(boat1location, 0, 45, 0);
-vec2f boat2location = {0.5, 0};
-Boat *boat2 = new Boat(boat2location, 0, 135, 1);
-Island *island = new Island();
 Island3D *island3D;
 Seafloor *seafloor;
 Skybox *skybox;
@@ -89,12 +80,7 @@ void keyDown(unsigned char key, int x, int y);
 void keyUp(unsigned char key, int x, int y);
 void keyPress(unsigned char key);
 void displayFPS();
-void updateProjectiles(float dt);
-void updateDefences(float dt);
-
-// Draw funcitons
-void drawAxis(float length);
-void drawCircle(vec2f location, float r);
+void condCheckLighting();
 
 // Calc functions
 float radToDeg(float rad);
@@ -169,6 +155,24 @@ void myReshape(int w, int h)
     global.windowHeight = h;
 }
 
+// Check whether or not to enable lighting again
+void condCheckLighting()
+{
+    GLfloat mat_specular[] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
+
+    if (global.lighting)
+    {
+        glEnable(GL_LIGHTING);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
+    }
+    else
+    {
+        glDisable(GL_LIGHTING);
+    }
+}
+
 void display()
 {
     // Error variable
@@ -187,19 +191,14 @@ void display()
     glColor3f(0.8f, 0.8f, 0.8f);
     glLoadIdentity();
 
+    // Moves the direction of the camera in line with the rotation of the cannon with an offset on the x axis
     vec3fSpherical sph = {0.9, 0.0, 165.0 + island3D->cannonSph.polar};
     vec3f xyz;
     xyz = sphericalToCartesian(sph);
-    //printf("x: %f, y: %f, z: %f\n", xyz.x, xyz.y, xyz.z);
 
     gluLookAt(xyz.x, 0.3, xyz.z, 0.0, 0.0, 0.0, xyz.x, 1.0, xyz.z);
 
-    /*lightingShader.setVec3("viewPos", camera.Position);
-    lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-    lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);*/
-
+    // Default lighting
     GLfloat light_ambient[] = {0.0, 0.0, 0.0, 1.0};
     GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
@@ -209,16 +208,7 @@ void display()
 
     skybox->draw();
 
-    if (global.lighting)
-    {
-        glEnable(GL_LIGHTING);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
-    }
-    else
-    {
-        glDisable(GL_LIGHTING);
-    }
+    condCheckLighting();
 
     glEnable(GL_LIGHT0);
 
@@ -247,10 +237,6 @@ void display()
     if (global.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // Draw Axis
-    //drawAxis(global.worldSize);
-
-    //glDisable(GL_LIGHT0);
     // Draw seafloor
     seafloor->draw();
 
@@ -259,34 +245,14 @@ void display()
     wave->drawAdvanced();
     glPopMatrix();
 
-    /*if (global.lighting)
-    {
-        glEnable(GL_LIGHT0);
-
-        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    }*/
-
     // Draw 3D Island
     glPushMatrix();
     island3D->draw(global.showNormals);
     island3D->drawTrajectory(wave);
     glPopMatrix();
 
-    if (global.lighting)
-    {
-        glEnable(GL_LIGHTING);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emission);
-    }
-    else
-    {
-        glDisable(GL_LIGHTING);
-    }
-
-    // Draw Island
-    // island->draw();
+    // The trajectory of the island re-enables lighting, check whether we disabled it
+    condCheckLighting();
 
     // Draw AI Boats
     for (int i = 0; i < boats.size(); i++)
@@ -324,64 +290,6 @@ void display()
     {
         effects[i]->draw();
     }
-
-    // // Draw Boat 1
-    // glPushMatrix();
-    // boat1->setLocation({boat1->getLocation().x,
-    //                     wave->getYfromX(boat1->getLocation().x)});
-    // boat1->setBoatDeg(wave->getGrad(boat1->getLocation().x));
-    // boat1->setScale(0.1);
-    // boat1->draw();
-    // glPopMatrix();
-    // // Draw Boat 1 Axis
-    // glPushMatrix();
-    // glTranslatef(boat1->getLocation().x, boat1->getLocation().y, 0.0);
-    // glRotatef(boat1->getBoatDeg(), 0, 0, 1.0);
-    // drawAxis(0.1);
-    // glPopMatrix();
-    // // Hitbox (Uncomment for visual)
-    // // drawCircle(boat1->getLocation(), boat1->getScale());
-
-    // // Draw Boat 2
-    // glPushMatrix();
-    // boat2->setLocation({boat2->getLocation().x,
-    //                     wave->getYfromX(boat2->getLocation().x)});
-    // boat2->setBoatDeg(wave->getGrad(boat2->getLocation().x));
-    // boat2->setScale(0.1);
-    // boat2->draw();
-    // glPopMatrix();
-    // // Draw Boat 2 Axis
-    // glPushMatrix();
-    // glTranslatef(boat2->getLocation().x, boat2->getLocation().y, 0.0);
-    // glRotatef(boat2->getBoatDeg(), 0, 0, 1.0);
-    // drawAxis(0.1);
-    // glPopMatrix();
-    // Hitbox (Uncomment for visual)
-    // drawCircle(boat2->getLocation(), boat2->getScale());
-
-    // Projectile creation location (Uncomment for visual)
-    // drawCircle(island->getCannonLocation(), 0.01);
-    // drawCircle(boat1->getCannonLocation(), 0.01);
-    // drawCircle(boat2->getCannonLocation(), 0.01);
-
-    // Draw Projectiles
-    /*if (island->getProjectileExists())
-        island->drawProjectile(wave);
-    if (boat1->getProjectileExists())
-        boat1->drawProjectile(wave);
-    if (boat2->getProjectileExists())
-        boat2->drawProjectile(wave);
-
-    // Draw Defences
-    if (boat1->getDefenceExists())
-        boat1->drawDefence(wave);
-    if (boat2->getDefenceExists())
-        boat2->drawDefence(wave);
-
-    // End Wireframe
-    if (global.wireframe)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    */
 
     glDisable(GL_LIGHTING);
     glPopMatrix();
@@ -932,10 +840,6 @@ void keyPressSpecial(int key)
             island3D->rotateCannonRight();
             break;
         }
-        /*default:
-            keyboard->keyDownSpecial(key);
-            break;
-        }*/
         glutPostRedisplay();
     }
 }
@@ -1025,86 +929,4 @@ void displayFPS()
     for (int i = 0; i < len; i++)
         glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text[i]);
     glPopMatrix();
-}
-
-void updateDefences(float dt)
-{
-    // // Update All Defences
-    // boat1->updateDefence(dt);
-    // boat2->updateDefence(dt);
-
-    // // Lambda function for collision detection
-    // auto defenceCollision = [&](std::list<Defence *> *defences) {
-    //     bool collision = false;
-
-    //     for (std::list<Defence *>::iterator d = defences->begin();
-    //          d != defences->end(); ++d)
-    //     {
-    //         vec2f location = (*d)->getLocation();
-    //         // Wave Collision
-    //         if (wave->getYfromX(location.x) >= location.y)
-    //         {
-    //             defences->erase(d);
-    //             collision = true;
-    //             break;
-    //         }
-    //     }
-
-    //     return collision;
-    // };
-
-    // // Lambda function calls for all defences
-    // if (boat1->getDefenceExists())
-    //     if (defenceCollision(boat1->getDefences()))
-    //         boat1->removeDefence();
-    // if (boat2->getDefenceExists())
-    //     if (defenceCollision(boat2->getDefences()))
-    //         boat2->removeDefence();
-}
-
-// Draw funcitons
-
-void drawAxis(float length)
-{
-    // X Axis
-    glColor3f(1, 0, 0);
-    glBegin(GL_LINES);
-    glVertex3f(0, 0, 0);
-    glVertex3f(length, 0, 0);
-    glEnd();
-
-    // Y Axis
-    glColor3f(0, 1, 0);
-    glBegin(GL_LINES);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, length, 0);
-    glEnd();
-
-    // Z Axis
-    glColor3f(0, 0, 1);
-    glBegin(GL_LINES);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, 0, length);
-    glEnd();
-    glColor3f(1, 1, 1);
-}
-
-void drawCircle(vec2f location, float r)
-{
-    const float numSegments = 50;
-
-    float x = location.x;
-    float y = location.y;
-
-    // Drawing segments of circle
-    glColor3f(1, 1, 1);
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < numSegments; i++)
-    {
-        float theta = 2.0 * M_PI * float(i) / float(numSegments);
-        float x1 = cos(theta) * r;
-        float y1 = sin(theta) * r;
-        glVertex2f(x1 + x, y1 + y);
-    }
-    glEnd();
 }

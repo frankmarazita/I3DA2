@@ -1,11 +1,11 @@
 #ifndef CYLINDER_H
 #define CYLINDER_H
 
-#include "vec2f.h"
-#include "vec2fPolar.h"
+#ifndef M_PI
+#define M_PI 3.141592653589793238463
+#endif
+
 #include "vec3f.h"
-#include "functions.h"
-#include "3d_wave.h"
 
 #include <cmath>
 #include <list>

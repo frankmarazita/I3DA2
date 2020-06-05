@@ -1,21 +1,19 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "vec2f.h"
-#include "vec2fPolar.h"
+#ifndef M_PI
+#define M_PI 3.141592653589793238463
+#endif
+
 #include "vec3f.h"
 #include "tex2f.h"
-#include "colour.h"
-#include "functions.h"
-#include "projectile.h"
-#include "defence.h"
-#include "wave.h"
-#include "cylinder.h"
 
 #include <cmath>
-#include <list>
 
 #include "opengl.h"
+
+#define SPHERE_STACKS_MAX 64
+#define SPHERE_SLICES_MAX 64
 
 class Sphere
 {
@@ -24,7 +22,6 @@ public:
     ~Sphere();
 
     void draw(bool showNormals);
-    void drawNormals(vec3f v);
 
 private:
     int stacks;
