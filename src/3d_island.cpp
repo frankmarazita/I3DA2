@@ -1,5 +1,25 @@
 #include "3d_island.h"
 
+Island3D::Island3D(int segments)
+{
+    this->texture = new Texture("../src/sand.jpg");
+    this->setSegments(segments);
+
+    this->resetTrajectoryData();
+}
+
+Island3D::~Island3D()
+{
+    delete texture;
+    delete qobj;
+    delete sphere;
+    delete cannon;
+    delete cannonBaseMiddle;
+    delete cannonGunBaseCylinder;
+    delete gunBox;
+    delete bottomCylinder;
+}
+
 // Util for debugging, remove later
 void drawDot(float x, float y, float z)
 {
@@ -12,18 +32,20 @@ void drawDot(float x, float y, float z)
     glPopMatrix();
 }
 
-Island3D::Island3D(int segments)
-{
-    this->texture = new Texture("../src/sand.jpg");
-    this->setSegments(segments);
-
-    this->resetTrajectoryData();
-}
-
 void Island3D::setSegments(int segments)
 {
     if (this->sphere)
         delete this->sphere;
+    if (this->cannon)
+        delete this->cannon;
+    if (this->cannonBaseMiddle)
+        delete this->cannonBaseMiddle;
+    if (this->cannonGunBaseCylinder)
+        delete this->cannonGunBaseCylinder;
+    if (this->gunBox)
+        delete this->gunBox;
+    if (this->bottomCylinder)
+        delete this->bottomCylinder;
 
     this->segments = segments;
 
@@ -116,12 +138,12 @@ void Island3D::draw(bool showNormals)
 
     //glDisable(GL_LIGHT0);
     glEnable(GL_LIGHT2);
-    GLfloat light_ambient[] = { 0.13, 0.32, 0.55, 1.0 };
-    GLfloat light_diffuse[] = { 0.13, 0.32, 0.55, 1.0 };
-    GLfloat light_position[] = { 0.0, 0.0, 0.0, 0.0 };
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat high_shininess[] = { 100.0 };
+    GLfloat light_ambient[] = {0.13, 0.32, 0.55, 1.0};
+    GLfloat light_diffuse[] = {0.13, 0.32, 0.55, 1.0};
+    GLfloat light_position[] = {0.0, 0.0, 0.0, 0.0};
+    GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat mat_emission[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat high_shininess[] = {100.0};
 
     //glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
     //glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
@@ -129,7 +151,6 @@ void Island3D::draw(bool showNormals)
     glLightfv(GL_LIGHT2, GL_POSITION, light_position);
     glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
-
 
     glColor4f(0.13, 0.32, 0.55, 1.0);
 
@@ -197,7 +218,7 @@ void Island3D::draw(bool showNormals)
     glEnable(GL_LIGHT0);
 }
 
-void Island3D::drawTrajectory(Wave3D * wave)
+void Island3D::drawTrajectory(Wave3D *wave)
 {
     vec3f rTemp = r;
     vec3f vTemp = v;

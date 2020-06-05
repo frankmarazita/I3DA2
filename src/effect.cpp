@@ -9,6 +9,7 @@ Effect::Effect(vec3f location, int creationTime)
 
 Effect::~Effect()
 {
+    delete random;
 }
 
 void Effect::generateParticles()

@@ -18,6 +18,7 @@ class Projectile3D
 {
 public:
     Projectile3D(vec3f location, vec3fSpherical sphr, bool isBoat, int segments);
+    ~Projectile3D();
 
     void draw(Wave3D *wave, bool showNormals);
     void drawDot(float x, float y, float z, bool showNormals);
@@ -29,6 +30,7 @@ public:
 
     bool getCollision(float radius, vec2f location);
     bool getIsBoat();
+
 private:
     vec3f location;
     vec3fSpherical spherical;
