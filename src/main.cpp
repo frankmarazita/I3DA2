@@ -200,12 +200,12 @@ void display()
     lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
     lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);*/
 
-    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_specular[] = { 0.2, 0.2, 0.2, 1.0 };
-    GLfloat light_position[] = { 0.5, 0.5, 0.0, 0.0 };
-    GLfloat mat_emission[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_ambient[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat mat_specular[] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat light_position[] = {0.5, 0.5, 0.0, 0.0};
+    GLfloat mat_emission[] = {0.0, 0.0, 0.0, 1.0};
 
     skybox->draw();
 
@@ -569,7 +569,7 @@ void update()
         {
             Boat3D *boat = boats[i];
 
-            float dist = 0.0007;
+            float dist = 0.0003;
 
             vec3f location = boat->getLocation();
             float destX = 0;
@@ -613,6 +613,7 @@ void update()
                 effects.push_back(effect);
 
                 boats.erase(boats.begin() + i);
+                delete boat;
                 island3D->damage();
                 break;
             }
@@ -641,6 +642,7 @@ void update()
 
         if (wave->getYfromXZ(location.x, location.z) > location.y)
         {
+            delete *d;
             defences.erase(d);
             break;
         }
@@ -657,6 +659,7 @@ void update()
 
         if (wave->getYfromXZ(location.x, location.z) > location.y)
         {
+            delete *p;
             projectiles.erase(p);
             break;
         }
@@ -667,6 +670,7 @@ void update()
             if (collision)
             {
                 island3D->damage();
+                delete *p;
                 projectiles.erase(p);
                 break;
             }
@@ -684,6 +688,7 @@ void update()
                     effects.push_back(effect);
 
                     boats.erase(boats.begin() + i);
+                    delete boat;
                     island3D->point();
                     erase = true;
                     break;
@@ -691,6 +696,7 @@ void update()
             }
             if (erase)
             {
+                delete *p;
                 projectiles.erase(p);
                 break;
             }
@@ -708,6 +714,7 @@ void update()
         }
         if (erase)
         {
+            delete *p;
             projectiles.erase(p);
             break;
         }

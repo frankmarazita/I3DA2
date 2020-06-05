@@ -8,6 +8,13 @@ Boat3D::Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDe
     this->projectilePolar.angle = cannonDeg;
     this->initialCannonDeg = cannonDeg;
     this->segments = segments;
+
+    this->cylinder = new Cylinder(0.1, 0.7, segments);
+}
+
+Boat3D::~Boat3D()
+{
+    delete cylinder;
 }
 
 Projectile3D *Boat3D::shoot()
@@ -106,7 +113,6 @@ void Boat3D::draw(bool showNormals)
     glPushMatrix();
     glTranslatef(0.35, 0.25, 0.0);
     glRotatef(-90 + projectilePolar.angle, 0.0, 0.0, 1.0);
-    Cylinder *cylinder = new Cylinder(0.1, 0.7, segments);
     cylinder->draw(showNormals);
     glPopMatrix();
 

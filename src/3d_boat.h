@@ -22,6 +22,7 @@ class Boat3D
 {
 public:
     Boat3D(vec3f location, float boatDeg, float boatRotation, float cannonDeg, int segments);
+    ~Boat3D();
 
     Projectile3D *shoot();
     void draw(bool showNormals);
@@ -54,7 +55,7 @@ private:
     float initialCannonDeg;
 
     float hitboxRadius = 1.1;
-    float scale = 0.1;
+    float scale = 0.05;
     int health = 1;
 
     const float cooldownTime = 2500;
@@ -65,6 +66,8 @@ private:
     vec3fSpherical sphericalVec = {0.4, 45, 0.0};
 
     int segments;
+
+    Cylinder *cylinder;
 };
 
 #endif // THREE_D_BOAT_H
