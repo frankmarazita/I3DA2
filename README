@@ -1,0 +1,42 @@
+I3D Assignment 02 - Island Defence 3D
+
+Worked as a pair:
+s3717437 - Frank Marazita - 50% contribution
+s3719157 - Thomas Bobbera - 50% contribution
+
+Running instructions:
+- Visual Studio project made for Windows, open solution in vs/ folder
+- Made using VS project template we were given in one of the labs for working on Windows
+- Run the VS program and build
+- Exe won't display textures correctly if the program is not run through VS, unless placed (with freeglut.dll) inside vs/ folder due to the working directory on VS
+- Program will run fine if run through VS however
+
+Controls are the same as requested.
+
+Features implemented:
+- PA: baseline:
+	- Boats on flat 3D water and 3D island with scene lighting and interactive viewer/camera controls.
+	- Wireframe/filled rendering controls
+	- Normal/tangent visualisation
+	- Tesselation controls
+- CR: PA baseline plus:
+	- Boats spawning with simple AI directing them towards the island, firing cannonballs with projectile motion.
+	- Island cannon able to fire a cannon under interactive user control.
+	- Projectile trajectory rendering
+	- Cannonball collision detection
+	- Boat and island health
+- DI: CR plus
+	- Static 3D sine wave water
+	- Island collision detection
+	- Island texturing
+- HD: DI plus
+	- Animated sine wave water.
+	- Polished gameplay, multiple missiles, cooldown, advanced rendering, OSD, missle defence, complex water.
+	- Correct 3D cannonball firing from boat, taking in to account boat rotation.
+	- Use of arrays to store vertex data.
+	- Advanced Features implemented:
+		- Particle effects
+		- Skybox
+
+Cannonballs shoot out of turret.
+Seafloor implemented.
